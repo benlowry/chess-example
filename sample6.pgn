@@ -1,0 +1,61 @@
+[Event "USA-01 Morphy Casual Games"]
+[Site "New York,NY"]
+[Date "1857.10.11"]
+[Round "?"]
+[White "Marache, Napoleon"]
+[Black "Morphy, Paul"]
+[Result "0-1"]
+[ECO "C52"]
+[Annotator "ChessBase"]
+[PlyCount "40"]
+[EventDate "1857.10.??"]
+[EventType "game"]
+[EventCountry "USA"]
+[SourceTitle "EXT 2004"]
+[Source "ChessBase"]
+[SourceDate "2003.11.25"]
+
+{Paul Morphy for those who don't know was the most dominant player of his
+lifetime. He only played competitively until his early 20's but he set the
+chess world ablaze. This game is a good example of his domination and you will
+not forget the finish!} 1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. b4 Bxb4 5. c3 Ba5 6.
+d4 exd4 7. e5 $2 {[%csl Re5] This is an absolutely awful move. In an opening
+like the Evans gambit there is absolutely no time to waste at all. Rather than
+develop or castle, white overextends their center and gives black time to hit
+back in the center.} (7. Qb3 {This is also a good move. I have played this
+several times myself. It has the benefit of avoiding the more explored
+variations that start with 7. 0-0.} Qe7 8. O-O Bb6 9. cxd4 {With compensation.}
+) (7. O-O {Paul Morphy played this move frequently with the white pieces and
+did exceptionally with it. It is very principled. White takes care of the king
+and can recapture on the following turn with cxd4 building a powerful center.}
+dxc3 $6 {This is an ill-advised pawn grab. White gets more than enough
+compensation for the current 3 pawn deficit. Often times black will not
+survive the opening after...} (7... Nge7 8. cxd4 d5 9. exd5 Nxd5 {This is a
+much better defense for black.}) 8. Qb3 $1 Qe7 $2 {This natural move has led
+to many miniatures.} 9. Nxc3 Nf6 10. Nd5 $1 {With an irresistible attack.})
+7... d5 $1 8. exd6 Qxd6 (8... cxd6 $1 {The computer likes this option for
+black in order to play d5 a second time. That will effectively shut down
+white's bishop and keep black up a healthy extra pawn.} 9. O-O d5 $1 10. Bb5 {
+[%cal Ge1e8]} Nge7 {[%csl Ye7][%cal Ge8g8]}) 9. O-O Nge7 10. Ng5 $4 {[%csl Ra1,
+Rb1,Rc1] Another slow move from white which completely abandons control of the
+center. White is giving up any hope of winning back the central pawn or
+developing the queenside in the near future. It is almost never a good idea to
+attack with so few pieces.} (10. Ba3 $1 {This would have given white some
+compensation for the pawn deficiency.} Qf6 $1 $17 {Black is still doing well
+here though.}) 10... O-O {[%csl Ga5,Gc6,Gd6,Ge7] Black is two pawns up with
+the better development! This is the reverse of how a gambit is supposed to go!}
+11. Bd3 (11. Qh5 {Perhaps white thought he had this move available but black
+has it well covered.} Qg6 $1 12. Qxg6 Nxg6 {White is busted.}) 11... Bf5 (11...
+h6 {This also would have been very strong.}) 12. Bxf5 Nxf5 13. Ba3 Qg6 14. Bxf8
+Qxg5 15. Ba3 (15. Bb4 $1 $19 {White is still lost but this was the best hope.
+With an exchange of pieces and change of pawn structure on the queenside,
+white could hope to complete development. The move played in the game leaves
+white hopelessly lagging behind.} Nh4 $1 16. g3 Bb6 {[%cal Gb6g1]}) 15... dxc3
+{[%csl Ra1,Rb1,Rd1,Rf1] The exchange that white managed to win back was hardly
+any consolation for the complete neglect of development. Black has a winning
+position here but the way Morphy wraps it up is something you will never
+forget!} (15... Nh4 {Black could have gone for this as well but it wouldn't
+have changed much.} 16. g3 dxc3 $19) 16. Bc1 {[%csl Ra1,Ga5,Rb1,Rc1,Gc6,Rd1,
+Rf1,Gf5,Gg5] A very telling position. After 16 moves, all of white's pieces
+are on the first rank.} Qg6 17. Bf4 Rd8 18. Qc2 Ncd4 19. Qe4 Ng3 $3 20. Qxg6
+Nde2# {That might be the most beautiful mate ever played!} 0-1

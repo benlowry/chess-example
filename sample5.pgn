@@ -1,0 +1,60 @@
+[Event "URS-ch24"]
+[Site "Moscow"]
+[Date "1957.??.??"]
+[Round "18"]
+[White "Gurgenidze, Bukhuti"]
+[Black "Tal, Mihail"]
+[Result "0-1"]
+[ECO "A78"]
+[Annotator "Mac"]
+[PlyCount "58"]
+[EventDate "1957.01.24"]
+[EventType "tourn"]
+[EventRounds "21"]
+[EventCountry "URS"]
+[SourceTitle "URS-ch"]
+[Source "ChessBase"]
+[SourceDate "1999.07.01"]
+
+{This is one of Tal's most famous games. It was played against Gurgenidze in
+the 1957 Soviet Championship. This was of course one of the strongest
+tournaments in the world at that time and all contestants were among the
+finest players at that time. Despite this, Tal rolled through his opponent in
+this game. He supposedly said that the first thing he looks for in any
+position is if he can sacrifice his queen. After seeing games like this I want
+to believe him.} 1. d4 Nf6 2. c4 c5 3. d5 {[%cal Rd5c6]} e6 4. Nc3 exd5 5. cxd5
+d6 6. Nf3 g6 7. e4 Bg7 8. Be2 O-O 9. O-O {[%cal Yb8d7,Yc8d7] Black's pieces in
+the Benoni often fight over the d7 square. I like the idea of black playing
+Bg4 here to eliminate one of black's clumsy pieces.} Re8 {[%cal Ye8e4]} (9...
+Bg4 $5 10. h3 Bxf3 11. Bxf3 Nbd7 {[%cal Ya7a6,Yf6e8,Ye8c7,Yb7b5]}) 10. Nd2 $1 {
+[%cal Ye2g4,Yd2e4,Yc3e4]} Na6 (10... a6 {Black can also try this plan but it's
+a bit too congested on the queenside to realistically expect black to be able
+to play b7-b5.} 11. a4 {[%cal Yd2c4,Yc1f4,Ya4b5]} Bd7 {[%csl Rb8]}) 11. Re1 (
+11. a4 $6 {[%csl Yb4][%cal Ya6b4]}) 11... Nc7 12. a4 b6 (12... a6 13. a5 $5 {
+[%cal Yd2c4,Yc4b6]}) 13. Qc2 (13. h3 $5 {As I mention in the video, I think
+this could be considered a more modern way to approach this variation. Black
+doesn't have a clear way to continue knocking on the white center here. In
+positions like this sometimes black will play g5 and play on the dark-squares
+but of course this is somewhat weakening.}) 13... Ng4 14. h3 $4 {Tal also
+jokingly stated that when he learned chess, he learned that knights don't move
+backwards. I really have to wonder what Gurgenidze was thinking here. To
+provoke Tal into a sacrifice such as the one played in the game is a crazy
+decision.} (14. Bxg4 $1 {This was absolutely the best course of action here.
+White still has an advantage after...} Bxg4 15. Nc4 $14 Bc8 16. Bf4 Bf8 $14)
+14... Nxf2 $1 15. Kxf2 $4 (15. Nf3 {White needed to accept the loss of
+material with this move, in order to keep his king safe.} Bxc3 16. bxc3 Nxe4
+17. Bd3 Nf6 $17) 15... Qh4+ 16. Kf1 Bd4 {[%cal Rh4f2,Rd4f2]} 17. Nd1 {[%csl
+Rd4,Rf2,Rg1][%cal Rd4g1]} Qxh3 $3 {[%cal Yc8h3,Yd4g1]} 18. Bf3 {[%cal Yf1e2]} (
+18. gxh3 Bxh3# {[%cal Gd4g1,Gh3f1]}) 18... Qh2 $1 (18... Qh1+ 19. Ke2 $1 {
+[%cal Ye1h1]}) 19. Ne3 {[%csl Ra8,Rc7,Rc8] Black has some inactive pieces and
+in order to finish off the attack, Tal needs to bring them in the game.} f5 $1
+20. Ndc4 (20. exf5 {[%cal Ye8e3]}) 20... fxe4 21. Bxe4 Ba6 {[%cal Ya6f1,Yd4g1]}
+22. Bf3 Re5 {[%csl Ra8][%cal Ra8e8,Re8f8]} (22... g5 $1 {This was also very
+strong!} 23. b3 (23. Rb1 g4 24. Bxg4 Nxd5) 23... g4 24. Bxg4) 23. Ra3 {[%cal
+Ra8e8,Re8f8]} Rae8 24. Bd2 Nxd5 25. Bxd5+ (25. Nxd5 Qg1#) 25... Rxd5 26. Ke2 {
+[%csl Rc4,Re3]} (26. Nxd5 Qg1#) 26... Bxe3 27. Rxe3 Bxc4+ {[%csl Rd2] This is
+where Gurgenidze resigned although if you play out the variation you will see
+why. An awesome game! Tal knew exactly when it was time to improve his pieces
+and when it was time to strike. A great example of attacking chess.} 28. Qxc4 (
+28. Kd1 Rxe3 29. Rxe3 Qg1+ 30. Re1 Qf2 31. Kc1 Bb3 32. Qc3 Qxe1+ 33. Bxe1 Rd1#)
+28... Qxg2+ 29. Kd1 Qxd2# 0-1

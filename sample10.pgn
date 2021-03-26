@@ -1,0 +1,87 @@
+[Event "?"]
+[Site "https://lichess.org/FXsStJfd"]
+[Date "2020.10.27"]
+[Round "?"]
+[White "Elizabeth Harmon"]
+[Black "Vasily Borgov"]
+[Result "1-0"]
+[ECO "D20"]
+[PlyCount "105"]
+[EventDate "2020.??.??"]
+[SourceDate "2014.01.17"]
+
+{Can this be called the most famous game ever played? Maybe. With the netlfix
+shows popularity this may actually the most massively seen chess game in
+history. It's certainly a great game and finale to the show.} 1. d4 d5 2. c4
+dxc4 3. e4 Nc6 4. Be3 Nf6 5. Nc3 e5 6. d5 Ne7 (6... Na5 $1 {[%csl Ra5,Re8]} 7.
+Qa4+ $1 {[%cal Gd8a5,Ra4a5,Ra4e8]} (7. Nf3 $2 Bd6 8. Qa4+ Bd7 $1 {This
+spectacular move nearly buries the white queenside on the queenside.} 9. Qxa5
+a6 $1 {[%cal Rb7b6]} 10. Na4 $1 {[%csl Ra5,Re1]} Qe7 {[%csl Ra5,Re1][%cal
+Re7b4]} 11. a3 Nxe4 12. Bxc4 O-O 13. O-O b5 {Black has the better game here.})
+7... c6 $1 (7... Bd7 {Although this works after 7. Nf3 and 8. Qa4+, it is not
+as good of an option now.} 8. Qxa5 a6 9. Nb1 $14) 8. dxc6 Nxc6 9. Bxc4 Bb4 10.
+Nf3 Bd7 11. O-O {With an equal position.}) 7. Bxc4 Ng6 8. f3 Bd6 {White has a
+solid space advantage but black is not too cramped and has a relatively
+comfortable position.} 9. Qd2 Bd7 10. Nge2 a6 11. Bb3 b5 12. a4 {[%cal Ga4b5,
+Ga1a8] This is a common pawn lever against the a6+b5 pawn structure. White
+controls when the a-file opens up.} O-O $1 (12... bxa4 $2 13. Bxa4 $16 {
+Black's a-pawn in particular would be extremely weak here.}) 13. O-O Qe7 (13...
+Nh5 {[%cal Yh5f4,Yd8g5] This plan was played on the next move but it's already
+a good time for it here. If the knight makes it to f4, black may even consider
+Qg5 after that.}) 14. Rac1 Nh5 15. g3 {[%csl Yg3][%cal Yg3f4]} h6 16. Bc2 Rab8
+{It's hard for either side to make meaningful improvements at this point, so
+there is a bit of a waiting game taking place now.} 17. axb5 axb5 18. Ra1 Ra8 (
+18... Bh3 $5 19. Rf2 $1) 19. Bd3 Bb4 $6 {The bishop is not helpful here. The
+pin is inconsequential.} (19... Rxa1 $1 20. Rxa1 {[%csl Gf3]} Qf6 {[%csl Rf3]
+[%cal Rf6f3] The computer recommends this idea with pressure against the
+f-pawn. A person would hesitate to do this because it blocks black's f-pawn,
+preventing a natural pawn break that black may want to use.}) 20. Rxa8 Rxa8 21.
+Qc2 {[%csl Gc7][%cal Gc2c7]} (21. Nc1 $1 {[%csl Yc5][%cal Yc1b3,Yd2f2]}) 21...
+Bc5 {[%cal Rc5e3,Re3g1]} 22. Nd1 $1 {[%csl Gc5][%cal Ge3c5,Gc2c5]} Bd6 $1 (
+22... Bxe3+ 23. Nxe3 {[%csl Rc7][%cal Gf1c1,Gc1c7]}) 23. Nf2 $2 (23. Nc1 $1)
+23... Nhf4 $1 {[%cal Gf4h3,Gf4g2,Gf4e2,Gf4d3]} 24. Rc1 $6 (24. gxf4 exf4 25.
+Bc1 Nh4 $1 $13 {[%cal Rh4f3]}) 24... Qg5 25. Kh1 Qh5 {[%cal Rh5f3,Rf3g2]} 26.
+Ng1 {[%cal Yg1f3]} Nxd3 27. Nxd3 f5 $1 {Softening up white's central grip and
+preparing to open the file or even expand further with f5-f4 at the right
+moment.} 28. Nc5 Bc8 29. Rf1 $2 {[%cal Yg6f4,Yg6h4,Yg3f4,Yg3h4]} (29. Qe2 Rb8)
+29... Ne7 (29... Nf8 $1 {[%cal Gf8h7,Gh7f6] Black would like to bring the
+knight to f6 in order to pressure the e4 pawn and set up moves like Ng4 at an
+ideal moment.}) 30. Qd3 fxe4 31. fxe4 Qg6 $6 (31... Kh7 $1 {[%cal Ge7g8,Gg8f6]
+Once again the idea of preparing the knight to go to f6 was powerful. We can
+see here that without white's pawn on f3, black's knight on f6 will be a great
+piece. It threatens e4 but also Nf6-g4 with pressure against h2 and e3.}) 32.
+Kg2 Kh7 33. Nf3 Ng8 34. Nh4 (34. h3 $5 Bxc5 35. Bxc5 Nf6 $15) 34... Qg4 35. Nf5
+Nf6 $2 {Mistake. Ra2 was best.} (35... Ra2 $1 {[%cal Ra2g2] This would have
+been strong. The rook certainly belongs on the second rank. It's a natural
+move with plenty of targets.} 36. Qb1 {Perhaps black was concerned about this.}
+Qe2+ $1 37. Rf2 Qc4 $15 {This keeps black's pieced connected and white's
+pieces tied down.}) 36. h3 {In the show the game was adjourned here and had
+actually been following a game played in 1993 at the Biel Interzonal between
+Ivanchuk and Wolff. Interestingly Ivanchuk's first name is Vassily and Wolff
+is an American GM, so the roles have been reversed!} Qg6 37. Ne6 Ra4 38. b3
+Rxe4 39. Nxd6 Bxe6 40. dxe6 cxd6 41. e7 d5 {At this point in the show it is
+clear that this is not a move that Beth anticipated in her home analysis.
+She's caught off guard but it sets up the situation in a way that both players
+are able to play freely from here with no preparation, letting the best player
+win.} 42. Bc5 {[%cal Gc5e7,Gb3b4]} Qe8 43. Qf3 Qc6 44. b4 Qe8 $4 {Upon playing
+this move, Borgov says "Draw?" The commentators of the game point out that if
+Beth accepts, she will be tying the World Champion and that it would be a
+great result. They also remak that Borgov is deadly in endgames, however Beth
+correctly decides to play on. As it turns out, Qe8 is actually a losing move.
+Now Beth finds the accurate continuation...} (44... Kh8 {Something not too
+committal like this would have been a better option. There isn't much black
+can do to improve their position, but in any case it would be helpful to avoid
+checks on the f5 square.}) 45. Qf5+ Kh8 {[%csl Rf8]} (45... Kg8 46. Qe6+ Qf7
+47. e8=Q+ {wins immediately.} (47. Rxf6 {This also wins immediately.})) 46.
+Qxf6 $1 gxf6 47. Rxf6 {[%csl Rf8][%cal Rf6f8,Rf8e8,Rf8h8] The queen on e8 is
+very misplaced. It's now a target for Rf8+. Borgov tries to create some
+complications but Beth has everything covered.} Qh5 48. Rf8+ Kg7 49. e8=Q {
+Commentator: "That check has been the whole point of the sequence. Beginning
+with the bishop, cutting down the scope of the rook by forcing it to a less
+threatening rank. The question is: what will she do now?"} Re2+ {Inaccuracy.
+Qxe8 was best.} 50. Kf1 Qxh3+ {Checkmate is now unavoidable. Qxe8 was best.} (
+50... Qxe8 51. Rxe8 $18 {White will win the endgame.}) 51. Kxe2 Qg2+ 52. Rf2
+Qe4+ 53. Kd2 {[%csl Yd4,Ye3,Yf4][%cal Yf2f4,Yc5e3,Yg3f4] Out of checks and out
+of luck, Borgov picks up his king and graciously says "It's your game" holds
+the king out farther and says "Take it". Needless to say Beth is quite the
+hero after winning the game.} 1-0
