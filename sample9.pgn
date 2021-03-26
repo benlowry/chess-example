@@ -1,0 +1,74 @@
+
+[Event "Steinitz - Chigorin World Championship "]
+[Site "Havana CUB"]
+[Date "1892.02.28"]
+[Round "23"]
+[White "Mikhail Chigorin"]
+[Black "Wilhelm Steinitz"]
+[Result "0-1"]
+[ECO "C34"]
+[Annotator "Mac"]
+[PlyCount "66"]
+[EventDate "1892.??.??"]
+[SourceDate "2014.01.17"]
+
+{Going into this game the match was 9-8 in a race to 10 wins. Steinitz, the
+reigning champion was ahead. All he needed was one more win but for Mikhail
+Chigorin, a win would bring him even in the match with only one win needed to
+become world champion. I use this game as a lesson to show what can happen if
+you let your nerves get to you when you're playing. There are a lot of high
+stress moments in tournaments and else where. It's best to try to calm
+yourself down before making any hasty choices...} 1. e4 e5 2. f4 $5 {It's rare
+I punctuate the second move of a game but the King's Gambit is seen so rarely
+nowadays that even this second move of the game is noteworthy. It's not
+necessarily a bad opening for white but it is thought that black is not
+challenged here as much as other options for white. Steinitz chooses a defense
+that is well respected even today.} exf4 {[%cal Rd8h4]} (2... d5) 3. Nf3 {
+[%cal Yf3h4,Yg7g5,Yg5g4]} (3. Bc4 Qh4+ 4. Kf1) (3. d4 Qh4+ 4. Ke2) 3... Nf6 {
+[%cal Rf6e4]} 4. e5 Nh5 {[%csl Gc1,Gf4,Rh5][%cal Yh5f4,Gg7g6,Gf8g7,Gd7d6]} 5.
+Be2 g6 $1 {This is actually a very clever setup by Steinitz. His knight is
+secure on h5 and the dark-squared bishop will come to g7. In combination with
+d7-d6 black will put a lot of pressure on the white center.} 6. d4 Bg7 7. O-O {
+[%csl Yd4,Ye5]} d6 8. Nc3 (8. exd6 $1 {Although white does not have anything
+special after this move, it would be best to eliminate the annoying pressure
+black is building up against the e5-pawn.}) 8... O-O 9. Ne1 $5 {[%cal Re2h5]}
+dxe5 (9... Qh4 10. Bxh5 Qxh5 11. Qxh5 gxh5 12. Bxf4 {[%csl Rh5,Rh7]}) 10. Bxh5
+$2 (10. dxe5 Qxd1 11. Bxd1 Bxe5 12. Bxh5 gxh5 13. Bxf4 $11 {This is a better
+version for white than what happens in the game. With the knight on c3 white
+definitely has better coordination and activity.}) 10... gxh5 $17 11. dxe5 {
+[%csl Yf4,Yf7,Yh5,Yh7]} (11. Qxh5 Qxd4+ 12. Kh1 Nc6 {[%cal Yd3h7]} 13. Qxf7+)
+11... Qxd1 12. Nxd1 {[%csl Ya1,Yc1,Yd1,Ye1,Ye5,Yf1]} Nc6 13. Bxf4 Bf5 $6 (13...
+Nxe5 $1 {It's hard to explain why Steinitz doesn't play this natural move.
+It's simple and strong here.}) 14. Ne3 Be4 15. Nf3 Rfe8 16. Ng5 Bg6 {[%cal
+Rc6e5,Re8e5,Rg7e5,Yg6c2,Yg7b2]} 17. Nd5 {White can't defend the e5-pawn so
+this counterattack makes a lot of sense. Chigorin needs something to make up
+for black's strong bishop pair and loss of center pawn.} Bxe5 $1 18. Nxc7 Bxc7
+19. Bxc7 Rac8 20. Bg3 Nd4 $1 21. c3 $6 Ne2+ $1 {This is a correct decision but
+Steinitz wasn't able to follow up correctly.} 22. Kf2 {[%csl Re2]} h4 $2 $14 {
+A huge swing! Now white is back in the driver's seat. Black's knight is going
+to end up short of squares on e2.} (22... Nxg3 $1 $17 {Black is close to
+winning if they play this move!} 23. hxg3 {[%csl Rb2,Rg5]} Re5 $1 24. Nf3 Rb5 {
+[%csl Yb1][%cal Gb5b2,Yg6b1] White has no good way to defend the pawn. b3 will
+hang the pawn on c3 and b1 is covered by the black bishop.}) (22... Bd3 23.
+Rfd1 Nxg3 24. Rxd3) 23. Bd6 {[%cal Ye2f4,Ye2d4]} Nd4 $4 {I can only imagine
+the emotions that both players must have been feeling at this time but it's
+hard to justify this move. I have a sense that Steinitz was either in time
+pressure or his emotions were clouding his judgment. This sacrifice is
+definitely not correct and costs black valuable material.} 24. cxd4 {[%cal
+Yc8c2,Ye8e2]} Rc2+ 25. Kg1 Ree2 {[%csl Yd6][%cal Rc2g2,Yd6h2,Yg1h1]} 26. Rae1
+Rxg2+ 27. Kh1 {[%csl Gd6,Gh2][%cal Gd6h2]} Kg7 (27... Rxg5 $4 28. Re8+ Kg7 29.
+Bf8+ Kg8 30. Bh6#) 28. Re8 f5 $2 {[%cal Ye8e7,Ye7b7,Ye7g7]} 29. Ne6+ $2 (29.
+Re7+ $1 {This move would put Steinitz away! Black would have to tuck their
+king back on the 8th rank but it's completely hopeless there.} Kf6 (29... Kg8
+30. Ne6 $18) 30. Ne4# $1 {What a beautiful mate!}) 29... Kf6 30. Re7 Rge2 {
+[%csl Ye6][%cal Ye2e6,Yf6e6,Ye2e7]} 31. d5 $1 Rcd2 {Now white needs a very
+accurate move. Black has threats like Bh5-f3+ with a back rank mate getting
+set up. White also needs to deal with the pressure on the d5-pawn.} 32. Bb4 $4
+{[%csl Rh2] Yikes! Anything but this! Unfortunately, there is no second
+chances after this move. It's hard to explain such a move but it is definitely
+one of the worst mistakes in chess history.} (32. Rxb7 $1 {This move saves the
+day and keeps a winning advantage for white.} Bh5 (32... Rxd5 33. Nf4 $1 {
+[%cal Rf4d5,Rf4e2]}) (32... Rxe6 33. dxe6 Rxd6 34. e7 (34. Re1 Rxe6 35. Rxe6+
+Kxe6 36. Rxa7 f4 37. Kg1)) 33. Rb3 {[%csl Yf3][%cal Yb3f3,Yb3h3]}) (32. Nf4) (
+32. Nd4 Rxe7 33. Bxe7+ Kxe7 {[%csl Yd2][%cal Yd2d4,Yd2d5,Yd2a2]}) 32... Rxh2+ (
+32... Rg2) 33. Kg1 Rdg2# 0-1

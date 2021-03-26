@@ -1,0 +1,67 @@
+[Event "Lodz"]
+[Site "Lodz RUE"]
+[Date "1907.12.26"]
+[Round "6"]
+[White "Georg Rotlewi"]
+[Black "Akiba Rubinstein"]
+[Result "0-1"]
+[ECO "D40"]
+[Annotator "Mac"]
+[PlyCount "50"]
+[EventDate "1907.??.??"]
+[SourceDate "2014.01.17"]
+
+{Rubinstein is arguably the best if not one of the best of players to never
+become world champion. He was known as a master technician but in this game he
+plays an incredible series of sacrifices, resulting in his "Immortal Game."} 1.
+d4 d5 2. Nf3 e6 3. e3 c5 4. c4 Nc6 5. Nc3 Nf6 {Incredibly, this rather boring
+symmetrical position results in fireworks later in the game. With a few
+inaccuracies throughout the middlegame, Rotlewi falls behind and overextends.}
+6. dxc5 {This is not the most consistent move with play so far.} (6. a3 {
+White could play this now as well with a potential transposition to the game.}
+a6 7. dxc5 Bxc5 8. b4 {White wants to expand on the queenside and fianchetto
+to b2.}) 6... Bxc5 7. a3 {[%cal Gb2b4,Gb4c5,Gc1b2]} a6 8. b4 Bd6 (8... Ba7) 9.
+Bb2 O-O 10. Qd2 $6 (10. cxd5 exd5 {[%cal Rc3d5,Rd1d5,Yf6d5,Yd8d5]} 11. Nxd5 $4
+(11. Be2 $1 {This was white's best bet towards fighting for the advantage. At
+least he is not on the wrong side of a symmetrical position here.}) 11... Nxd5
+12. Qxd5 $4 {[%csl Rd5][%cal Rd8d5]} Bxb4+ $1 13. axb4 (13. Qd2 Bxd2+) 13...
+Qxd5) (10. Be2 {White hesitated with this move because he didn't want to lose
+time moving this light-squared bishop twice. In reality though, he ended up
+playing waiting moves that did not help his cause either and just ends up
+falling farther behind in development.} dxc4 $1 11. Bxc4 b5 $1 12. Bd3 Bb7 {
+Black is now playing the white side of a symmetrical position due to the extra
+tempo!}) 10... Qe7 11. Bd3 (11. cxd5 exd5 12. Nxd5 Nxd5 13. Qxd5 Rd8 {[%cal
+Rd8d5,Rd6b4] White can retreat the queen to safety but black's lead in
+development and safer king give good compensation.}) 11... dxc4 12. Bxc4 b5 13.
+Bd3 (13. Bb3 {This is nothing special for white either.} Bb7) 13... Rd8 {
+[%cal Gd8d2] There are a few pieces in between the queen and rook but it never
+feels comfortable to have them opposite each other on an open file. White has
+to spend another turn here to get out of harm's way.} 14. Qe2 Bb7 {Black is
+now two tempi up in a symmetrical opening. Often symmetrical games can be very
+drawish but Rubinstein finds a way to turn the small development advantage
+into concrete problems for his opponent.} 15. O-O Ne5 $1 {[%cal Re5f3,Rb7f3]}
+16. Nxe5 Bxe5 {[%csl Rd3,Rh2][%cal Re5h2,Re7d6,Rd6d3,Rd6h2] Now white is
+provoked to create a kingside weakness.} 17. f4 $6 (17. Rfd1 {This was a
+better way to keep the bishop defended on d3. White is behind in development,
+so advancing the center and kingside pawns will only create more avenues for
+the better developed black pieces to start operating on.}) 17... Bc7 $1 {
+[%cal Gc7b6]} 18. e4 Rac8 19. e5 Bb6+ {[%cal Gb6g1,Gb7g2] These bishops are
+lasers with their sights pointed at the white king.} 20. Kh1 Ng4 $1 {[%cal
+Ye2g4,Yd8d3] Perfect timing! With black having achieved complete development,
+now is absolutely the time to strike with some kind of active and forceful
+advance against the white position. Black does not want to waste time with
+non-confrontational plans and let white catch up.} (20... Nd5 $2 21. Nxd5 Bxd5
+22. Rac1 $17 {Black is still better here but not anywhere near as much as in
+the game.}) 21. Be4 (21. Qxg4 {Unfortunately, this does not save white.} Rxd3 {
+[%csl Gb7][%cal Rd3c3,Rd3d2,Rd2g2,Rd2b2,Gb7g2] By removing white's
+light-squared bishop, there is no hope of stopping the bishop on b7.}) 21...
+Qh4 $1 {[%cal Rh4h2] In order to play this move, Rubinstein would have needed
+to have calculated the entire game continuation in advance. Without doing that
+there would be no way of knowing that all of these loose pieces black will be
+ok.} 22. g3 {[%csl Rc3][%cal Yc3e4,Ye2e4]} (22. h3 {This doesn't work either.}
+Rxc3 $1 {With shades of the game.} 23. Bxc3 Bxe4 24. Qxe4 Qg3) 22... Rxc3 $3 {
+[%cal Ye2e4]} 23. gxh4 {[%cal Ye2e4,Gb7e4]} Rd2 $3 {[%csl Re2][%cal Ye2e4,
+Gb7e4,Rd2e2]} 24. Qxd2 Bxe4+ {[%csl Rb6,Re4][%cal Rb6g1,Re4h1]} 25. Qg2 {
+[%csl Gh2][%cal Re4h1,Rb6g1]} Rh3 $1 {[%cal Rh3h2,Re4h1,Rb6g1] A calm and
+quiet crushing move. If anyone is looking for an example of how powerful a
+bishop pair can be, looking no further.} 0-1

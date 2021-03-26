@@ -1,0 +1,71 @@
+[Event "Chinese Chess League"]
+[Site "China CHN"]
+[Date "2017.11.04"]
+[Round "18.4"]
+[White "Jinshi Bai"]
+[Black "Ding Liren"]
+[Result "0-1"]
+[ECO "E21"]
+[WhiteElo "2553"]
+[BlackElo "2774"]
+[Annotator "Mac"]
+[PlyCount "64"]
+[EventDate "2017.04.18"]
+[SourceDate "2014.01.17"]
+
+{Ding Liren is world class player who is typically seen as a solid but very
+strong player, however in this game he shows off an incredible imagination.
+His opponent is a fellow countrymen who made GM at just the age of sixteen.} 1.
+d4 Nf6 2. c4 e6 {This is the Nimzo-Indian defense. It's very popular at the
+highest levels. At one point this was considered a hypermodern defense because
+it puts no pawns in the center immediately. Gradually though, it has become
+clear that there is a very strong positional foundation here for black. They
+are still controlling the center and will be able to counterstrike the center
+with the pawn break of their choice, once they are ready.} 3. Nc3 (3. Nf3 {
+This is a very popular move which can head back towards the Queen's Gambit
+Declined, or into a new opening, the Queen's Indian.} b6 {[%csl Gb7,Ge4][%cal
+Gc8b7,Gb7e4] This is the Queen's Indian.} (3... d5 {This is also a good option
+for black. Now white cannot play the Exchange variation, which is typically
+seen as one of the best challenges to the QGD.})) 3... Bb4 {[%cal Rb4e1]} 4.
+Nf3 {After the game, Ding Liren said that his opponent is a very well prepared
+player with a lot of ideas in the opening. He expected Jinshi to be playing
+for a win here.} (4. Qc2 {This is a more positional approach. White will
+usually aim to grab the bishop pair with this variation.} O-O 5. a3 Bxc3+ 6.
+Qxc3) (4. f3 {This is a very aggressive approach. White hopes to expand the
+center as much as possible. The gained space can often lead to kingside
+attacks.}) 4... O-O (4... b6 {[%csl Ge4][%cal Gc8b7,Gb7e4] This is also a good
+move. Black fights for control of the e4-square using their bishop on b7.}) 5.
+Bg5 {[%cal Rg5d8]} c5 6. e3 cxd4 (6... h6 7. Bh4 cxd4 8. Qxd4 Nc6 9. Qd3 {
+This would tranpose to the game.}) 7. Qxd4 $1 (7. exd4 d5 $1 {Black gets good
+play in the center.}) 7... Nc6 8. Qd3 h6 9. Bh4 d5 $1 10. Rd1 g5 $1 {This
+always requires very careful judgment, and here Ding's judgment is correct.
+Black will get good counterplay in the center now that the f6 knight can move.}
+11. Bg3 Ne4 {[%csl Rc3][%cal Rb4e1,Re4c3]} (11... Qa5 $1 {This is good now as
+well as the next turn.}) 12. Nd2 Nc5 $5 {This leads to massive complications.}
+(12... Qa5 $5) 13. Qc2 d4 $1 14. Nf3 $1 {[%cal Rd1d8]} e5 $1 {[%csl Gc8][%cal
+Gc8g4,Ge5d4] Black must commit to the attack here or else their center will
+collapse. Generally speaking, it is also very principled to try to open up the
+center when the opponent's king is not castled.} 15. Nxe5 (15. Bxe5 $1 {
+This would have allowed white to keep more control of the game, but black
+would still have good compensation after the following sequence...} Nxe5 16.
+Nxe5 Qf6 17. exd4 Bf5 18. Qd2 Ne6 $44) 15... dxc3 $1 16. Rxd8 cxb2+ {[%cal
+Gb4e1]} 17. Ke2 $2 {[%csl Re2]} (17. Rd2 $1 {White must play this move,
+otherwise face a devastating attack. As is often times the case, white can
+survive the attack by sacrificing back the extra material to weather the storm.
+The game could reach an even endgame after this sensible sequence...} Rd8 18.
+Nf3 Bg4 19. Qxb2 Bxf3 20. gxf3 Rxd2 21. Qxd2 Bxd2+ 22. Kxd2 Rd8+ 23. Ke2 Rd3
+24. Bh3 Ra3 25. Ra1 $11) 17... Rxd8 $19 18. Qxb2 Na4 $1 {[%cal Ra4c3,Ra4b2]}
+19. Qc2 Nc3+ 20. Kf3 {[%csl Rf3]} Rd4 $3 {[%csl Gg4][%cal Gd4g4,Gg5g4,Rc6d4,
+Rd4c2,Rd4f3] Wow!! What a move! Black now threatens g4 with mate coming.} (
+20... h5 {This could lead to the game continuation if white plays h3.}) (20...
+Rd6 $5 {This is also a good idea but definitely not as strong as the game move.
+}) 21. h3 h5 22. Bh2 g4+ 23. Kg3 Rd2 $3 {[%cal Gc2d2,Rc3e4,Re4d2,Re4g3]} (23...
+Ne4+ $2 {The standard looking check here would actually fail completely
+because White can runaway with the king, and black will have to deal with the
+d4 rook being under attack.} 24. Kf4 $1 {[%csl Rd4]} Rd2 25. Qxe4 Rxf2+ 26. Kg5
+$1 Be7+ 27. Kxh5 Rf5+ 28. Qxf5 Bxf5 29. hxg4 $14) 24. Qb3 Ne4+ 25. Kh4 {
+On the run!} Be7+ 26. Kxh5 Kg7 {[%csl Gg7][%cal Ra8h8]} (26... Rxf2) 27. Bf4
+Bf5 {[%cal Ra8h8]} 28. Bh6+ Kh7 29. Qxb7 Rxf2 {[%csl Rg3][%cal Re4g3,Rg3h5]}
+30. Bg5 Rh8 $1 {There is no escape!} 31. Nxf7 Bg6+ 32. Kxg4 Ne5+ {The game
+ended here although a beautiful outcome would have been 34. Kh4 Kg8 35. Nxh8
+Bxg5# or 34. Nxe5 Bf5 35. Kh4 Kg7 36. Bh6 Rxh6#} 0-1

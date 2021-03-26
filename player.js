@@ -1712,13 +1712,14 @@ function createTagRow (tag, last) {
 
 
 
-((exports) => {
+;; ((exports) => {
   exports.addColumn = addColumn
   exports.addColumnAndRow = addColumnAndRow
   exports.addRow = addRow
   exports.calculatePieceMovement = calculatePieceMovement
   exports.cleanSpacing = cleanSpacing
   exports.createTurnObject = createTurnObject
+  exports.extractNextLine = extractNextLine
   exports.findClosingBracket = findClosingBracket
   exports.findCoordinates = findCoordinates
   exports.tokenizeLine = tokenizeLine
@@ -1852,7 +1853,6 @@ function createTagRow (tag, last) {
    * then returns the modified array of pieces
    */
   function processTurn (turn, turns, pieces) {
-    console.log('processTurn', turn)
     for (const piece of pieces) {
       delete (piece.coordinateBefore)
       delete (piece.moveSteps)
@@ -1885,6 +1885,9 @@ function createTagRow (tag, last) {
       const movingPiece = findMovingPiece(turn, pieces)
       movingPiece.coordinateBefore = movingPiece.coordinate
       movingPiece.coordinate = turn.to
+      if (turn.promoted) {
+        movingPiece.type = turn.promotedTo
+      }
       if (turn.capturing) {
         for (const piece of pieces) {
           if (piece.coordinate === movingPiece.coordinate && piece !== movingPiece) {
@@ -2050,7 +2053,14 @@ function createTagRow (tag, last) {
         text = text.split(spacing.double).join(spacing.single)
       }
     }
-    return text
+    for (let i = 1, len = 150; i < len; i++) {
+      if (text.indexOf(i.toString()) === -1) {
+        continue
+      }
+      text = text.split(`${i}. `).join(`${i}.`)
+      text = text.split(`${i}... `).join(`${i}...`)
+    }
+    return text.trim()
   }
 
   /*
@@ -2060,7 +2070,8 @@ function createTagRow (tag, last) {
     * [
     *   '1. a5 {[%csl a5]} b7',
     *   '2. f3 (2. d4 {an annotated turn})',
-    *   '2... a6'
+    *   '2... a6',
+    *   '{prepended annotation} 3. f7'
     * ]
     */
   function tokenizeLines (pgnFileData) {
@@ -2069,10 +2080,10 @@ function createTagRow (tag, last) {
     rawMoveData = cleanSpacing(rawMoveData)
     const tokens = []
     while (rawMoveData.length) {
-      const line = parseNextLine(rawMoveData)
+      const line = extractNextLine(rawMoveData)
       rawMoveData = rawMoveData.substring(line.length + 1)
       if (line) {
-        tokens.push(line)
+        tokens.push(line.trim())
       }
     }
     return tokens
@@ -2149,34 +2160,37 @@ function createTagRow (tag, last) {
    *
    * 1. e4 [ %cal Ra1b2 ] e5
    */
-  function parseNextLine (moveText) {
+  function extractNextLine (moveText) {
     const parts = moveText.split(' ')
     const line = []
     let index = 0
+    let annotated
+    let moveNumber
     while (index < parts.length) {
       const part = parts[index]
       if (part.indexOf('(') === 0 || part.indexOf('{') === 0 || part.indexOf('[') === 0) {
         const closingIndex = findClosingBracket(index, parts)
         line.push(parts.slice(index, closingIndex).join(' '))
         index = closingIndex
+        annotated = true
         continue
       }
       const dotIndex = part.indexOf('.')
       if (dotIndex > 0 && dotIndex < 4) {
-        const moveNumber = part.substring(0, dotIndex)
+        moveNumber = part.substring(0, dotIndex)
         let moveInt
         try {
           moveInt = parseInt(moveNumber, 10)
         } catch (error) {
         }
-        if (moveInt.toString() === moveNumber && line.length) {
+        if (moveInt.toString() === moveNumber && ((line.length > 1 && annotated) || (line.length && !annotated))) {
           break
         }
       }
       line.push(part)
       index++
     }
-    return line.join(' ')
+    return line.join(' ').replace(`${moveNumber}. `, `${moveNumber}.`).replace(`${moveNumber}... `, `${moveNumber}...`)
   }
 
   /**
@@ -2184,8 +2198,20 @@ function createTagRow (tag, last) {
    */
   function parseTurn (line) {
     const lineParts = tokenizeLine(line)
-    const numberPart = lineParts.shift()
-    const moveNumber = numberPart.substring(0, numberPart.indexOf('.'))
+    let moveNumber, numberPart
+    for (const part of lineParts) {
+      if (part.indexOf('.') === -1) {
+        continue
+      }
+      moveNumber = part.substring(0, part.indexOf('.'))
+      try {
+        if (parseInt(moveNumber, 10).toString() === moveNumber) {
+          numberPart = part
+          break
+        }
+      } catch (error) {
+      }
+    }
     const coordinates = findCoordinates(lineParts)
     let color
     const moves = []
@@ -2243,12 +2269,16 @@ function createTagRow (tag, last) {
     if (checkMate) {
       to = to.replace('#', '')
     }
-    const promoted = to.indexOf('=') > -1
+    let promoted = to.indexOf('=')
     let promotedTo
-    if (promoted) {
-      promotedTo = to.substring(to.indexOf('=') + 1).trim()
+    if (promoted > -1) {
+      promotedTo = to.substring(promoted + 1)
       promotedTo = promotedTo || 'Q'
-      to = to.substring(0, to.indexOf('='))
+      to = to.substring(0, promoted)
+      promoted = true
+    } else {
+      promoted = undefined
+      promotedTo = undefined
     }
     let requireRow, requireColumn
     if (to.length > 2) {
@@ -2309,7 +2339,7 @@ function createTagRow (tag, last) {
       if (part.startsWith('$')) {
         continue
       }
-      if (part.indexOf('*') > -1 || part.indexOf('/') > -1) {
+      if (part.indexOf('*') > -1 || part.indexOf('/') > -1 || part.indexOf('.') > -1) {
         continue
       }
       if (part.indexOf('O-O') === -1 && part.indexOf('-') > -1) {
@@ -2341,7 +2371,6 @@ function createTagRow (tag, last) {
     let openSquare = 0
     let openBrace = 0
     const bracket = array[index].charAt(0)
-    console.log('bracket', bracket)
     let finish = index
     while (finish < array.length) {
       let part = '' + array[finish]
@@ -2349,12 +2378,10 @@ function createTagRow (tag, last) {
         while (part.indexOf('(') > -1) {
           openParantheses++
           part = part.replace('(', '')
-          console.log(finish, 'open parantheses++', openParantheses)
         }
         while (part.indexOf(')') > -1) {
           openParantheses--
           part = part.replace(')', '')
-          console.log(finish, 'open parantheses--', openParantheses)
         }
       } else if (bracket === '{') {
         while (part.indexOf('{') > -1) {
@@ -2376,13 +2403,10 @@ function createTagRow (tag, last) {
         }
       }
       if (!openParantheses && !openSquare && !openBrace) {
-        console.log('found ending', finish + 1, 'out of', array.length)
-        console.log(array.slice(index, finish + 1).join(' '))
         return finish + 1
       }
       finish++
     }
-    console.log('never found ending....')
     return finish
   }
 
@@ -2437,15 +2461,10 @@ function createTagRow (tag, last) {
       piece.moveSteps = moves
       return piece
     }
-    console.log(move)
-    for (const piece of pieces) {
-      console.log(piece.type, piece.color, piece.coordinate, piece.start)
-    }
     throw new Error('could not determine piece for coordinate "' + move.to + '"')
   }
 
   function calculatePieceMovement (piece, move, pieces) {
-    console.log('calculate piece movement', piece, move)
     if (piece.type === 'N') {
       for (const knightJumpDirection in knightMoveDirections) {
         const knightMoves = [piece.coordinate]
@@ -2478,15 +2497,49 @@ function createTagRow (tag, last) {
         const captureLeft = addColumn(nextValue, -1)
         if (move.to === captureLeft) {
           const captureLeftPiece = checkObstructed(captureLeft, pieces)
-          if (captureLeftPiece && move.capturing && captureLeftPiece.color !== piece.color) {
+          if (captureLeftPiece && captureLeftPiece.color !== piece.color) {
             return [piece.coordinate, captureLeft]
+          }
+          if (piece.color === 'w') {
+            const enPassantCoordinate = addRow(move.to, -1)
+            if (enPassantCoordinate) {
+              const downPiece = checkObstructed(enPassantCoordinate, pieces)
+              if (downPiece && downPiece.type === 'P' && downPiece.color !== piece.color) {
+                return [piece.coordinate, captureLeft]
+              }
+            }
+          } else if (piece.color === 'b') {
+            const enPassantCoordinate = addRow(move.to, +1)
+            if (enPassantCoordinate) {
+              const upPiece = checkObstructed(enPassantCoordinate, pieces)
+              if (upPiece && upPiece.type === 'P' && upPiece.color !== piece.color) {
+                return [piece.coordinate, captureRight]
+              }
+            }
           }
         }
         const captureRight = addColumn(nextValue)
         if (move.to === captureRight) {
           const captureRightPiece = checkObstructed(captureRight, pieces)
-          if (captureRightPiece && move.capturing && captureRightPiece.color !== piece.color) {
+          if (captureRightPiece && captureRightPiece.color !== piece.color) {
             return [piece.coordinate, captureRight]
+          }
+          if (piece.color === 'w') {
+            const enPassantCoordinate = addRow(move.to, -1)
+            if (enPassantCoordinate) {
+              const downPiece = checkObstructed(enPassantCoordinate, pieces)
+              if (downPiece && downPiece.type === 'P' && downPiece.color !== piece.color) {
+                return [piece.coordinate, captureRight]
+              }
+            }
+          } else if (piece.color === 'b') {
+            const enPassantCoordinate = addRow(move.to, +1)
+            if (enPassantCoordinate) {
+              const upPiece = checkObstructed(enPassantCoordinate, pieces)
+              if (upPiece && upPiece.type === 'P' && upPiece.color !== piece.color) {
+                return [piece.coordinate, captureRight]
+              }
+            }
           }
         }
       } else if (piece.coordinate === piece.start) {
