@@ -1,0 +1,254 @@
+<html>
+  <head>
+    <title>PGN Player</title>
+    <link rel="stylesheet" href="/fontawesome/css/all.min.css">
+    <script src="/player.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <div class="pgn-player-container">
+      <div class="tabs-container">
+        <menu class="tabs">
+          <button class="tab control-playback current-tab">Playback</button>
+          <button class="tab control-annotations">Annotations</button>
+          <button class="tab control-tags">Tags</button>
+          <button class="tab control-pgn">PGN</button>
+        </menu>
+      </div>
+      <div class="columns">
+        <div class="left">
+          <div class="left-container">
+            <div class="chessboard-container">
+              <div class="chessboard-arrows"></div>
+              <table class="chessboard"></table>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="right-container">
+            <div class="playback-container">
+              <div class="playback-controls-container">
+                <div class="header-container">
+                  <header class="header">
+                    <h1 class="header-title">
+                      <span class="header-white header-player-name"></span>
+                      vs
+                      <span class="header-black header-player-name"></span>
+                      <span class="header-result"></span>
+                    </h1>
+                    <h2 class="header-subtitle">
+                      <span class="header-event"></span>
+                      <span class="header-site"></span>
+                      <span class="header-date"></span>
+                      <span class="header-round"></span>
+                      <span class="header-eco"></span>
+                    </h2>
+                  </header>
+                </div>
+                <div class="move-description"></div>
+                <menu class="playback-controls">
+                  <button class="button playback-control playback-start"><i class="fas fa-fast-backward"></i></button>
+                  <button class="button playback-control playback-rewind"><i class="fas fa-step-backward"></i></button>
+                  <button class="button playback-control playback-play"><i class="fas fa-play"></i></button>
+                  <button class="button playback-control playback-forward"><i class="fas fa-step-forward"></i></button>
+                  <button class="button playback-control playback-end"><i class="fas fa-fast-forward"></i></button>
+                  <label class="checkbox"><input class="play-nested-moves" type="checkbox" /> Play nested moves</label>
+                </menu>
+                <div class="timeline-container"></div>
+              </div>
+            </div>
+            <div class="annotations-container">
+              <div class="nag-form annotate-form">
+                <select id="position-list"></select>
+                <select id="nag-list"></select>
+              </div>
+              <div class="annotation-form annotate-form">
+                <input type="text" />
+                <chessboard></chessboard>
+              </div>
+              <div class="square-form annotate-form">
+                <select id="position-list"></select>
+                <chessboard></chessboard>
+              </div>
+              <div class="arrow-form annotate-form">
+                <select id="position-list"></select>
+                <chessboard></chessboard>
+              </div>
+              <div class="move-list-container">
+                <menu class="move-list"></menu>
+              </div>
+            </div>
+            <div class="pgn-container">
+              <div class="pgn-controls-container">
+                <menu class="pgn-controls">
+                  <button class="button file-control file-save-as">Export file</button>
+                  <button class="button file-control file-open">Open file</button>
+                  <button class="button file-control file-paste">Paste PGN</button>
+                </menu>
+              </div>
+              <div class="paste-pgn-container">
+                <textarea class="paste-pgn" placeholder="Paste your PGN text here"></textarea>
+                <button class="button file-control file-load-pasted-pgn">Load pasted PGN</button>
+                <button class="button file-control file-cancel-paste">Cancel</button>
+              </div>
+              <pre class="pgn"></pre>
+            </div>
+            <div class="tags-container">
+              <table class="tags-table">
+                <tfoot>
+                  <tr>
+                    <td><input class="tag-input new-tag-name" type="text" placeholder="New tag name" /></td>
+                    <td><input class="tag-input new-tag-value" type="text" placeholder="Value" /></td>
+                    <td><button class="tag-button add-tag-button"><i class="fas fa-plus"></i></button></td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <template id="nag-index">
+    <option value="$0">Null annotation</option>
+    <option value="$1">Good move</option>
+    <option value="$2">Poor move or mistake</option>
+    <option value="$3">Very good or brilliant move</option>
+    <option value="$4">Very poor move or blunder</option>
+    <option value="$5">Speculative or interesting move</option>
+    <option value="$6">Questionable or dubious move</option>
+    <option value="$7">Forced move(all others lose quickly) or only move</option>
+    <option value="$8">Singular move(no reasonable alternatives)</option>
+    <option value="$9">Worst move</option>
+    <option value="$10">Drawish position or even</option>
+    <option value="$11">Equal chances, quiet position</option>
+    <option value="$12">Equal chances, active position</option>
+    <option value="$13">Unclear position</option>
+    <option value="$14">White has a slight advantage</option>
+    <option value="$15">Black has a slight advantage</option>
+    <option value="$16">White has a moderate advantage</option>
+    <option value="$17">Black has a moderate advantage</option>
+    <option value="$18">White has a decisive advantage</option>
+    <option value="$19">Black has a decisive advantage</option>
+    <option value="$20">White has a crushing advantage(Black should resign)</option>
+    <option value="$21">Black has a crushing advantage(White should resign)</option>
+    <option value="$22">White is in zugzwang</option>
+    <option value="$23">Black is in zugzwang</option>
+    <option value="$24">White has a slight space advantage</option>
+    <option value="$25">Black has a slight space advantage</option>
+    <option value="$26">White has a moderate space advantage</option>
+    <option value="$27">Black has a moderate space advantage</option>
+    <option value="$28">White has a decisive space advantage</option>
+    <option value="$29">Black has a decisive space advantage</option>
+    <option value="$30">White has a slight time(development) advantage</option>
+    <option value="$31">Black has a slight time(development) advantage</option>
+    <option value="$32">White has a moderate time(development) advantage </option>
+    <option value="$33">Black has a moderate time(development) advantage</option>
+    <option value="$34">White has a decisive time(development) advantage</option>
+    <option value="$35">Black has a decisive time(development) advantage</option>
+    <option value="$36">White has the initiative</option>
+    <option value="$37">Black has the initiative</option>
+    <option value="$38">White has a lasting initiative</option>
+    <option value="$39">Black has a lasting initiative</option>
+    <option value="$40">White has the attack</option>
+    <option value="$41">Black has the attack</option>
+    <option value="$42">White has insufficient compensation for material deficit</option>
+    <option value="$43">Black has insufficient compensation for material deficit</option>
+    <option value="$44">White has sufficient compensation for material deficit</option>
+    <option value="$45">Black has sufficient compensation for material deficit</option>
+    <option value="$46">White has more than adequate compensation for material deficit</option>
+    <option value="$47">Black has more than adequate compensation for material deficit</option>
+    <option value="$48">White has a slight center control advantage</option>
+    <option value="$49">Black has a slight center control advantage</option>
+    <option value="$50">White has a moderate center control advantage</option>
+    <option value="$51">Black has a moderate center control advantage</option>
+    <option value="$52">White has a decisive center control advantage</option>
+    <option value="$53">Black has a decisive center control advantage</option>
+    <option value="$54">White has a slight kingside control advantage</option>
+    <option value="$55">Black has a slight kingside control advantage</option>
+    <option value="$56">White has a moderate kingside control advantage</option>
+    <option value="$57">Black has a moderate kingside control advantage</option>
+    <option value="$58">White has a decisive kingside control advantage</option>
+    <option value="$59">Black has a decisive kingside control advantage</option>
+    <option value="$60">White has a slight queenside control advantage</option>
+    <option value="$61">Black has a slight queenside control advantage</option>
+    <option value="$62">White has a moderate queenside control advantage</option>
+    <option value="$63">Black has a moderate queenside control advantage</option>
+    <option value="$64">White has a decisive queenside control advantage</option>
+    <option value="$65">Black has a decisive queenside control advantage</option>
+    <option value="$66">White has a vulnerable first rank</option>
+    <option value="$67">Black has a vulnerable first rank</option>
+    <option value="$68">White has a well protected first rank</option>
+    <option value="$69">Black has a well protected first rank</option>
+    <option value="$70">White has a poorly protected king</option>
+    <option value="$71">Black has a poorly protected king</option>
+    <option value="$72">White has a well protected king</option>
+    <option value="$73">Black has a well protected king</option>
+    <option value="$74">White has a poorly placed king</option>
+    <option value="$75">Black has a poorly placed king</option>
+    <option value="$76">White has a well placed king</option>
+    <option value="$77">Black has a well placed king</option>
+    <option value="$78">White has a very weak pawn structure</option>
+    <option value="$79">Black has a very weak pawn structure</option>
+    <option value="$80">White has a moderately weak pawn structure</option>
+    <option value="$81">Black has a moderately weak pawn structure</option>
+    <option value="$82">White has a moderately strong pawn structure</option>
+    <option value="$83">Black has a moderately strong pawn structure</option>
+    <option value="$84">White has a very strong pawn structure</option>
+    <option value="$85">Black has a very strong pawn structure</option>
+    <option value="$86">White has poor knight placement</option>
+    <option value="$87">Black has poor knight placement</option>
+    <option value="$88">White has good knight placement</option>
+    <option value="$89">Black has good knight placement</option>
+    <option value="$90">White has poor bishop placement</option>
+    <option value="$91">Black has poor bishop placement</option>
+    <option value="$92">White has good bishop placement</option>
+    <option value="$93">Black has good bishop placement</option>
+    <option value="$94">White has poor rook placement</option>
+    <option value="$95">Black has poor rook placement</option>
+    <option value="$96">White has good rook placement</option>
+    <option value="$97">Black has good rook placement</option>
+    <option value="$98">White has poor queen placement</option>
+    <option value="$99">Black has poor queen placement</option>
+    <option value="$100">White has good queen placement</option>
+    <option value="$101">Black has good queen placement</option>
+    <option value="$102">White has poor piece coordination</option>
+    <option value="$103">Black has poor piece coordination</option>
+    <option value="$104">White has good piece coordination</option>
+    <option value="$105">Black has good piece coordination</option>
+    <option value="$106">White has played the opening very poorly</option>
+    <option value="$107">Black has played the opening very poorly</option>
+    <option value="$108">White has played the opening poorly</option>
+    <option value="$109">Black has played the opening poorly</option>
+    <option value="$110">White has played the opening well</option>
+    <option value="$111">Black has played the opening well</option>
+    <option value="$112">White has played the opening very well</option>
+    <option value="$113">Black has played the opening very well</option>
+    <option value="$114">White has played the middlegame very poorly</option>
+    <option value="$115">Black has played the middlegame very poorly</option>
+    <option value="$116">White has played the middlegame poorly</option>
+    <option value="$117">Black has played the middlegame poorly</option>
+    <option value="$118">White has played the middlegame well</option>
+    <option value="$119">Black has played the middlegame well</option>
+    <option value="$120">White has played the middlegame very well</option>
+    <option value="$121">Black has played the middlegame very well</option>
+    <option value="$122">White has played the ending very poorly</option>
+    <option value="$123">Black has played the ending very poorly</option>
+    <option value="$124">White has played the ending poorly</option>
+    <option value="$125">Black has played the ending poorly</option>
+    <option value="$126">White has played the ending well</option>
+    <option value="$127">Black has played the ending well</option>
+    <option value="$128">White has played the ending very well</option>
+    <option value="$129">Black has played the ending very well</option>
+    <option value="$130">White has slight counterplay</option>
+    <option value="$131">Black has slight counterplay</option>
+    <option value="$132">White has moderate counterplay</option>
+    <option value="$133">Black has moderate counterplay</option>
+    <option value="$134">White has decisive counterplay</option>
+    <option value="$135">Black has decisive counterplay</option>
+    <option value="$136">White has moderate time control pressure</option>
+    <option value="$137">Black has moderate time control pressure</option>
+    <option value="$138">White has severe time control pressure / zeitnot</option>
+    <option value="$139">Black has severe time control pressure / zeitno</option>
+  </template>
+</html>

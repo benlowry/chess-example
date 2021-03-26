@@ -1,0 +1,62 @@
+[Event "?"]
+[Site "?"]
+[Date "2020.11.08"]
+[Round "?"]
+[White "5 Traps You Need to Know"]
+[Black "?"]
+[Result "*"]
+[ECO "C50"]
+[Annotator "Mac"]
+[PlyCount "14"]
+[EventDate "2020.??.??"]
+[SourceDate "2020.11.08"]
+
+1. e4 (1. d4 d5 (1... e5 $2 {This is the Englund Gambit. Not to be recommended,
+although there is a dangerous trick which players with Black here are usually
+aiming for.} 2. dxe5 Nc6 3. Nf3 Qe7 4. Bf4 {[%csl Rb2,Re1,Rf4]} Qb4+ 5. Bd2
+Qxb2 {[%csl Ra1][%cal Rb2a1] This is the position that Black is aiming for.
+White has to not take the bait!} 6. Bc3 $4 {[%cal Rb4e1]} (6. Nc3 $1 {With a
+huge development advantage and much better position.}) 6... Bb4 $1 7. Qd2 (7.
+Bxb4 {This is no good because of the following} Nxb4 {The knight fork on c2
+will be too powerful.}) 7... Bxc3 8. Qxc3 {It might look like white has
+everything covered here but...} Qc1# {Oops!}) 2. c4 e6 3. Nc3 Nf6 4. cxd5 exd5
+{This is a very common variation known as the Exchange Variation.} 5. Bg5 {
+White typically likes to go here to apply pressure along the diagonal and
+undermine control over the d5-square. However, Black has a chance to set a
+trap here that does not compromise their position.} Nbd7 {[%csl Rd7,Yd8][%cal
+Yd8d5]} 6. Nxd5 $4 Nxd5 $1 7. Bxd8 {[%csl Re1]} Bb4+ $1 8. Qd2 Bxd2+ 9. Kxd2
+Kxd8 {Black has emerged with an extra Knight for only a pawn and is in good
+shape to go on to win the game.}) 1... e5 (1... c5 2. d4 cxd4 3. c3 {Offering
+the Smith-Morra gambit. Black has many ways to respond but can find themself
+in a difficult situation after following this very natural continuation.} dxc3 
+4. Nxc3 Nc6 5. Nf3 d6 6. Bc4 {[%csl Rf7][%cal Rc4f7]} Nf6 $6  7. e5 $1 
+{As a younger player I remember sitting next to several players who played 
+this way with White and never quite understood what they were up to. You will 
+soon see!} dxe5 $2  {[%csl Rf7] Not as bad as 7... Nxe5 but Black is still 
+worse off here, and there is potential for a major disaster to happen.}  (7... 
+Ng4 $1 {Is playable and leads to an unclear position}) (7... Nxe5 $4 {This 
+completely backfires for Black. They will not be able to recapture without 
+losing their queen.} 8. Nxe5 dxe5 $4 {[%csl Rd8][%cal Re8d8,Gd1d8]} 9. Bxf7+ 
+Kxf7 10. Qxd8) 8. Qxd8+ $1 Nxd8 {This leads to the most spectacular variation of the trap!} (
+8... Kxd8 9. Ng5 $1 {Black needs to find the stubborn} Na5 {in order to stay
+in the game.}) 9. Nb5 $1 {[%cal Rc7a8,Rc7e8]} Kd7 $4 {Trying to defend the
+fork on c7 but this is a massive mistake...} 10. Nxe5+ Ke8 11. Nc7# {Ouch!}) 2.
+Nf3 Nc6 3. Bc4 (3. Bb5 Nf6 {Kramnik famously used this opening with great
+success in his World Championship match with Kasparov, helping him to
+eventually dethrone one of the greatest players of all time. This solid
+opening is not usually known for tricks and traps and perhaps for that reason
+your opponent may not suspect anything after the following moves...} 4. d3 Ne7
+$5 {[%csl Ge5][%cal Gf3e5] An audacious move. Completely breaking the rules of
+the opening but it's not as pointless as it originally appears. The knight is
+heading to g6 in order to defend the e5-pawn and Black will soon play c6 to
+gain some control over the center.} 5. Nxe5 $4 c6 $1 6. Bc4 {[%csl Re1,Re5]}
+Qa5+ {This was Black's idea, winning the knight on e5}) 3... Nd4 {This trap is
+very common because it has a good chance of working! Even Josh Waitzkin,
+legendary hero of the movie "Searching for Bobby Fischer" fell for this trap
+in one of his youth tournaments. If Josh can fall for it, anyone can!} 4. Nxe5
+$2 {[%csl Re5,Rg2] This unsuspecting move is a costly mistake, allowing Black
+a double attack.} (4. Nxd4 $1 exd4 5. O-O {With an advantage}) 4... Qg5 $1 5.
+Nxf7 $4 {[%cal Rf7g5,Rf7h8] After this natural move though, there is no
+turning back. White went from worse to completely losing with this move.} Qxg2
+$1 {[%csl Rh1][%cal Rg2h1]} 6. Rf1 Qxe4+ 7. Be2 {[%cal Ye4e1]} (7. Qe2 Nxe2 {
+Black is winning}) 7... Nf3# {[%csl Re1] An unforgettable checkmate.} *

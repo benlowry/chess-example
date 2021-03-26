@@ -1,0 +1,250 @@
+html { height: 100%; font-size: 100% }
+body { min-width: 320px; font-family: sans-serif; padding: 0; margin: 0; height: 100% }
+a,
+button,
+img,
+input,
+textarea,
+li { outline: 0 }
+i { pointer-events: none }
+
+.columns { display: flex; user-select: none }
+.left { width: 40% }
+.right { width: 100% }
+.button { outline: 0; border-radius: 0.25rem; border: 2px outset; cursor: pointer; font-size: 0.8rem; line-height: 1.6rem }
+.button-down { border-style: inset !important }
+
+/* responsiveness */
+@media (orientation: portrait) {
+  .columns { flex-direction: column }
+ .left { width: 100% !important; max-width: none !important; height: auto !important }
+ .right { height: auto !important; flex: 1 }
+ .right-container { display: flex; flex-direction: column }
+}
+
+@media (orientation: landscape) {
+ .left { width: 33% !important }
+}
+
+
+/* board and pieces */
+.chessboard-container { position: relative; padding: 0; margin: 0 0 0.5rem 0 }
+.chessboard { width: 100%; padding: 0; margin: 0; border: none; border-collapse: collapse }
+.chessboard-square { width: 12.5%; padding: 0; margin: 0; position: relative }
+.chessboard-square sup { position: absolute; left: 0.25rem; top: 0.25rem; font-size: 0.6rem }
+.chessboard-square sub { position: absolute; bottom: 0.25rem; right: 0.25rem; font-size: 0.6rem }
+.chessboard-pieces { position: absolute; left: 0; top: 0; z-index: 1 }
+.chessboard-piece { position: absolute; width: 12% }
+.chessboard-move-arrows { position: absolute; left: 0; top: 0; z-index: 2 }
+.chessboard-arrows { opacity: 0; position: absolute; left: 0; top: 0; z-index: 2 }
+.chessboard-arrow { position: absolute; left: 0; top: 0; z-index: 3; width: 100%; height: 100%; stroke-linecap: round; }
+.fade-in { opacity: 1; transition: all 1s }
+.fade-out { opacity: 0; transition: all 1s }
+.move-description { margin: 0; height: 6rem; overflow: scroll; line-height: 1rem; font-size: 0.8rem }
+.move-description .annotation { font-weight: bold }
+
+/* header */
+.header-container { height: 6rem; margin: 0 }
+.header-title { margin: 0; padding: 0; font-size: 1.2rem; font-weight: normal }
+.header-subtitle { margin: 0; padding: 0; font-size: 1rem; font-weight: normal }
+.header-player-name { font-weight: bold }
+
+/* playback timeline */
+.playback-container { padding: 0.5rem }
+.timeline-container { margin: 0.5rem 0 0 0; position: relative }
+.timeline-bar { position: absolute; border-radius: 0.25rem; display: flex }
+.frame { font-weight: bold; font-size: 0.4rem; margin: 0; text-align: center; height: 1rem; line-height: 1rem; overflow: hidden }
+.frame:first-of-type { border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem }
+.frame:last-of-type { border-top-right-radius: 0.25rem; border-bottom-right-radius: 00.25rem }
+.connecting-line { position: absolute; top: 1rem; border-left: solid }
+.playback-controls { padding: 0; margin: 0 }
+.playback-controls .checkbox { font-size: 0.75rem }
+.playback-controls .checkbox input { padding: 0; margin: 0 0.25rem 0 0.5rem }
+.playback-control { height: 2rem }
+
+/* tabs */
+.tabs { margin: 0; padding: 0; display: flex }
+.tab { border: 0; cursor: pointer; outline: 0; height: 2rem; font-size: 0.8rem; padding-left: 0.5rem; padding-right: 0.5rem }
+
+/* annotations */
+.move-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
+.move-list-item { border-bottom: thin solid; padding: 0.25rem 0 0.25rem 0.25rem }
+.move-list .move-list-item:last-of-type { padding-bottom: 2rem }
+.move-list .move-list { display: block; padding: 0; list-style-type: none; margin: 0.5rem 0 0.5rem 0.5rem; overflow: visible }
+.move-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
+.move-list-button i { opacity: 0.5 }
+.move-list-button:hover i { opacity: 1 }
+.annotate-menu { margin: 0; padding: 0 }
+.annotate-button { margin: 0.25rem; border-width: thin; border-radius: 0.25rem }
+.move-sequence { width: 80%; font-size: 0.8rem; line-height: 1.6rem; margin: 0.5rem 0 1rem 0.5rem; display: flex; list-style-type: none; padding: 0 }
+.move-sequence-item,
+.sequence-position-item { cursor: pointer; display: inline-block; padding: 0 0.5rem; border: thin solid; border-radius: 0.25rem; margin-right: 0.5rem }
+.sequence-position-item { display: none; border-style: dotted; border-width: medium }
+.sequence-position-item input { display: none }
+.show-positioning .sequence-position-item { display: inline-block }
+.show-positioning .move-list-item .sequence-position-item { display: none }
+.move-sequence .move-sequence-item:last-of-type { border-right: thin solid }
+.branch-options { padding: 0.25rem }
+.branch-options .move-list-button { margin: 0 0.5rem 0 0 }
+.piece-glyph-wrapper { display: inline-block; padding: 0.125rem; border-radius: 0.125rem }
+.piece-glyph { font-size: 1.2rem }
+
+/* tags table */
+.tags-container { padding: 0 }
+.tags-table { border-collapse: collapse; margin: 0.5rem }
+.tags-table td { padding: 0.125rem }
+.tags-table .tag-name { width: 8rem }
+.tags-table .tag-value { width: 10rem }
+.tag-input { width: 100%; font-size: 0.8rem; line-height: 1rem; padding: 0.25rem }
+.tags-table tr:last-of-type td { padding-top: 1rem }
+.tag-button { margin-left: 0.5rem; background-color: transparent; border: none; padding: 0; font-size: 0.8rem; display: block; cursor: pointer }
+
+/* view / load PGN */ 
+.pgn-container { margin: 0; padding: 0 }
+.pgn-controls { margin: 0; padding: 0 }
+.pgn { padding: 0.5rem; margin: 0; outline: 0; max-width: 50rem; white-space: pre-wrap; font-size: 0.8rem }
+.file-control { margin: 0.25rem }
+.paste-pgn-container { display: none; margin: 0.25rem }
+.paste-pgn { outline: 0; border: 1px solid; padding: 0.5rem; width: 90%; height: 10rem; display: block; margin: 0 0 0.25rem 0 }
+.paste-pgn-container .file-control { margin-top: 0; margin-left: 0 }
+
+
+/* color schemes for light and dark modes */
+@media (prefers-color-scheme: dark) {
+}
+
+@media (prefers-color-scheme: light) {
+ body { background-color: #FFF }
+ .button { border-color: #CCC; background-color: #CCC }
+ /* chessboard */
+ .chessboard { color: #000 }
+ .white-square { background-color: #DDD; color: #333 }
+ .black-square { background-color: #999; color: #FFF }
+ /* highlights */
+ .red-square { background-color: darkred }
+ .green-square { background-color: darkgreen }
+ .yellow-square { background-color: darkolive }
+ .blue-square { background-color: darkblue }
+ .red-arrow { fill: red; stroke: red }
+ .green-arrow { fill: green; stroke:green }
+ .yellow-arrow { fill: yellow; stroke: yellow }
+ .blue-arrow { fill: blue; stroke: blue }
+ .move-arrow { fill: #FFF; stroke:#FFF }
+ /* move list */
+ .white-piece-glyph { color: rgba(255, 255, 255, 0.75) }
+ .black-piece-glyph { color: rgba(0, 0, 0, 0.75) }
+ .white-piece-glyph-wrapper { background-color: rgba(0, 0, 0, 0.5) }
+ .black-piece-glyph-wrapper { background-color: rgba(255, 255, 255, 0.5) }
+ .move-list { background: rebeccapurple }
+ .move-list-item { color: #FFF; border-color: rgba(255, 255, 255, 0.5) }
+ .move-list-button { background-color: rgba(0, 0, 0, 0.25); border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.9) }
+ .move-list-button:hover { background-color: rgba(0, 0, 0, 0.75) }
+ .annotate-button { background-color: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.5); color: rgba(0, 0, 0, 0.9) }
+ .annotate-button:hover { background-color: #FFF }
+ .cancel-button { border-color: transparent; background-color: transparent; color: rgba(255, 255, 255, 0.75) }
+ .cancel-button:hover { color: #FFF }
+ .nag-select { font-size: 0.8rem }
+ .move-sequence-item { border-color: rgba(255, 255, 255, 0.5) }
+ .sequence-position-item { border-color: rgba(255, 255, 255, 0.5); background-color: transparent }
+ .sequence-position-item i { color: rgba(255, 255, 255, 0.5) }
+ .sequence-position-item:hover { border-color: rgba(255, 255, 255, 0.75); background-color: rgba(255, 255, 255, 0.25) }
+ .selected-position { background-color: rgba(255, 255, 255, 0.5); border-style: solid }
+ .selected-position i { color: #FFF }
+ .move-sequence .move-sequence-item:first-of-type { border-color: transparent; background-color: transparent }
+ .move-sequence .move-sequence-item:last-of-type { border-color: rgba(255, 255, 255, 0.5) }
+ .branch-options { background-color: rgba(255, 255, 255, 0.5) }
+ .move-list .timeline1 { background:rebeccapurple }
+ .move-list .timeline2 { background: darkred }
+ .move-list .timeline3 { background: green }
+ .move-list .timeline4 { background: midnightblue }
+ .move-list .timeline5 { background: olive }
+ .move-list .timeline6 { background: purple }
+ .move-list .timeline7 { background: teal }
+ .move-list .timeline8 { background: steelblue }
+ .move-list .timeline9 { background: slategrey }
+ .move-list .timeline10 { background: sienna }
+ .move-list .timeline11 { background: maroon}
+ .move-list .timeline12 { background:dimgray }
+ .move-list .timeline13 { background: mediumslateblue }
+ .move-list .timeline14 { background: limegreen }
+ .move-list .timeline15 { background: goldenrod }
+
+ /* loading pgn */
+ .paste-text { border-color: #999 }
+ /* tabs */
+ .current-tab { background-color: #000 !important; color: beige !important }
+ .tab { background-color: gold; color: #333 }
+ .tabs { background-color: gold }
+ .tab:hover { background-color: rgba(255, 255, 255, 0.5) }
+ /* tags */
+ .tag-input { background-color: #FFF; border: thin solid #DDD }
+ .delete-tag-button i { color: #900 }
+ .add-tag-button i { color: rebeccapurple }
+ .add-tag-button:hover i { color: blue }
+ .tag-button:hover i { color: #999 }
+ /* timeline */
+ .frame { background-color: #666; color: #FFF}
+ .connecting-line { border-color: #CCC }
+ .alternating-frame { background-color:rgba(255, 255, 255, 0.5) !important }
+ .current-move-frame { background-color: rgba(255, 255, 0, 0.75) !important }
+
+ .timeline1 .timeline-bar { background: rebeccapurple }
+ .timeline1 .frame { background-color: rebeccapurple }
+ .timeline1 .connecting-line { border-color: rebeccapurple }
+ 
+ .timeline2 .timeline-bar { background-color: darkred }
+ .timeline2 .frame { background-color: darkred }
+ .timeline2 .connecting-line { border-color: darkred }
+
+ .timeline3 .timeline-bar { background-color: green }
+ .timeline3 .frame { background-color: green }
+ .timeline3 .connecting-line { border-color: green }
+
+ .timeline4 .timeline-bar { background-color: midnightblue }
+ .timeline4 .frame { background-color: midnightblue }
+ .timeline4 .connecting-line { border-color: midnightblue }
+
+ .timeline5 .timeline-bar { background-color: olive }
+ .timeline5 .frame { background-color: olive }
+ .timeline5 .connecting-line { border-color: olive }
+
+ .timeline6 .timeline-bar { background-color: purple }
+ .timeline6 .frame { background-color: purple }
+ .timeline6 .connecting-line { border-color: purple }
+
+ .timeline7 .timeline-bar { background-color: teal }
+ .timeline7 .frame { background-color: teal }
+ .timeline7 .connecting-line { border-color: teal }
+
+ .timeline8 .timeline-bar { background-color:steelblue }
+ .timeline8 .frame { background-color: steelblue }
+ .timeline8 .connecting-line { border-color: steelblue }
+
+ .timeline9 .timeline-bar { background-color: slategrey }
+ .timeline9 .frame { background-color: slategrey }
+ .timeline9 .connecting-line { border-color: slategrey }
+
+ .timeline10 .timeline-bar { background-color: sienna }
+ .timeline10 .frame { background-color: sienna }
+ .timeline10 .connecting-line { border-color: sienna }
+
+ .timeline11 .timeline-bar { background-color: maroon }
+ .timeline11 .frame { background-color: maroon }
+ .timeline11 .connecting-line { border-color: maroon }
+
+ .timeline12 .timeline-bar { background-color: dimgray }
+ .timeline12 .frame { background-color: dimgray }
+ .timeline12 .connecting-line { border-color: dimgray }
+
+ .timeline13 .timeline-bar { background-color: mediumslateblue }
+ .timeline13 .frame { background-color: mediumslateblue }
+ .timeline13 .connecting-line { border-color: mediumslateblue }
+
+ .timeline14 .timeline-bar { background-color: limegreen }
+ .timeline14 .frame { background-color: limegreen }
+ .timeline14 .connecting-line { border-color: limegreen }
+
+ .timeline15 .timeline-bar { background-color: goldenrod }
+ .timeline15 .frame { background-color: goldenrod }
+ .timeline15 .connecting-line { border-color: goldenrod }
+}
