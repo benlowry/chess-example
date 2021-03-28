@@ -1,0 +1,143 @@
+html { height: 100%; font-size: 100% }
+body { min-width: 320px; font-family: sans-serif; padding: 0; margin: 0; height: 100% }
+a,
+button,
+img,
+input,
+textarea,
+li { outline: 0 }
+i { pointer-events: none }
+
+.columns { display: flex; user-select: none }
+.left { width: 40% }
+.right { width: 100% }
+.button { outline: 0; border-radius: 0.25rem; border: 2px outset; cursor: pointer; font-size: 0.8rem; line-height: 1.6rem }
+.button-down { border-style: inset !important }
+
+/* responsiveness */
+@media (orientation: portrait) {
+  .columns { flex-direction: column }
+ .left { width: 100% !important; max-width: none !important; height: auto !important }
+ .right { height: auto !important; flex: 1 }
+ .right-container { display: flex; flex-direction: column }
+}
+
+@media (orientation: landscape) {
+ .left { width: 33% !important }
+}
+
+
+/* board and pieces */
+.chessboard-container { position: relative; padding: 0; margin: 0 0 0.5rem 0 }
+.chessboard { width: 100%; padding: 0; margin: 0; border: none; border-collapse: collapse }
+.chessboard-square { width: 12.5%; padding: 0; margin: 0; position: relative }
+.chessboard-square sup { position: absolute; left: 0.25rem; top: 0.25rem; font-size: 0.6rem }
+.chessboard-square sub { position: absolute; bottom: 0.25rem; right: 0.25rem; font-size: 0.6rem }
+.chessboard-pieces { position: absolute; left: 0; top: 0; z-index: 1 }
+.chessboard-piece { position: absolute; width: 12% }
+.chessboard-move-arrows { position: absolute; left: 0; top: 0; z-index: 2 }
+.chessboard-arrows { opacity: 0; position: absolute; left: 0; top: 0; z-index: 2 }
+.chessboard-arrow { position: absolute; left: 0; top: 0; z-index: 3; width: 100%; height: 100%; stroke-linecap: round; }
+.fade-in { opacity: 1; transition: all 1s }
+.fade-out { opacity: 0; transition: all 1s }
+.move-description { margin: 0; height: 6rem; overflow: scroll; line-height: 1rem; font-size: 0.8rem }
+.move-description .annotation { font-weight: bold }
+
+/* header */
+.header-container { height: 6rem; margin: 0 }
+.header-title { margin: 0; padding: 0; font-size: 1.2rem; font-weight: normal }
+.header-subtitle { margin: 0; padding: 0; font-size: 1rem; font-weight: normal }
+.header-player-name { font-weight: bold }
+
+/* playback timeline */
+.playback-container { padding: 0.5rem }
+.timeline-container { margin: 0.5rem 0 0 0; position: relative }
+.timeline-bar { position: absolute; border-radius: 0.25rem; display: flex }
+.frame { font-weight: bold; font-size: 0.4rem; margin: 0; text-align: center; height: 1rem; line-height: 1rem; overflow: hidden }
+.frame:first-of-type { border-top-left-radius: 0.25rem; border-bottom-left-radius: 0.25rem }
+.frame:last-of-type { border-top-right-radius: 0.25rem; border-bottom-right-radius: 00.25rem }
+.connecting-line { position: absolute; top: 1rem; border-left: solid }
+.playback-controls { padding: 0; margin: 0 }
+.playback-controls .checkbox { font-size: 0.75rem }
+.playback-controls .checkbox input { padding: 0; margin: 0 0.25rem 0 0.5rem }
+.playback-control { height: 2rem }
+
+/* tabs */
+.tabs { margin: 0; padding: 0; display: flex }
+.tab { border: 0; cursor: pointer; outline: 0; height: 2rem; font-size: 0.8rem; padding-left: 0.5rem; padding-right: 0.5rem }
+
+/* annotations */
+.move-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
+.move-list-item { border-bottom: thin solid; padding: 0.25rem }
+.move-list .move-list-item:last-of-type { padding-bottom: 2rem }
+.move-list .move-list { display: block; padding: 0; list-style-type: none; margin: 0.5rem 0 0.5rem 0.5rem; overflow: visible }
+.move-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
+.move-list-button i { opacity: 0.5 }
+.move-list-button:hover i { opacity: 1 }
+.annotate-menu { margin: 0; padding: 0 }
+.annotate-button { margin: 0.25rem; border-width: thin; border-radius: 0.25rem }
+.move-sequence { width: 80%; font-size: 0.8rem; line-height: 1.6rem; margin: 0; display: flex; list-style-type: none; padding: 0 }
+.move-sequence-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
+.sequence-position-item { display: none; padding: 0.5rem 0.25rem 0.25rem 0.25rem }
+.move-options-item { margin: 0; padding: 0.25rem }
+.move-option-button { margin: 0; padding: 0.25rem; font-size: 1rem }
+.move-option-button i { opacity: 0.5 }
+.move-option-button:hover { background-color: none }
+.move-option-button:hover i { opacity: 1 }
+.move-location-button { font-size: 1rem; margin: 0; padding: 0 }
+.edit-annotation-button { margin: 0; padding: 0.25rem; border-color: transparent; border-radius: 0.25rem }
+.show-positioning .move-list .sequence-position-item { display: none !important }
+.show-positioning .show-positioning .sequence-position-item { display: inline-block !important }
+.show-positioning .sequence-position-item { display: inline-block !important }
+.show-positioning .annotation-forms { display: block }
+.branch-options { padding: 0.25rem }
+.branch-options .move-list-button { margin: 0 0.5rem 0 0 }
+.piece-glyph-wrapper { display: inline-block; padding: 0.125rem; border-radius: 0.125rem }
+.piece-glyph { font-size: 1.2rem }
+.annotation-tabs { display: inline-block; margin: 0.5rem 0 0 1rem; list-style-type: none; padding: 0; border-bottom: thin solid }
+.annotation-tab-item { display: inline-block; line-height: normal; margin-right: 0.125rem }
+.annotation-tab-item:first-of-type { margin-left: 0.5rem }
+.annotation-tab-item:last-of-type { margin-right: 2rem }
+.annotation-tab-button,
+.annotation-type-button { border: thin solid; border-bottom: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0 }
+.annotation-type { display: none; padding: 0.5rem 0 0 1rem }
+.annotation-tab { display: none; padding: 0.5rem 0 0 1rem }
+.annotation-forms { display: none }
+.annotation-form-button { margin: 0.5rem 0 0 0; border: none; border-radius: 0.5rem; font-size: 0.7rem; line-height: 1.4rem }
+.annotation-form-button i { opacity: 0.5 }
+.annotation-form-button:hover i { opacity: 1 }
+.highlight-switch { font-size: 0.7rem; background-color: transparent !important; border-color: transparent !important; padding: 0; margin: 0 }
+.current-annotation-tab { display: block !important }
+.nag-select { appearance: none; background-color: transparent; color: #FFF; border: none; outline: 0; padding: 0.25rem; margin: 0; width: 100%; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit; z-index: 1; outline: none }
+.nag-select::-ms-expand { display: none }
+.nag-select:hover,
+.nag-select:focus { background-color: rgba(255, 255, 255, 0.25); border-radius: 0.25rem }
+.select { display: grid; grid-template-areas: "select"; align-items: center; position: relative; min-width: 15ch; max-width: 30ch; border-radius: 0.25em; font-size: 1.25rem; cursor: pointer; line-height: 1.1; background-color: rgba(255, 255, 255, 0.25) }
+.select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; background-color: rgba(255, 255, 255, 0.5); clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
+.nag-select,
+.select::after { grid-area: select }
+.text-input { width: 100% }
+.annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 }
+.annotation-with-chessboard { display: flex }
+.mini-chessboard .chessboard { width: 14rem; height: 14rem }
+.mini-chessboard { margin-right: 0.5rem }
+
+/* tags */
+.tags-container { padding: 0 }
+.tags-table { border-collapse: collapse; margin: 0.5rem }
+.tags-table td { padding: 0.125rem }
+.tags-table .tag-name { width: 8rem }
+.tags-table .tag-value { width: 10rem }
+.tag-input { width: 100%; font-size: 0.8rem; line-height: 1rem; padding: 0.25rem }
+.tags-table tr:last-of-type td { padding-top: 1rem }
+.tag-button { margin-left: 0.5rem; background-color: transparent; border: none; padding: 0; font-size: 0.8rem; display: block; cursor: pointer }
+
+/* PGN */ 
+.pgn-container { margin: 0; padding: 0 }
+.pgn-controls { margin: 0; padding: 0 }
+.pgn { padding: 0.5rem; margin: 0; outline: 0; max-width: 50rem; white-space: pre-wrap; font-size: 0.8rem }
+.file-control { margin: 0.25rem }
+.paste-pgn-container { display: none; margin: 0.25rem }
+.paste-pgn { outline: 0; border: 1px solid; padding: 0.5rem; width: 90%; height: 10rem; display: block; margin: 0 0 0.25rem 0 }
+.paste-pgn-container .file-control { margin-top: 0; margin-left: 0 }
+
