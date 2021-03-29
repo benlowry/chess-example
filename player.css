@@ -26,7 +26,6 @@ i { pointer-events: none }
  .left { width: 33% !important }
 }
 
-
 /* board and pieces */
 .chessboard-container { position: relative; padding: 0; margin: 0 0 0.5rem 0 }
 .chessboard { width: 100%; padding: 0; margin: 0; border: none; border-collapse: collapse }
@@ -94,7 +93,7 @@ i { pointer-events: none }
 .branch-options .move-list-button { margin: 0 0.5rem 0 0 }
 .piece-glyph-wrapper { display: inline-block; padding: 0.125rem; border-radius: 0.125rem }
 .piece-glyph { font-size: 1.2rem }
-.annotation-tabs { display: inline-block; margin: 0.5rem 0 0 1rem; list-style-type: none; padding: 0; border-bottom: thin solid }
+.annotation-tabs { display: block; margin: 0; list-style-type: none; padding: 0; border-bottom: thin solid }
 .annotation-tab-item { display: inline-block; line-height: normal; margin-right: 0.125rem }
 .annotation-tab-item:first-of-type { margin-left: 0.5rem }
 .annotation-tab-item:last-of-type { margin-right: 2rem }
@@ -118,9 +117,11 @@ i { pointer-events: none }
 .select::after { grid-area: select }
 .text-input { width: 100% }
 .annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 }
-.annotation-with-chessboard { display: flex }
-.mini-chessboard .chessboard { width: 14rem; height: 14rem }
+.mini-chessboard-container { position: relative; height: 16rem; width: 16rem }
+.mini-chessboard .chessboard { pointer-events: none; width: 16rem; height: 16rem; position: absolute }
+.mini-chessboard svg { pointer-events: none; position: absolute; z-index: 1; top: 0; left: 0 }
 .mini-chessboard { margin-right: 0.5rem }
+.mini-chessboard td { cursor: pointer }
 
 /* tags */
 .tags-container { padding: 0 }
