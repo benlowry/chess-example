@@ -117,6 +117,7 @@
             <button class="button annotation-form-button add-text-button"><i class="fa fa-plus"></i> Add text</button>
             <button class="button annotation-form-button add-square-button"><i class="fa fa-plus"></i> Highlight square</button>
             <button class="button annotation-form-button add-arrow-button"><i class="fa fa-plus"></i> Draw arrow</button>
+            <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
           </div>
           <div class="text-input annotation-type">
             <textarea class="annotation-text"></textarea>
@@ -124,32 +125,49 @@
             <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
           </div>
           <div class="square-input mini-chessboard annotation-type">
-            <div class="square-color-options">
-              <button class="button highlight-switch square-color"><i class="fa fa-dot-circle"></i> Red</button>
-              <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Green</button>
-              <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Blue</button>
-              <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Yellow</button>
+            <div class="annotation-container">
+              <div class="annotation-entry">
+                <div class="square-color-options">
+                  <button class="button highlight-switch square-color"><i class="fa fa-dot-circle"></i> Red</button>
+                  <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Green</button>
+                  <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Blue</button>
+                  <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Yellow</button>
+                </div>
+                <div class="mini-chessboard-container">
+                  <table class="chessboard annotate-square-chessboard"></table>
+                </div>
+                <button class="button annotation-form-button insert-square-button"><i class="fa fa-pen"></i> Insert square(s)</button>
+                <button class="button annotation-form-button reset-squares-button"><i class="fa fa-redo"></i> Reset</button>
+                <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
+              </div>
+              <div class="annotation-list">
+                <ul class="pending-list pending-square-list"></ul>
+              </div>
             </div>
-            <div class="mini-chessboard-container">
-              <table class="chessboard annotate-square-chessboard"></table>
-            </div>
-            <button class="button annotation-form-button insert-square-button"><i class="fa fa-pen"></i> Insert square(s)</button>
-            <button class="button annotation-form-button reset-squares-button"><i class="fa fa-redo"></i> Reset</button>
-            <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
           </div>
           <div class="arrow-input mini-chessboard annotation-type">
-            <div class="arrow-color-options">
-              <button class="button highlight-switch arrow-color"><i class="fa fa-dot-circle"></i> Red</button>
-              <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Green</button>
-              <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Blue</button>
-              <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Yellow</button>
+            <div class="annotation-container">
+              <div class="annotation-entry">
+                <div class="arrow-color-options">
+                  <button class="button highlight-switch arrow-color"><i class="fa fa-dot-circle"></i> Red</button>
+                  <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Green</button>
+                  <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Blue</button>
+                  <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Yellow</button>
+                </div>
+                <div class="mini-chessboard-container">
+                  <table class="chessboard annotate-arrow-chessboard"></table>
+                  <div class="highlight-arrow-container"></div>
+                  <div class="preview-arrow-container"></div>
+                  <table class="chessboard annotate-chessboard annotate-arrow-hitarea"></table>
+                </div>
+                <button class="button annotation-form-button insert-arrow-button"><i class="fa fa-pen"></i> Insert arrow(s)</button>
+                <button class="button annotation-form-button reset-arrows-button"><i class="fa fa-redo"></i> Reset</button>
+                <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
+              </div>
+              <div class="annotation-list">
+                <ul class="pending-list pending-arrow-list"></ul>
+              </div>
             </div>
-            <div class="mini-chessboard-container">
-              <table class="chessboard annotate-arrow-chessboard"></table>
-            </div>
-            <button class="button annotation-form-button insert-arrow-button"><i class="fa fa-pen"></i> Insert arrow(s)</button>
-            <button class="button annotation-form-button reset-arrows-button"><i class="fa fa-redo"></i> Reset</button>
-            <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
           </div>
         </form>
         <form class="annotation-tab quiz-form">

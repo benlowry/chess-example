@@ -118,11 +118,17 @@ i { pointer-events: none }
 .text-input { width: 100% }
 .annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 }
 .mini-chessboard-container { position: relative; height: 16rem; width: 16rem }
-.mini-chessboard .chessboard { pointer-events: none; width: 16rem; height: 16rem; position: absolute }
-.mini-chessboard svg { pointer-events: none; position: absolute; z-index: 1; top: 0; left: 0 }
+.mini-chessboard .chessboard { width: 16rem; height: 16rem; position: absolute }
+.mini-chessboard svg { position: absolute; z-index: 1; top: 0; left: 0 }
+.annotate-chessboard { z-index: 2 }
 .mini-chessboard { margin-right: 0.5rem }
 .mini-chessboard td { cursor: pointer }
-
+.mini-chessboard .annotation-container { display: flex }
+.pending-list { margin: 1rem 0 0 1rem; padding: 0; list-style-type: none }
+.pending-list li { display: flex; margin-bottom: 0.5rem; line-height: 1.4rem }
+.pending-list span { font-family: monospace; font-size: 0.7rem; margin-right: 1rem; line-height: 1.4rem }
+.pending-list span i { display: inline-block; font-size: 0.7rem; border: thin solid; padding: 0 0.25rem; border-radius: 0.125rem; line-height: 1.4rem; font-style: normal }
+.pending-list .button { margin-top: 0 }
 /* tags */
 .tags-container { padding: 0 }
 .tags-table { border-collapse: collapse; margin: 0.5rem }

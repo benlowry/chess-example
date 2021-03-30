@@ -13,7 +13,7 @@
  .mini-chessboard .black-square { background-color: rgba(255, 255, 255, 0.5); color: #FFF }
  .mini-chessboard .white-square { background-color: rgba(255, 255, 255, 0.75); color: #FFF }
  .mini-chessboard .highlight-switch { color: rgba(255, 255, 255, 0.75) }
- .mini-chessboard td:hover { background-color: rgba(0, 0, 0, 0.25) }
+ .mini-chessboard td:hover { background-color: rgba(0, 0, 0, 0.25) !important }
 
  /* highlights */
  .red-square { background-color: darkred !important }
