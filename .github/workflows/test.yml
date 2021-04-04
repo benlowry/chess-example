@@ -1,0 +1,25 @@
+name: test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - name: Run test suite
+      run: |
+        git clone https://github.com/benlowry/chess-pgn-player ../player
+        cd ../player
+        npm install
+        grunt
+    - name: Publish to Github
+      uses: stefanzweifel/git-auto-commit-action@v4.1.6
+      with:
+        commit_message: Automatically regenerated against current version
+        branch: ${{ github.head_ref }}
+        commit_options: '--no-verify --signoff'
+        repository: .

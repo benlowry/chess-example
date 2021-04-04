@@ -67,7 +67,7 @@ i { pointer-events: none }
 
 /* annotations */
 .move-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
-.move-list-item { border-bottom: thin solid; padding: 0.25rem }
+.move-list-item { border-bottom: thin solid; padding: 0.25rem; position: relative }
 .move-list .move-list-item:last-of-type { padding-bottom: 2rem }
 .move-list .move-list { display: block; padding: 0; list-style-type: none; margin: 0.5rem 0 0.5rem 0.5rem; overflow: visible }
 .move-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
@@ -75,7 +75,7 @@ i { pointer-events: none }
 .move-list-button:hover i { opacity: 1 }
 .annotate-menu { margin: 0; padding: 0 }
 .annotate-button { margin: 0.25rem; border-width: thin; border-radius: 0.25rem }
-.move-sequence { width: 80%; font-size: 0.8rem; line-height: 1.6rem; margin: 0; display: flex; list-style-type: none; padding: 0 }
+.move-sequence { font-size: 0.8rem; line-height: 1.6rem; margin: 0 0 0.5rem 0; display: flex; list-style-type: none; padding: 0 }
 .move-sequence-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
 .sequence-position-item { display: none; padding: 0.5rem 0.25rem 0.25rem 0.25rem }
 .move-options-item { margin: 0; padding: 0.25rem }
@@ -83,40 +83,37 @@ i { pointer-events: none }
 .move-option-button i { opacity: 0.5 }
 .move-option-button:hover { background-color: none }
 .move-option-button:hover i { opacity: 1 }
-.move-location-button { font-size: 1rem; margin: 0; padding: 0 }
+.move-location-button { font-size: 1rem; margin: 0; padding: 0; pointer-events: none }
 .edit-annotation-button { margin: 0; padding: 0.25rem; border-color: transparent; border-radius: 0.25rem }
 .show-positioning .move-list .sequence-position-item { display: none !important }
 .show-positioning .show-positioning .sequence-position-item { display: inline-block !important }
 .show-positioning .sequence-position-item { display: inline-block !important }
-.show-positioning .annotation-forms { display: block }
+.insertion-form-selector { display: block; margin-left: 2.5rem }
+.selected-position,
+.edit-position { border-radius: 0.25rem }
 .branch-options { padding: 0.25rem }
 .branch-options .move-list-button { margin: 0 0.5rem 0 0 }
 .piece-glyph-wrapper { display: inline-block; padding: 0.125rem; border-radius: 0.125rem }
 .piece-glyph { font-size: 1.2rem }
-.annotation-tabs { display: block; margin: 0; list-style-type: none; padding: 0; border-bottom: thin solid }
-.annotation-tab-item { display: inline-block; line-height: normal; margin-right: 0.125rem }
-.annotation-tab-item:first-of-type { margin-left: 0.5rem }
-.annotation-tab-item:last-of-type { margin-right: 2rem }
-.annotation-tab-button,
-.annotation-type-button { border: thin solid; border-bottom: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0 }
-.annotation-type { display: none; padding: 0.5rem 0 0 1rem }
-.annotation-tab { display: none; padding: 0.5rem 0 0 1rem }
-.annotation-forms { display: none }
-.annotation-form-button { margin: 0.5rem 0 0 0; border: none; border-radius: 0.5rem; font-size: 0.7rem; line-height: 1.4rem }
-.annotation-form-button i { opacity: 0.5 }
+.annotation-form-button { font-weight: bold; margin: 0; border: none; border-radius: 0.5rem; font-size: 0.7rem; line-height: 1.4rem }
+.annotation-form-button i { opacity: 0.75 }
 .annotation-form-button:hover i { opacity: 1 }
+.insertion-form-selector,
+.annotation-form { padding: 0.5rem; border-radius: 0.5rem; display: inline-block; width: auto; border: thin solid }
+.annotation-form,
+.insertion-form-selector { position: absolute; z-index: 999 }
+    
 .highlight-switch { font-size: 0.7rem; background-color: transparent !important; border-color: transparent !important; padding: 0; margin: 0 }
-.current-annotation-tab { display: block !important }
-.nag-select { appearance: none; background-color: transparent; color: #FFF; border: none; outline: 0; padding: 0.25rem; margin: 0; width: 100%; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit; z-index: 1; outline: none }
+.nag-select { appearance: none; border: none; outline: 0; padding: 0.25rem; margin: 0; width: 100%; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit; z-index: 1; outline: none }
 .nag-select::-ms-expand { display: none }
 .nag-select:hover,
-.nag-select:focus { background-color: rgba(255, 255, 255, 0.25); border-radius: 0.25rem }
-.select { display: grid; grid-template-areas: "select"; align-items: center; position: relative; min-width: 15ch; max-width: 30ch; border-radius: 0.25em; font-size: 1.25rem; cursor: pointer; line-height: 1.1; background-color: rgba(255, 255, 255, 0.25) }
-.select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; background-color: rgba(255, 255, 255, 0.5); clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
+.nag-select:focus { border-radius: 0.25rem }
+.select { margin-bottom: 0.5rem; display: grid; grid-template-areas: "select"; align-items: center; position: relative; min-width: 15ch; max-width: 30ch; border-radius: 0.25em; font-size: 1.25rem; cursor: pointer; line-height: 1.1 }
+.select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
 .nag-select,
 .select::after { grid-area: select }
-.text-input { width: 100% }
-.annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 }
+.text-input { width: 100%; max-width: 40rem }
+.annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 0 0.5rem 0 }
 .mini-chessboard-container { position: relative; height: 16rem; width: 16rem }
 .mini-chessboard .chessboard { width: 16rem; height: 16rem; position: absolute }
 .mini-chessboard svg { position: absolute; z-index: 1; top: 0; left: 0 }
