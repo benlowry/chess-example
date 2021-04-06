@@ -106,7 +106,7 @@
   <template id="new-nag-form">
     <form class="annotation-form nag-form">
       <div class="select">
-        <select class="nag-select"></select>
+        <select class="nag-select" size="1"></select>
       </div>
       <button class="button annotation-form-button add-nag-button"><i class="fa fa-pen"></i> Insert nag</button>
       <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
@@ -115,7 +115,7 @@
   <template id="edit-nag-form">
     <form class="annotation-form nag-form">
       <div class="select">
-        <select class="nag-select"></select>
+        <select class="nag-select" size="1"></select>
       </div>
       <button class="button annotation-form-button update-nag-button"><i class="fa fa-pen"></i> Update nag</button>
       <button class="button annotation-form-button delete-nag-button"><i class="fa fa-trash"></i> Delete nag</button>
@@ -150,7 +150,8 @@
   </template>
   <template id="annotation-builder-options">
     <div class="annotation-button-container">
-      <button class="submit-button button annotation-form-button add-annotation-button"><i class="fa fa-pen"></i> Insert annotation</button>
+      <button class="submit-button button annotation-form-button insert-annotation-button"><i class="fa fa-pen"></i> Insert annotation</button>
+      <button class="submit-button button annotation-form-button update-annotation-button"><i class="fa fa-pen"></i> Update annotation</button>
       <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
     </div>
   </template>
@@ -182,15 +183,44 @@
       <div class="annotation-container">
         <div class="annotation-entry">
           <div class="square-color-options">
-            <button class="button highlight-switch square-color"><i class="fa fa-dot-circle"></i> Red</button>
-            <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Green</button>
-            <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Blue</button>
-            <button class="button highlight-switch square-color"><i class="fa fa-circle"></i> Yellow</button>
+            <button class="button highlight-switch square-color red-square-button"><i class="fa fa-dot-circle"></i> Red</button>
+            <button class="button highlight-switch square-color green-square-button"><i class="fa fa-circle"></i> Green</button>
+            <button class="button highlight-switch square-color blue-square-button"><i class="fa fa-circle"></i> Blue</button>
+            <button class="button highlight-switch square-color yellow-square-button"><i class="fa fa-circle"></i> Yellow</button>
           </div>
+          <form class="square-entry-fallback entry-fallback">
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-column">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+                <option>f</option>
+                <option>g</option>
+                <option>h</option>
+              </select>
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-row">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+              </select>
+            </div>
+            <div>
+              <button class="button annotation-form-button highlight-square-button"><i class="fa fa-plus"></i> Add</button>
+            </div>
+          </form>
           <div class="mini-chessboard-container">
             <table class="chessboard annotate-square-chessboard"></table>
           </div>
-          <button class="button annotation-form-button update-nag-button"><i class="fa fa-pen"></i> Update square(s)</button>
+          <button class="button annotation-form-button insert-squares-text-button"><i class="fa fa-pen"></i> Insert square(s)</button>
           <button class="button annotation-form-button reset-squares-button"><i class="fa fa-redo"></i> Reset</button>
           <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
         </div>
@@ -204,10 +234,45 @@
     <div class="square-input mini-chessboard">
       <div class="annotation-container">
         <div class="annotation-entry">
+          <div class="square-color-options">
+            <button class="button highlight-switch square-color red-square-button"><i class="fa fa-dot-circle"></i> Red</button>
+            <button class="button highlight-switch square-color green-square-button"><i class="fa fa-circle"></i> Green</button>
+            <button class="button highlight-switch square-color blue-square-button"><i class="fa fa-circle"></i> Blue</button>
+            <button class="button highlight-switch square-color yellow-square-button"><i class="fa fa-circle"></i> Yellow</button>
+          </div>
+          <form class="square-entry-fallback entry-fallback">
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-column">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+                <option>f</option>
+                <option>g</option>
+                <option>h</option>
+              </select>
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-row">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+              </select>
+            </div>
+            <div>
+              <button class="button annotation-form-button highlight-square-button"><i class="fa fa-plus"></i> Add</button>
+            </div>
+          </form>
           <div class="mini-chessboard-container">
             <table class="chessboard annotate-square-chessboard"></table>
           </div>
-          <button class="button annotation-form-button update-nag-button"><i class="fa fa-pen"></i> Update square(s)</button>
+          <button class="button annotation-form-button update-squares-text-button"><i class="fa fa-pen"></i> Update square(s)</button>
           <button class="button annotation-form-button reset-squares-button"><i class="fa fa-redo"></i> Reset</button>
           <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
         </div>
@@ -222,11 +287,67 @@
       <div class="annotation-container">
         <div class="annotation-entry">
           <div class="arrow-color-options">
-            <button class="button highlight-switch arrow-color"><i class="fa fa-dot-circle"></i> Red</button>
-            <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Green</button>
-            <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Blue</button>
-            <button class="button highlight-switch arrow-color"><i class="fa fa-circle"></i> Yellow</button>
+            <button class="button highlight-switch arrow-color red-arrow-button"><i class="fa fa-dot-circle"></i> Red</button>
+            <button class="button highlight-switch arrow-color green-arrow-button"><i class="fa fa-circle"></i> Green</button>
+            <button class="button highlight-switch arrow-color blue-arrow-button"><i class="fa fa-circle"></i> Blue</button>
+            <button class="button highlight-switch arrow-color yellow-arrow-button"><i class="fa fa-circle"></i> Yellow</button>
           </div>
+          <form class="arrow-entry-fallback entry-fallback">
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-column-start">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+                <option>f</option>
+                <option>g</option>
+                <option>h</option>
+              </select>
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-row-start">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+              </select>
+            </div>
+            <div class="coordinate-select coordinate-to-bridge">
+              to
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-column-end">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+                <option>f</option>
+                <option>g</option>
+                <option>h</option>
+              </select>
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-row-end">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+              </select>
+            </div>
+            <div>
+              <button class="button annotation-form-button highlight-square-button"><i class="fa fa-plus"></i> Add</button>
+            </div>
+          </form>
           <div class="mini-chessboard-container">
             <table class="chessboard annotate-arrow-chessboard"></table>
             <div class="highlight-arrow-container"></div>
@@ -247,13 +368,75 @@
     <div class="arrow-input mini-chessboard">
       <div class="annotation-container">
         <div class="annotation-entry">
+          <div class="arrow-color-options">
+            <button class="button highlight-switch arrow-color red-arrow-button"><i class="fa fa-dot-circle"></i> Red</button>
+            <button class="button highlight-switch arrow-color green-arrow-button"><i class="fa fa-circle"></i> Green</button>
+            <button class="button highlight-switch arrow-color blue-arrow-button"><i class="fa fa-circle"></i> Blue</button>
+            <button class="button highlight-switch arrow-color yellow-arrow-button"><i class="fa fa-circle"></i> Yellow</button>
+          </div>
+          <form class="arrow-entry-fallback entry-fallback">
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-column-start">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+                <option>f</option>
+                <option>g</option>
+                <option>h</option>
+              </select>
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-row-start">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+              </select>
+            </div>
+            <div class="coordinate-select coordinate-to-bridge">
+              to
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-column-end">
+                <option>a</option>
+                <option>b</option>
+                <option>c</option>
+                <option>d</option>
+                <option>e</option>
+                <option>f</option>
+                <option>g</option>
+                <option>h</option>
+              </select>
+            </div>
+            <div class="select coordinate-select">
+              <select class="coordinate-select select-row-end">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+                <option>6</option>
+                <option>7</option>
+                <option>8</option>
+              </select>
+            </div>
+            <div>
+              <button class="button annotation-form-button highlight-square-button"><i class="fa fa-plus"></i> Add</button>
+            </div>
+          </form>          
           <div class="mini-chessboard-container">
             <table class="chessboard annotate-arrow-chessboard"></table>
             <div class="highlight-arrow-container"></div>
             <div class="preview-arrow-container"></div>
             <table class="chessboard annotate-chessboard annotate-arrow-hitarea"></table>
           </div>
-          <button class="button annotation-form-button update-nag-button"><i class="fa fa-pen"></i> Update arrow(s)</button>
+          <button class="button annotation-form-button update-arrow-button"><i class="fa fa-pen"></i> Update arrow(s)</button>
           <button class="button annotation-form-button reset-arrows-button"><i class="fa fa-redo"></i> Reset</button>
           <button class="button annotation-form-button cancel-annotation-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
         </div>
