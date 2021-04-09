@@ -1,11 +1,13 @@
 ((exports) => {
-  exports.setupAnnotations = setupAnnotations
-  exports.refreshAnnotations = refreshAnnotations
   exports.expandAnnotationSequence = expandAnnotationSequence
+  exports.nextMoveNumber = nextMoveNumber
+  exports.refreshAnnotations = refreshAnnotations
+  exports.setupAnnotations = setupAnnotations
 
-  let moveList, lastRenderedPGN
+  let container, moveList, lastRenderedPGN, timeline
 
   function setupAnnotations () {
+    container = document.querySelector('.annotations-container')
     moveList = document.querySelector('.move-list')
     document.onmousedown = startHighlightArrow
     document.onmousemove = previewHighlightArrow
@@ -13,14 +15,15 @@
   }
 
   function refreshAnnotations () {
-    if (!moveList) {
+    if (!moveList || container.style.display === 'none') {
       return
     }
     if (lastRenderedPGN !== window.pgn) {
+      timeline = 1
       lastRenderedPGN = window.pgn
       moveList.innerHTML = ''
       moveList.classList.add('timeline1')
-      renderMoves(window.pgn.turns, moveList, 1)
+      renderMoves(window.pgn.turns, moveList)
     }
     if (document.body.offsetHeight > document.body.offsetWidth) {
       moveList.style.height = (document.body.offsetHeight - document.querySelector('.tabs-container').offsetHeight - document.querySelector('.left').offsetHeight) + 'px'
@@ -180,48 +183,32 @@
     return parser.tokenizeLine(joined)
   }
 
-  function renderMoves (moves, parent, timeline) {
+  function renderMoves (moves, parent) {
     for (const move of moves) {
-      const li = document.createElement('li')
-      li.moveIndex = move.move
+      let li = createFromTemplate('#move-components-template')
+      parent.appendChild(li)
+      li = parent.lastElementChild
       li.move = move
-      li.className = 'move-list-item'
-      const sequence = document.createElement('ul')
-      sequence.className = 'move-sequence'
+      li.sequence = move.sequence
+      const sequence = li.querySelector('.move-components')
       renderSequence(move.sequence, sequence)
-      li.appendChild(sequence)
       resetMoveContainerButtons(li)
       if (move.color === 'w') {
         li.classList.add('white-move-link')
       } else {
         li.classList.add('black-move-link')
       }
-      if (move.siblings) {
-        for (const sibling of move.siblings) {
-          timeline++
-          const ul = document.createElement('ul')
-          ul.className = `move-list timeline${timeline}`
-          li.appendChild(ul)
-          timeline = renderMoves(sibling, ul, timeline)
-          const branchOptions = document.createElement('li')
-          branchOptions.className = 'branch-options'
-          const addBranchButton = document.createElement('button')
-          addBranchButton.className = 'button move-list-button'
-          addBranchButton.innerHTML = '<i class="fas fa-plus"></i></span> Add move'
-          addBranchButton.title = 'Add move'
-          branchOptions.appendChild(addBranchButton)
-          const deleteLastButton = document.createElement('button')
-          deleteLastButton.className = 'button move-list-button'
-          deleteLastButton.innerHTML = '<i class="fas fa-trash"></i></span> Delete last move'
-          branchOptions.appendChild(deleteLastButton)
-          const deleteBranchButton = document.createElement('button')
-          deleteBranchButton.className = 'button move-list-button'
-          deleteBranchButton.innerHTML = '<i class="fas fa-trash"></i></span> Delete branch'
-          branchOptions.appendChild(deleteBranchButton)
-          ul.appendChild(branchOptions)
-        }
+      if (!move.siblings || !move.siblings.length) {
+        continue
       }
-      parent.appendChild(li)
+      for (const sibling of move.siblings) {
+        timeline++
+        let ul = createFromTemplate('#sibling-components-template')
+        li.appendChild(ul)
+        ul = li.lastElementChild
+        ul.classList.add(`timeline${timeline}`)
+        timeline = renderMoves(sibling, ul)
+      }
     }
     return timeline
   }
@@ -233,7 +220,7 @@
       expandedSequence.pop()
       expandedSequence.shift()
     }
-    const renderingAnnotation = container.classList.contains('annotation-sequence')
+    const renderingAnnotation = container.classList.contains('annotation-components')
     for (const i in expandedSequence) {
       const item = expandedSequence[i]
       const li = document.createElement('li')
@@ -251,7 +238,7 @@
             li.mouseEnabled = false
           }
         } else {
-          li.onmousedown = selectMoveSequencePosition
+          li.onmousedown = selectMoveComponentsPosition
           li.position = i
           li.sequence = expandedSequence
         }
@@ -266,7 +253,7 @@
         li.firstChild.mouseEnabled = false
         continue
       }
-      li.className = 'move-sequence-item'
+      li.className = 'move-components-item'
       if (item.length > 30) {
         li.title = item
         li.innerHTML = item.substring(0, 20) + '...'
@@ -283,12 +270,12 @@
     return container
   }
 
-  function selectMoveSequencePosition (event) {
+  function selectMoveComponentsPosition (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
-    const positionList = moveContainer.querySelector('.move-sequence')
+    const positionList = moveContainer.querySelector('.move-components')
     let editing
     for (const child of positionList.children) {
       if (child.classList.contains('edit-position')) {
@@ -316,25 +303,21 @@
       }
     }
     if (editing) {
-      return editMoveSequencePosition(event)
+      return editMoveComponentsPosition(event)
     }
     const newForm = makeInsertionTypeSelector(moveContainer)
-    clearContents(moveContainer)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    if (moveSequence.nextSibling) {
-      moveContainer.insertBefore(newForm, moveSequence.nextSibling)
-    } else {
-      moveContainer.appendChild(newForm)
-    }
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    moveForms.appendChild(newForm)
   }
 
-  function editMoveSequencePosition (event) {
+  function editMoveComponentsPosition (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
     expandMoveContainer(moveContainer)
-    const sequence = moveContainer.querySelector('.move-sequence')
+    const sequence = moveContainer.querySelector('.move-components')
     const position = findElementChildIndex(event.target) - 1
     for (const child of sequence.children) {
       if (child === event.target) {
@@ -351,12 +334,12 @@
     if (formSelector) {
       formSelector.parentNode.removeChild(formSelector)
     }
-    const expandedSequence = expandSequence(moveContainer.move.sequence)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
+    const expandedSequence = expandSequence(moveContainer.sequence)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
     const editing = expandedSequence[position]
     // editing a nag
     if (event.target.innerHTML.startsWith('$')) {
-      clearContents(moveContainer)
       const newForm = makeNagForm('#edit-nag-form')
       const nagSelect = newForm.querySelector('.nag-select')
       nagSelect.selectedIndex = parseInt(editing.substring(1), 10)
@@ -366,32 +349,22 @@
       if (formSelector) {
         formSelector.parentNode.removeChild(formSelector)
       }
-      if (moveSequence.nextSibling) {
-        moveContainer.insertBefore(newForm, moveSequence.nextSibling)
-      } else {
-        moveContainer.appendChild(newForm)
-      }
+      moveForms.appendChild(newForm)
       return
     }
     // editing an annotation
     if (event.target.innerHTML.startsWith('{')) {
-      clearContents(moveContainer)
-      const newForm = makeAnnotationBuilder(moveContainer, window.parser.tokenizeLine(editing))
-      if (moveSequence.nextSibling) {
-        moveContainer.insertBefore(newForm, moveSequence.nextSibling)
-      } else {
-        moveContainer.appendChild(newForm)
-      }
-      return
+      const newForm = makeAnnotationEditor(moveContainer, window.parser.tokenizeLine(editing))
+      moveForms.appendChild(newForm)
     }
   }
 
-  function selectAnnotationSequencePosition(event) {
+  function selectAnnotationSequencePosition (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
-    const positionList = moveContainer.querySelector('.annotation-sequence')
+    const positionList = moveContainer.querySelector('.annotation-components')
     let editing
     for (const child of positionList.children) {
       if (child.classList.contains('edit-position')) {
@@ -433,9 +406,9 @@
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
-    const sequence = moveContainer.querySelector('.annotation-sequence')
+    const components = moveContainer.querySelector('.annotation-components')
     const position = findElementChildIndex(event.target)
-    for (const child of sequence.children) {
+    for (const child of components.children) {
       if (child === event.target) {
         child.classList.add('edit-position')
       } else if (child.classList.contains('edit-position')) {
@@ -545,7 +518,7 @@
       }
       const cancelButton = formContainer.querySelector('.cancel-button')
       cancelButton.onclick = cancelAndCloseForm
-      return 
+      return
     }
     // a text block
     const newForm = makeAnnotationTextForm(moveContainer, '#edit-text-annotation-form')
@@ -559,29 +532,29 @@
   function cancelAndCloseForm (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
     unexpandMoveContainer(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
-    clearContents(moveContainer)
+    unselectMoveComponentsPosition(moveContainer)
   }
 
   function switchForm (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
     const button = event.target
     const formCreator = button.formCreator
     const moveContainer = findMoveContainer(event.target)
-    if (button.formContainer) {
-      button.formContainer.innerHTML = ''
-    } else {
-      clearContents(moveContainer)
-    }
     const newForm = formCreator(moveContainer)
     if (button.formContainer) {
+      button.formContainer.innerHTML = ''
       return button.formContainer.appendChild(newForm)
     }
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    if (moveSequence.nextSibling) {
-      moveContainer.insertBefore(newForm, moveSequence.nextSibling)
-    } else{
-      moveContainer.appendChild(newForm)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    moveForms.appendChild(newForm)
+    if (button.formSetup) {
+      button.formSetup(moveContainer)
     }
   }
 
@@ -592,7 +565,8 @@
     nagButton.formCreator = makeNagForm
     nagButton.onclick = switchForm
     const annotationButton = form.querySelector('.annotation-button')
-    annotationButton.formCreator = makeAnnotationBuilder
+    annotationButton.formCreator = makeAnnotationEditor
+    annotationButton.formSetup = setupAnnotationEditor
     annotationButton.onclick = switchForm
     const alternativeMovesButton = form.querySelector('.alternative-moves-button')
     alternativeMovesButton.formCreator = makeAlternativeMovesForm
@@ -605,29 +579,31 @@
     return form
   }
 
-  function makeAnnotationBuilder(moveContainer, annotationSequence) {
-    clearContents(moveContainer)
-    const form = createForm('#annotation-builder')
-    const moveSequence = form.querySelector('.annotation-sequence')
+  function makeAnnotationEditor (moveContainer, annotationSequence) {
+    const form = createFromTemplate('#annotation-editor')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const annotationComponents = form.querySelector('.annotation-components')
     moveContainer.annotationSequence = annotationSequence || ['{}']
-    moveContainer.appendChild(form)
-    renderSequence(moveContainer.annotationSequence, moveSequence, true)
-    makeAnnotationOptionSelector(moveContainer)
-    const preselectPosition = moveSequence.children.length === 5 ? moveSequence.children[2] : moveSequence.children[moveSequence.children.length - 2]
-    selectAnnotationSequencePosition({
-      target: preselectPosition
-    })
-    const cancelButton = moveContainer.querySelector('.cancel-button')
+    renderSequence(moveContainer.annotationSequence, annotationComponents, true)
+    const formContainer = form.querySelector('.annotation-form-container')
+    const editing = !!moveComponents.querySelector('.edit-position')
+    makeAnnotationOptionSelector(formContainer, editing)
+    const cancelButton = formContainer.querySelector('.cancel-button')
     cancelButton.onclick = cancelAndCloseForm
     return form
   }
+  function setupAnnotationEditor (moveContainer) {
+    const annotationComponents = moveContainer.querySelector('.annotation-components')
+    const preselectPosition = annotationComponents.children.length === 5 ? annotationComponents.children[2] : annotationComponents.children[annotationComponents.children.length - 2]
+    selectAnnotationSequencePosition({
+      target: preselectPosition
+    })
+  }
 
-  function makeAnnotationOptionSelector (moveContainer) {
-    const form = createForm('#annotation-builder-options')
-    const formContainer = moveContainer.querySelector('.annotation-form-container')
+  function makeAnnotationOptionSelector (formContainer, editing) {
+    const form = createFromTemplate('#annotation-editor-options')
     formContainer.innerHTML = ''
     formContainer.appendChild(form)
-    const editing = moveContainer.querySelector('.edit-position') ? true : false
     const insertAnnotationButton = formContainer.querySelector('.insert-annotation-button')
     insertAnnotationButton.onclick = addAnnotation
     insertAnnotationButton.style.display = editing ? 'none' : 'inline-block'
@@ -641,7 +617,7 @@
   }
 
   function makeAnnotationTypeSelector (moveContainer) {
-    const form = createForm('#annotation-type-selector')
+    const form = createFromTemplate('#annotation-type-selector')
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     const addTextButton = form.querySelector('.add-text-button')
     addTextButton.formCreator = makeAnnotationTextForm
@@ -656,14 +632,14 @@
     addArrowButton.formContainer = formContainer
     addArrowButton.onclick = switchForm
     const cancelButton = form.querySelector('.cancel-button')
-    cancelButton.formCreator = makeAnnotationBuilder
+    cancelButton.formCreator = makeAnnotationEditor
     cancelButton.onclick = switchForm
     return form
   }
 
   function makeNagForm (eventOrTemplate) {
     const template = eventOrTemplate && eventOrTemplate.substring ? eventOrTemplate : '#new-nag-form'
-    const newForm = createForm(template)
+    const newForm = createFromTemplate(template)
     const nagIndex = document.querySelector('#nag-index')
     const nagSelect = newForm.querySelector('.nag-select')
     nagSelect.innerHTML = nagIndex.content.firstElementChild.innerHTML
@@ -685,27 +661,192 @@
     return newForm
   }
 
-  function makeAlternativeMovesForm () {
-    const newForm = createForm('#new-alternative-moves-form')
+  function makeAlternativeMovesForm (moveContainer) {
+    const newForm = createFromTemplate('#new-alternative-moves-form')
+    const chessBoard = newForm.querySelector('.chessboard')
+    const previousMoveState = {
+      pieces: moveContainer.move.previousPieces
+    }
+    if (moveContainer.move.color === 'w') {
+      newForm.querySelector('.black-move-title').style.display = 'none'
+    } else {
+      newForm.querySelector('.white-move-title').style.display = 'none'
+    }
+    const hitArea = chessBoard.parentNode.querySelector('.alternative-moves-hitarea')
+    hitArea.onmousedown = selectAlternativePiece
+    hitArea.onmouseup = moveAlternativePiece
+    moveContainer.alternativeMoves = []
+    setupMiniChessBoard(chessBoard, hitArea, previousMoveState, true)
+    const insertButton = newForm.querySelector('.insert-alternative-moves-button')
+    insertButton.onclick = insertAlternativeMove
     const cancelButton = newForm.querySelector('.cancel-button')
     cancelButton.formCreator = makeInsertionTypeSelector
     cancelButton.onclick = switchForm
     return newForm
+  }
+
+  function selectAlternativePiece (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    console.log('selecting alternative piece')
+    const moveContainer = findMoveContainer(event.target)
+    const pieces = moveContainer.move.previousPieces
+    const coordinate = event.target.className.split('-').pop()
+    if ('abcdefgh'.indexOf(coordinate[0]) === -1) {
+      return
+    }
+    if ('12345678'.indexOf(coordinate[1]) === -1) {
+      return
+    }
+    let requiredColor
+    if (moveContainer.alternativeMoves && moveContainer.alternativeMoves.length) {
+      requiredColor = moveContainer.alternativeMoves[moveContainer.alternativeMoves.length - 1].color === 'w' ? 'b' : 'w'
+    } else {
+      requiredColor = moveContainer.move.color === 'w' ? 'w' : 'b'
+    }
+    console.log('got valid coordinate', coordinate)
+    let selectedPiece
+    for (const piece of pieces) {
+      if (piece.coordinate === coordinate) {
+        selectedPiece = piece
+        break
+      }
+    }
+    if (!selectedPiece || selectedPiece.color !== requiredColor) {
+      delete (moveContainer.selectedPiece)
+      return
+    }
+    moveContainer.selectedPiece = selectedPiece
+  }
+
+  function moveAlternativePiece (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const moveContainer = findMoveContainer(event.target)
+    if (!moveContainer.selectedPiece) {
+      return
+    }
+    const coordinate = event.target.className.split('-').pop()
+    if ('abcdefgh'.indexOf(coordinate[0]) === -1) {
+      return
+    }
+    if ('12345678'.indexOf(coordinate[1]) === -1) {
+      return
+    }
+    const alternativeMoves = moveContainer.alternativeMoves
+    let pieces, moveNumber, dots, color
+    if (alternativeMoves.length) {
+      pieces = alternativeMoves[alternativeMoves.length - 1].pieces
+      moveNumber = nextMoveNumber(alternativeMoves[alternativeMoves.length - 1])
+      dots = alternativeMoves[alternativeMoves.length - 1].color === 'w' ? '...' : '.'
+      color = moveContainer.alternativeMoves[moveContainer.alternativeMoves.length - 1].color === 'w' ? 'b' : 'w'
+    } else {
+      pieces = moveContainer.move.previousPieces
+      moveNumber = moveContainer.move.moveNumber
+      dots = moveContainer.move.color === 'w' ? '.' : '...'
+      color = moveContainer.move.color === 'w' ? 'w' : 'b'
+    }
+    const pseudoMove = {
+      color,
+      moveNumber,
+      to: coordinate,
+      pieces: JSON.parse(JSON.stringify(pieces)),
+      piece: moveContainer.selectedPiece
+    }
+    const movement = window.parser.calculatePieceMovement(pseudoMove.piece, pseudoMove, pseudoMove.pieces)
+    if (!movement) {
+      return
+    }
+    for (const piece of pseudoMove.pieces) {
+      if (piece.type === pseudoMove.piece.type && piece.coordinate === pseudoMove.piece.coordinate) {
+        piece.coordinate = coordinate
+        break
+      }
+    }
+    // todo:
+    // 1) captured pieces
+    // 2) promoted pieces
+    // 3) moving pieces that, within the alternative sequence, have already moved
+    // 4) inserting the alternative sequence text
+    const chessBoard = moveContainer.querySelector('.alternative-moves-chessboard')
+    const cellBefore = chessBoard.querySelector(`.coordinate-${moveContainer.selectedPiece.coordinate}`)
+    const cellAfter = chessBoard.querySelector(`.coordinate-${coordinate}`)
+    cellAfter.style.backgroundImage = cellBefore.style.backgroundImage
+    cellBefore.style.backgroundImage = ''
+    alternativeMoves.push(pseudoMove)
+    const pendingList = moveContainer.querySelector('.pending-move-list')
+    const listItem = document.createElement('li')
+    listItem.innerHTML = `<span>${moveNumber}${dots} ${pseudoMove.piece.type} <i>${pseudoMove.piece.coordinate}</i> to <i>${coordinate}</i></span>`
+    pendingList.appendChild(listItem)
+  }
+
+  function nextMoveNumber (previousMove) {
+    const previousNumber = parseInt(previousMove.moveNumber, 10)
+    if (previousMove.color === 'w') {
+      return previousNumber
+    }
+    return previousNumber + 1
+  }
+
+  function insertAlternativeMove (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const moveContainer = findMoveContainer(event.target)
+    const pendingList = moveContainer.querySelector('.pending-move-list')
+    const annotationParts = []
+    for (const child of pendingList.children) {
+      let moveNumber = child.innerHTML.substring('<span>'.length)
+      moveNumber = moveNumber.substring(0, moveNumber.indexOf(' '))
+      let coordinate = child.innerHTML.substring(child.innerHTML.lastIndexOf('<i>') + 3)
+      coordinate = coordinate.substring(0, coordinate.indexOf('<'))
+      let coordinateBefore = child.innerHTML.substring(child.innerHTML.indexOf('<i>') + 3)
+      coordinateBefore = coordinateBefore[0]
+      let piece = child.innerHTML.substring(child.innerHTML.indexOf(' ') + 1)
+      piece = piece[0]
+      // TODO: this is a very verbose "1.Kde4" structure, it should be
+      // possible to calculate the smallest unambiguous expression
+      annotationParts.push(`${moveNumber}${piece}${coordinateBefore}${coordinate}`)
+    }
+    const annotationText = `(${annotationParts.join(' ')})`
+    const sibling = window.parser.parseTurn(annotationText.substring(1, annotationText.length - 1))
+    const selectedItem = moveContainer.querySelector('.selected-position')
+    const expandedSequence = selectedItem.sequence
+    const position = selectedItem.position
+    expandedSequence.splice(position, 0, ' ', annotationText)
+    moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
+    const moveComponents = moveContainer.querySelector('.move-components')
+    renderSequence(moveContainer.sequence, moveComponents)
+    resetMoveContainerButtons(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
+    unexpandMoveContainer(moveContainer)
+
+    let ul = createFromTemplate('#sibling-components-template')
+    moveContainer.appendChild(ul)
+    ul = moveContainer.lastElementChild
+    ul.className = `move-list timeline${timeline++}`
+    moveContainer.move.siblings = moveContainer.move.siblings || []
+    moveContainer.move.siblings.push(sibling)
+    renderMoves(sibling, ul)
   }
 
   function makeQuizForm () {
-    const newForm = createForm('#new-quiz-form')
+    const newForm = createFromTemplate('#new-quiz-form')
     const cancelButton = newForm.querySelector('.cancel-button')
     cancelButton.formCreator = makeInsertionTypeSelector
     cancelButton.onclick = switchForm
     return newForm
   }
 
-  function makeAnnotationTextForm(moveContainer, template) {
+  function makeAnnotationTextForm (moveContainer, template) {
     const formContainer = moveContainer.querySelector('.annotation-form-container')
-    const newForm = createForm(template || '#new-text-annotation-form')
+    const newForm = createFromTemplate(template || '#new-text-annotation-form')
     const insertTextButton = newForm.querySelector('.insert-text-button')
-    if (insertTextButton) {      
+    if (insertTextButton) {
       insertTextButton.onclick = insertAnnotationText
     }
     const updateButton = newForm.querySelector('.update-text-button')
@@ -725,7 +866,7 @@
 
   function makeAnnotationSquareForm (moveContainer, templateid) {
     const formContainer = moveContainer.querySelector('.annotation-form-container')
-    const newForm = createForm(templateid || '#new-square-annotation-form')
+    const newForm = createFromTemplate(templateid || '#new-square-annotation-form')
     const cancelButton = newForm.querySelector('.cancel-button')
     cancelButton.formCreator = makeAnnotationTypeSelector
     cancelButton.formContainer = formContainer
@@ -777,7 +918,7 @@
 
   function makeAnnotationArrowForm (moveContainer, templateid) {
     const formContainer = moveContainer.querySelector('.annotation-form-container')
-    const newForm = createForm(templateid || '#new-arrow-annotation-form')
+    const newForm = createFromTemplate(templateid || '#new-arrow-annotation-form')
     const cancelButton = newForm.querySelector('.cancel-button')
     cancelButton.formCreator = makeAnnotationTypeSelector
     cancelButton.formContainer = formContainer
@@ -831,12 +972,12 @@
     const coordinate2 = column2.value + row2.value
     column2.selectedIndex = 0
     row2.selectedIndex = 0
-   stopHighlightArrow({
+    stopHighlightArrow({
       target: chessboard.querySelector(`.coordinate-${coordinate2}`)
     })
   }
 
-  function createForm (templateid) {
+  function createFromTemplate (templateid) {
     const template = document.querySelector(templateid)
     const newForm = document.importNode(template.content, true)
     return newForm
@@ -1078,8 +1219,9 @@
     const moveContainer = findMoveContainer(event.target)
     if (moveContainer.classList.contains('show-positioning')) {
       unexpandMoveContainer(moveContainer)
-      unselectMoveSequencePosition(moveContainer)
-      return clearContents(moveContainer)
+      unselectMoveComponentsPosition(moveContainer)
+      const moveForms = moveContainer.querySelector('.move-forms')
+      moveForms.innerHTML = ''
     } else {
       return expandMoveContainer(moveContainer)
     }
@@ -1087,8 +1229,8 @@
 
   /**
    * adds annotation to the move sequence
-   * @param {} event 
-   * @returns 
+   * @param {} event
+   * @returns
    */
   function addAnnotation (event) {
     event.preventDefault()
@@ -1099,37 +1241,39 @@
       return
     }
     const position = findElementChildIndex(selectedPosition)
-    const expandedSequence = expandSequence(moveContainer.move.sequence)
+    const expandedSequence = expandSequence(moveContainer.sequence)
     if (expandedSequence.indexOf('{') > -1 && expandedSequence.indexOf('{') < position - 1 && expandedSequence.indexOf('}') > position - 1) {
       annotation = annotation.slice(1, annotation.length - 1)
     }
     expandedSequence.splice(position, 0, ' ', annotation)
-    moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
+    moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
     const sequence = selectedPosition.parentNode
-    renderSequence(moveContainer.move.sequence, sequence)
+    renderSequence(moveContainer.sequence, sequence)
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
   function updateAnnotation (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
-    let annotation = moveContainer.annotationSequence.join(' ')
+    const annotation = moveContainer.annotationSequence.join(' ')
     const editPosition = moveContainer.querySelector('.edit-position')
     if (!editPosition) {
       return
     }
     const position = findElementChildIndex(editPosition)
-    const expandedSequence = expandSequence(moveContainer.move.sequence)
+    const expandedSequence = expandSequence(moveContainer.sequence)
     expandedSequence[position - 1] = annotation
-    moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
-    const sequence = moveContainer.querySelector('.move-sequence')
-    renderSequence(moveContainer.move.sequence, sequence)
+    moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
+    const sequence = moveContainer.querySelector('.move-components')
+    renderSequence(moveContainer.sequence, sequence)
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
@@ -1139,68 +1283,71 @@
 
   /**
    * adds a nag to the move sequence
-   * @param {} event 
-   * @returns 
+   * @param {} event
+   * @returns
    */
   function addNag (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
     const nag = moveContainer.querySelector('.nag-select').value
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    const selectedItem = moveSequence.querySelector('.selected-position')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const selectedItem = moveComponents.querySelector('.selected-position')
     const expandedSequence = selectedItem.sequence
     const position = selectedItem.position
     expandedSequence.splice(position, 0, ' ', nag)
-    moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
-    renderSequence(moveContainer.move.sequence, moveSequence)
+    moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
+    renderSequence(moveContainer.sequence, moveComponents)
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
   function updateNag (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    const selectedItem = moveSequence.querySelector('.edit-position')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const selectedItem = moveComponents.querySelector('.edit-position')
     const expandedSequence = selectedItem.sequence
     const position = selectedItem.position
     const newNag = moveContainer.querySelector('.nag-select').value
     expandedSequence[position] = newNag
-    moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
-    renderSequence(moveContainer.move.sequence, moveSequence)
+    moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
+    renderSequence(moveContainer.sequence, moveComponents)
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
   function deleteNag (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    const selectedItem = moveSequence.querySelector('.edit-position')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const selectedItem = moveComponents.querySelector('.edit-position')
     const expandedSequence = selectedItem.sequence
     const position = selectedItem.position
     expandedSequence.splice(position, 1)
-    moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
-    renderSequence(moveContainer.move.sequence, moveSequence)
+    moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedSequence)
+    renderSequence(moveContainer.sequence, moveComponents)
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
   /**
    * adds text to the annotation block
-   * @param {} event 
-   * @returns 
+   * @param {} event
+   * @returns
    */
   function insertAnnotationText (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.selected-position')
     const textArea = moveContainer.querySelector('.annotation-text')
     const annotationText = textArea.value
@@ -1210,13 +1357,13 @@
     renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     formContainer.innerHTML = ''
-    return makeAnnotationOptionSelector(moveContainer)
+    return makeAnnotationOptionSelector(formContainer)
   }
 
   function updateAnnotationText (event) {
     event.preventDefault()
     const moveContainer = findMoveContainer(event.target)
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.edit-position')
     const textArea = moveContainer.querySelector('.annotation-text')
     const annotationText = textArea.value
@@ -1228,7 +1375,7 @@
     renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     formContainer.innerHTML = ''
-    return makeAnnotationOptionSelector(moveContainer)
+    return makeAnnotationOptionSelector(formContainer, true)
   }
 
   function deleteAnnotationText (event) {
@@ -1236,35 +1383,36 @@
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.edit-position')
     annotationPosition.sequence.splice(annotationPosition.position, 1)
     moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
-    const movePosition = moveSequence.querySelector('.edit-position')
-    const expandedMoveSequence = expandSequence(moveContainer.move.sequence)
+    const movePosition = moveComponents.querySelector('.edit-position')
+    const expandedmoveComponents = expandSequence(moveContainer.sequence)
     if (moveContainer.annotationSequence.length === 1 && moveContainer.annotationSequence[0] === '{}') {
       delete (moveContainer.annotationSequence)
-      expandedMoveSequence.splice(movePosition.position, 1)
-      moveContainer.move.sequence = contractExpandedSequence(expandedMoveSequence)
+      expandedmoveComponents.splice(movePosition.position, 1)
+      moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedmoveComponents)
     } else {
-      expandedMoveSequence[movePosition.position - 1] = contractExpandedSequence(annotationPosition.sequence).join(' ')
+      expandedmoveComponents[movePosition.position - 1] = contractExpandedSequence(annotationPosition.sequence).join(' ')
     }
     annotationPosition.sequence = moveContainer.expandedSequence
-    renderSequence(moveContainer.move.sequence, moveSequence)
+    renderSequence(moveContainer.sequence, moveComponents)
     if (moveContainer.annotationSequence) {
       renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     }
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
   /**
    * adds [% csl] to the annotation block
-   * @param {*} event 
-   * @returns 
+   * @param {*} event
+   * @returns
    */
   function insertSquareText (event) {
     if (event && event.preventDefault) {
@@ -1308,7 +1456,7 @@
     }
     if (annotationParts.length) {
       const annotationText = `[%csl ${annotationParts.join(',')}]`
-      const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+      const annotationSequence = moveContainer.querySelector('.annotation-components')
       const annotationPosition = annotationSequence.querySelector('.selected-position')
       annotationPosition.sequence.splice(annotationPosition.position, 0, ' ', annotationText)
       moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
@@ -1316,10 +1464,10 @@
     }
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     formContainer.innerHTML = ''
-    return makeAnnotationOptionSelector(moveContainer)
+    return makeAnnotationOptionSelector(formContainer)
   }
 
-  function updateSquareText(event) {
+  function updateSquareText (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
@@ -1362,15 +1510,15 @@
     if (!annotationParts.length) {
       return deleteSquareText(event)
     }
-    const annotationText = `[%csl ${annotationParts.join(',') }]`
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const annotationText = `[%csl ${annotationParts.join(',')}]`
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.edit-position')
     annotationPosition.sequence[annotationPosition.position] = annotationText
     moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
     renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     formContainer.innerHTML = ''
-    return makeAnnotationOptionSelector(moveContainer)
+    return makeAnnotationOptionSelector(formContainer, true)
   }
 
   function deleteSquareText (event) {
@@ -1378,35 +1526,36 @@
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.edit-position')
     annotationPosition.sequence.splice(annotationPosition.position, 1)
     moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
-    const movePosition = moveSequence.querySelector('.edit-position')
-    const expandedMoveSequence = expandSequence(moveContainer.move.sequence)
+    const movePosition = moveComponents.querySelector('.edit-position')
+    const expandedmoveComponents = expandSequence(moveContainer.sequence)
     if (moveContainer.annotationSequence.length === 1 && moveContainer.annotationSequence[0] === '{}') {
       delete (moveContainer.annotationSequence)
-      expandedMoveSequence.splice(movePosition.position, 1)
-      moveContainer.move.sequence = contractExpandedSequence(expandedMoveSequence)
+      expandedmoveComponents.splice(movePosition.position, 1)
+      moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedmoveComponents)
     } else {
-      expandedMoveSequence[movePosition.position - 1] = contractExpandedSequence(annotationPosition.sequence).join(' ')
+      expandedmoveComponents[movePosition.position - 1] = contractExpandedSequence(annotationPosition.sequence).join(' ')
     }
     annotationPosition.sequence = moveContainer.expandedSequence
-    renderSequence(moveContainer.move.sequence, moveSequence)
+    renderSequence(moveContainer.sequence, moveComponents)
     if (moveContainer.annotationSequence) {
       renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     }
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
   /**
    * adds [%cal] to the annotation
-   * @param {} event 
-   * @returns 
+   * @param {} event
+   * @returns
    */
   function insertArrowText (event) {
     event.preventDefault()
@@ -1434,7 +1583,7 @@
     }
     if (annotationParts.length) {
       const annotationText = `[%cal ${annotationParts.join(',')}]`
-      const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+      const annotationSequence = moveContainer.querySelector('.annotation-components')
       const annotationPosition = annotationSequence.querySelector('.selected-position')
       annotationPosition.sequence.splice(annotationPosition.position, 0, ' ', annotationText)
       moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
@@ -1442,10 +1591,10 @@
     }
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     formContainer.innerHTML = ''
-    return makeAnnotationOptionSelector(moveContainer)
+    return makeAnnotationOptionSelector(formContainer)
   }
 
-  function updateArrowText(event) {
+  function updateArrowText (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
@@ -1475,43 +1624,44 @@
       return deleteArrowText(event)
     }
     const annotationText = `[%cal ${annotationParts.join(',')}]`
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.edit-position')
     annotationPosition.sequence[annotationPosition.position] = annotationText
     moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
     renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     const formContainer = moveContainer.querySelector('.annotation-form-container')
     formContainer.innerHTML = ''
-    return makeAnnotationOptionSelector(moveContainer)
+    return makeAnnotationOptionSelector(formContainer, true)
   }
 
-  function deleteArrowText(event) {
+  function deleteArrowText (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
     const moveContainer = findMoveContainer(event.target)
-    const moveSequence = moveContainer.querySelector('.move-sequence')
-    const annotationSequence = moveContainer.querySelector('.annotation-sequence')
+    const moveComponents = moveContainer.querySelector('.move-components')
+    const annotationSequence = moveContainer.querySelector('.annotation-components')
     const annotationPosition = annotationSequence.querySelector('.edit-position')
     annotationPosition.sequence.splice(annotationPosition.position, 1)
     moveContainer.annotationSequence = contractExpandedSequence(annotationPosition.sequence)
-    const movePosition = moveSequence.querySelector('.edit-position')
-    const expandedMoveSequence = expandSequence(moveContainer.move.sequence)
+    const movePosition = moveComponents.querySelector('.edit-position')
+    const expandedmoveComponents = expandSequence(moveContainer.sequence)
     if (moveContainer.annotationSequence.length === 1 && moveContainer.annotationSequence[0] === '{}') {
       delete (moveContainer.annotationSequence)
-      expandedMoveSequence.splice(movePosition.position, 1)
-      moveContainer.move.sequence = contractExpandedSequence(expandedMoveSequence)
+      expandedmoveComponents.splice(movePosition.position, 1)
+      moveContainer.sequence = moveContainer.move.sequence = contractExpandedSequence(expandedmoveComponents)
     } else {
-      expandedMoveSequence[movePosition.position - 1] = contractExpandedSequence(annotationPosition.sequence).join(' ')
+      expandedmoveComponents[movePosition.position - 1] = contractExpandedSequence(annotationPosition.sequence).join(' ')
     }
     annotationPosition.sequence = moveContainer.expandedSequence
-    renderSequence(moveContainer.move.sequence, moveSequence)
+    renderSequence(moveContainer.sequence, moveComponents)
     if (moveContainer.annotationSequence) {
       renderSequence(moveContainer.annotationSequence, annotationSequence, true)
     }
     resetMoveContainerButtons(moveContainer)
-    clearContents(moveContainer)
-    unselectMoveSequencePosition(moveContainer)
+    const moveForms = moveContainer.querySelector('.move-forms')
+    moveForms.innerHTML = ''
+    unselectMoveComponentsPosition(moveContainer)
     unexpandMoveContainer(moveContainer)
   }
 
@@ -1592,6 +1742,7 @@
         const cell = row.insertCell(row.cells.length)
         cell.className = `coordinate-${c}${r} chessboard-square ` + (white ? 'white-square' : 'black-square')
         cell.coordinate = `${c}${r}`
+        cell.style.backgroundSize = 'cover'
         white = !white
         if (r === '1') {
           cell.innerHTML = '<sub>' + c + '</sub>'
@@ -1601,13 +1752,15 @@
         }
         cell.style.width = '12%'
         cell.style.height = '12%'
+        if (!move) {
+          continue
+        }
         for (const piece of move.pieces) {
           if (piece.coordinate !== `${c}${r}`) {
             continue
           }
           const color = piece.color === 'w' ? 'o' : 'b'
           cell.style.backgroundImage = `url(themes/${window.themeName}/${color}${piece.type}.png)`
-          cell.style.backgroundSize = 'cover'
         }
         if (!hitarea) {
           continue
@@ -1621,7 +1774,7 @@
     }
   }
 
-  function expandMoveContainer(moveContainer) {
+  function expandMoveContainer (moveContainer) {
     moveContainer.classList.add('show-positioning')
     const circle = moveContainer.querySelector('.fa-edit')
     if (circle) {
@@ -1630,7 +1783,7 @@
     }
   }
 
-  function unexpandMoveContainer(moveContainer) {
+  function unexpandMoveContainer (moveContainer) {
     moveContainer.classList.remove('show-positioning')
     const circle = moveContainer.querySelector('.fa-minus-circle')
     if (circle) {
@@ -1639,9 +1792,9 @@
     }
   }
 
-  function unselectMoveSequencePosition (moveContainer) {
+  function unselectMoveComponentsPosition (moveContainer) {
     moveContainer.classList.remove('show-positioning')
-    const list = moveContainer.querySelector('.move-sequence')
+    const list = moveContainer.querySelector('.move-components')
     for (const child of list.children) {
       if (child.classList.contains('selected-position')) {
         child.classList.remove('selected-position')
@@ -1663,19 +1816,8 @@
     const showSpacing = document.createElement('li')
     showSpacing.className = 'move-options-item'
     showSpacing.appendChild(toggleInsertionSpacesButton)
-    const sequence = moveContainer.querySelector('.move-sequence')
+    const sequence = moveContainer.querySelector('.move-components')
     sequence.insertBefore(showSpacing, sequence.firstChild)
-  }
-
-  function clearContents (moveContainer) {
-    for (const child of moveContainer.children) {
-      if (!child.classList.contains('move-sequence') && !child.classList.contains('move-list')) {
-        moveContainer.removeChild(child)
-      }
-      if (child.classList.contains('annotation-sequence')) {
-        moveContainer.removeChild(child)
-      }
-    }
   }
 
   function findMoveContainer (element) {
@@ -3108,6 +3250,7 @@ function createTagRow (tag, last) {
   exports.extractNextLine = extractNextLine
   exports.findClosingBracket = findClosingBracket
   exports.findCoordinates = findCoordinates
+  exports.findMovingPiece = findMovingPiece
   exports.tokenizeLine = tokenizeLine
   exports.tokenizeLines = tokenizeLines
   exports.parse = parse
@@ -3178,7 +3321,7 @@ function createTagRow (tag, last) {
    * parses a PGN file of text and recursively extracts all of the turns and
    * and their descriptors and creates an object representation
   */
-  function parse(pgn) {
+  function parse (pgn) {
     const tags = parseTags(pgn)
     const moveData = tokenizeLines(pgn)
     const turns = parseRecursively(moveData)
@@ -3217,7 +3360,7 @@ function createTagRow (tag, last) {
    * that has been truncated to exclude tags, the board
    * state for each turn is progressively determined
   */
-  function parseRecursively(pgnData, results) {
+  function parseRecursively (pgnData, results) {
     const turns = parseTurns(pgnData)
     results = results || []
     for (const turn of turns) {
@@ -3238,7 +3381,7 @@ function createTagRow (tag, last) {
    * receives a turn and array of pieces and applies the turn
    * then returns the modified array of pieces
    */
-  function processTurn(turn, turns, pieces) {
+  function processTurn (turn, turns, pieces) {
     for (const piece of pieces) {
       delete (piece.coordinateBefore)
       delete (piece.moveSteps)
@@ -3291,15 +3434,16 @@ function createTagRow (tag, last) {
         }
       }
     }
+    turn.previousPieces = JSON.parse(previousPieces)
     turn.pieces = JSON.parse(JSON.stringify(pieces))
     turn.fen = toFen(pieces, turn, turns)
   }
 
-  function toPieces(fen) {
+  function toPieces (fen) {
     // TODO: convert starting FEN to piece array
   }
 
-  function toFen(pieces, turn, turns) {
+  function toFen (pieces, turn, turns) {
     const board = [
       ['', '', '', '', '', '', '', ''],
       ['', '', '', '', '', '', '', ''],
@@ -3353,7 +3497,7 @@ function createTagRow (tag, last) {
     return result
   }
 
-  function halfTurnCount(currentTurn, turns) {
+  function halfTurnCount (currentTurn, turns) {
     let count = 0
     for (const turn of turns) {
       if (turn === currentTurn) {
@@ -3373,7 +3517,7 @@ function createTagRow (tag, last) {
     return 0
   }
 
-  function fenEnPassant(pieces) {
+  function fenEnPassant (pieces) {
     for (const piece of pieces) {
       if (piece.type !== 'P' || !piece.coordinateBefore || piece.moveSteps.length !== 3) {
         continue
@@ -3383,7 +3527,7 @@ function createTagRow (tag, last) {
     return '-'
   }
 
-  function fenCastling(pieces) {
+  function fenCastling (pieces) {
     const whiteKing = pieces.filter(piece => piece.type === 'K' && piece.color === 'w' && piece.coordinate === piece.start)
     const whiteKingSideRook = pieces.filter(piece => piece.type === 'R' && piece.color === 'w' && piece.coordinate === piece.start && piece.start === 'h1')
     const whiteQueenSideRook = pieces.filter(piece => piece.type === 'R' && piece.color === 'w' && piece.coordinate === piece.start && piece.start === 'a1')
@@ -3409,7 +3553,7 @@ function createTagRow (tag, last) {
     return parts.join('')
   }
 
-  function parseTurns(lines) {
+  function parseTurns (lines) {
     const moves = []
     for (const line of lines) {
       const turn = parseTurn(line)
@@ -3423,7 +3567,7 @@ function createTagRow (tag, last) {
   /**
    * formats PGN for consistent spacing especially around brackets
    */
-  function cleanSpacing(text) {
+  function cleanSpacing (text) {
     text = text.split('\n').join(' ')
     const doubleSpacing = [
       { single: ' ', double: '  ' },
@@ -3445,10 +3589,8 @@ function createTagRow (tag, last) {
       }
       text = text.split(`${i}. `).join(`${i}.`)
       text = text.split(`${i}... `).join(`${i}...`)
-
       text = text.split(`${i}.{`).join(`${i}. {`)
       text = text.split(`${i}...{`).join(`${i}... {`)
-
     }
     return text.trim()
   }
@@ -3464,7 +3606,7 @@ function createTagRow (tag, last) {
     *   '{prepended annotation} 3. f7'
     * ]
     */
-  function tokenizeLines(pgnFileData) {
+  function tokenizeLines (pgnFileData) {
     const movesDataStart = pgnFileData.indexOf(']\n\n') + 1
     let rawMoveData = movesDataStart > 0 ? pgnFileData.substring(movesDataStart) : pgnFileData
     rawMoveData = cleanSpacing(rawMoveData)
@@ -3499,7 +3641,7 @@ function createTagRow (tag, last) {
     *   '$0 3... a6'
     *    [ '$0', '3...', 'a6 ]
     */
-  function tokenizeLine(lineData) {
+  function tokenizeLine (lineData) {
     const parts = lineData.split(' ')
     const line = []
     let index = 0
@@ -3557,7 +3699,7 @@ function createTagRow (tag, last) {
    *
    * 1. e4 [ %cal Ra1b2 ] e5
    */
-  function extractNextLine(moveText) {
+  function extractNextLine (moveText) {
     const parts = moveText.split(' ')
     const line = []
     let index = 0
@@ -3593,7 +3735,7 @@ function createTagRow (tag, last) {
   /**
    * parses the moves from a string
    */
-  function parseTurn(line) {
+  function parseTurn (line) {
     const lineParts = tokenizeLine(line)
     let moveNumber, numberPart
     for (const part of lineParts) {
@@ -3638,7 +3780,7 @@ function createTagRow (tag, last) {
    * @param {*} pgn
    * @returns
    */
-  function createTurnObject(color, moveNumber, to, sequence, pgn) {
+  function createTurnObject (color, moveNumber, to, sequence, pgn) {
     let type
     const firstCharacter = to.charAt(0)
     if ('KQBRNP'.indexOf(firstCharacter) > -1) {
@@ -3726,7 +3868,7 @@ function createTagRow (tag, last) {
    * @param {} lineArray
    * @returns
    */
-  function findCoordinates(lineArray) {
+  function findCoordinates (lineArray) {
     let first, firstIndex, second, secondIndex
     for (const index in lineArray) {
       const part = lineArray[index]
@@ -3763,7 +3905,7 @@ function createTagRow (tag, last) {
   * that has been split by spaces (but not tokenized, this is part of the
   * raw PGN processing that creates the tokenized version)
   */
-  function findClosingBracket(index, array) {
+  function findClosingBracket (index, array) {
     let openParantheses = 0
     let openSquare = 0
     let openBrace = 0
@@ -3813,7 +3955,7 @@ function createTagRow (tag, last) {
    * eg:
    * [name "value"]
    */
-  function parseTags(pgnFileData) {
+  function parseTags (pgnFileData) {
     const tags = {}
     let blank = false
     for (const line of pgnFileData.split('\n')) {
@@ -3837,7 +3979,7 @@ function createTagRow (tag, last) {
    * identifies the moving piece based on the pieces that have a valid option
    * to move to the target coordinate and matching any criteria noted in the PGN
    */
-  function findMovingPiece(move, pieces) {
+  function findMovingPiece (move, pieces) {
     for (const piece of pieces) {
       if (move.type && move.type !== piece.type) {
         continue
@@ -3861,7 +4003,7 @@ function createTagRow (tag, last) {
     throw new Error('could not determine piece for coordinate "' + move.to + '"')
   }
 
-  function calculatePieceMovement(piece, move, pieces) {
+  function calculatePieceMovement (piece, move, pieces) {
     if (piece.type === 'N') {
       for (const knightJumpDirection in knightMoveDirections) {
         const knightMoves = [piece.coordinate]
@@ -3910,7 +4052,7 @@ function createTagRow (tag, last) {
             if (enPassantCoordinate) {
               const upPiece = checkObstructed(enPassantCoordinate, pieces)
               if (upPiece && upPiece.type === 'P' && upPiece.color !== piece.color) {
-                return [piece.coordinate, captureRight]
+                return [piece.coordinate, captureLeft]
               }
             }
           }
@@ -4001,7 +4143,7 @@ function createTagRow (tag, last) {
   /**
    * checks the pieces array to see if anything occupies a coordinate
    */
-  function checkObstructed(coordinate, pieces) {
+  function checkObstructed (coordinate, pieces) {
     for (const piece of pieces) {
       if (piece.coordinate === coordinate) {
         return piece
@@ -4009,7 +4151,7 @@ function createTagRow (tag, last) {
     }
   }
 
-  function moveAllPossibleSpaces(moveMethod, piece, pieces, move) {
+  function moveAllPossibleSpaces (moveMethod, piece, pieces, move) {
     const moves = [piece.coordinate]
     let nextValue = piece.coordinate
     while (nextValue) {
@@ -4034,56 +4176,56 @@ function createTagRow (tag, last) {
   /**
    * calculates the coordinate up left
    */
-  function nextCoordinateUpLeft(coordinate) {
+  function nextCoordinateUpLeft (coordinate) {
     return addColumnAndRow(coordinate, -1, 1)
   }
 
   /**
    * calculates the coordinate up right
    */
-  function nextCoordinateUpRight(coordinate) {
+  function nextCoordinateUpRight (coordinate) {
     return addColumnAndRow(coordinate, 1, 1)
   }
 
   /**
    * calculates the coordinate down left
    */
-  function nextCoordinateDownLeft(coordinate) {
+  function nextCoordinateDownLeft (coordinate) {
     return addColumnAndRow(coordinate, -1, -1)
   }
 
   /**
    * calculates the coordinate down right
    */
-  function nextCoordinateDownRight(coordinate) {
+  function nextCoordinateDownRight (coordinate) {
     return addColumnAndRow(coordinate, 1, -1)
   }
 
   /**
    * calculates the coordinate up
    */
-  function nextCoordinateUp(coordinate) {
+  function nextCoordinateUp (coordinate) {
     return addRow(coordinate, 1)
   }
 
   /**
    * calculates the coordinate down
    */
-  function nextCoordinateDown(coordinate) {
+  function nextCoordinateDown (coordinate) {
     return addRow(coordinate, -1)
   }
 
   /**
    * calculates the coordinate left
    */
-  function nextCoordinateLeft(coordinate) {
+  function nextCoordinateLeft (coordinate) {
     return addColumn(coordinate, -1)
   }
 
   /**
    * calculates the coordinate right
    */
-  function nextCoordinateRight(coordinate) {
+  function nextCoordinateRight (coordinate) {
     return addColumn(coordinate, 1)
   }
 
@@ -4091,7 +4233,7 @@ function createTagRow (tag, last) {
    * Adds +/- row to a coordinate if possible
    * @returns coordinate or undefined
    */
-  function addColumnAndRow(coordinate, columnAmount, rowAmount) {
+  function addColumnAndRow (coordinate, columnAmount, rowAmount) {
     let nextCoordinate = coordinate
     if (nextCoordinate && columnAmount && columnAmount !== 0) {
       nextCoordinate = addColumn(nextCoordinate, columnAmount)
@@ -4108,7 +4250,7 @@ function createTagRow (tag, last) {
    * Adds +/- row to a coordinate if possible
    * @returns coordinate or undefined
    */
-  function addRow(coordinate, amount) {
+  function addRow (coordinate, amount) {
     amount = amount || 1
     if (!coordinate) {
       return
@@ -4125,7 +4267,7 @@ function createTagRow (tag, last) {
    * Adds +/- column to a coordinate if possible
    * @returns coordinate or undefined
    */
-  function addColumn(coordinate, amount) {
+  function addColumn (coordinate, amount) {
     amount = amount || 1
     const parts = coordinate.split('')
     const columns = 'abcdefgh'

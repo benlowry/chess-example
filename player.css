@@ -67,18 +67,18 @@ i { pointer-events: none }
 
 /* annotations */
 .move-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
-.move-list-item { border-bottom: thin solid; padding: 0.25rem; position: relative }
-.move-list .move-list-item:last-of-type { padding-bottom: 2rem }
-.move-list .move-list { display: block; padding: 0; list-style-type: none; margin: 0.5rem 0 0.5rem 0.5rem; overflow: visible }
+.move-list-item { border-bottom: thin solid; border-top: thin solid; padding: 0.25rem; border-radius: 0.5rem; position: relative }
+.move-list .move-list { display: block; padding: 0; list-style-type: none; overflow: visible; margin: 0.25rem 0.25rem 0.25rem 2.5rem; border-radius: 0.5rem }
+
 .move-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
 .move-list-button i { opacity: 0.5 }
 .move-list-button:hover i { opacity: 1 }
 .annotate-menu { margin: 0; padding: 0 }
 .annotate-button { margin: 0.25rem; border-width: thin; border-radius: 0.25rem }
-.move-sequence { font-size: 0.8rem; line-height: 1.6rem; margin: 0 0 0.5rem 0; display: flex; list-style-type: none; padding: 0 }
-.move-sequence-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
+.move-components { font-size: 0.8rem; line-height: 1.6rem; margin: 0 0 0.5rem 0; display: flex; list-style-type: none; padding: 0 }
+.move-components-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
 .sequence-position-item { display: none; padding: 0.5rem 0.25rem 0.25rem 0.25rem }
-.move-options-item { margin: 0; padding: 0.25rem }
+.move-options-item { margin: 0; padding: 0.25rem; border-radius: 0.5rem }
 .move-option-button { margin: 0; padding: 0.25rem; font-size: 1rem }
 .move-option-button i { opacity: 0.5 }
 .move-option-button:hover { background-color: none }
@@ -118,18 +118,20 @@ i { pointer-events: none }
 .coordinate-to-bridge { color: #000; padding: 0.25rem 0.5rem 0.25rem 0.25rem; width: auto; margin: 0 }
 .text-input { width: 100%; max-width: 40rem }
 .annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 0 0.5rem 0 }
-.mini-chessboard-container { position: relative; height: 16rem; width: 16rem; margin-bottom: 0.5rem }
-.mini-chessboard .chessboard { width: 16rem; height: 16rem; position: absolute }
+.mini-chessboard-container { position: relative; height: 24rem; width: 24rem; margin-bottom: 0.5rem }
+.mini-chessboard .chessboard { width: 24rem; height: 24rem; position: absolute }
 .mini-chessboard svg { position: absolute; z-index: 1; top: 0; left: 0 }
 .annotate-chessboard { z-index: 2 }
 .mini-chessboard { margin-right: 0.5rem }
 .mini-chessboard td { cursor: pointer }
-.mini-chessboard .annotation-container { display: flex }
+.annotation-container { display: flex }
 .pending-list { min-width: 10rem; margin: 1rem 0 0 1rem; padding: 0; list-style-type: none }
 .pending-list li { display: flex; margin-bottom: 0.5rem; line-height: 1.2rem }
 .pending-list span { font-family: monospace; font-size: 0.7rem; margin-right: 1rem; line-height: 1.4rem }
 .pending-list span i { display: inline-block; font-size: 0.7rem; border: thin solid; padding: 0 0.25rem; border-radius: 0.125rem; line-height: 1.4rem; font-style: normal }
 .pending-list .button { margin-top: 0 }
+.alternative-move-title { font-weight: normal; margin: 0 0 0.5rem 0 }
+
 /* tags */
 .tags-container { padding: 0 }
 .tags-table { border-collapse: collapse; margin: 0.5rem }

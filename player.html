@@ -94,6 +94,16 @@
       </div>
     </div>
   </body>
+  <template id="move-components-template">
+    <li class="move-list-item">
+      <ul class="move-components"></ul>
+      <div class="move-forms"></div>
+      <div class="nested-moves"></div>
+    </li>
+  </template>
+  <template id="sibling-components-template">
+    <ul class="move-list"></ul>
+  </template>
   <template id="insertion-form-selector">
     <div class="insertion-form-selector">
       <button class="button annotation-form-button nag-button"><i class="fa fa-plus"></i> Nag</button>
@@ -133,22 +143,40 @@
     </form>
   </template>
   <template id="new-alternative-moves-form">
-    <form class="annotation-form alternative-moves-form">
-      <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
-    </form>
+    <div class="annotation-form annotation-form">
+      <div class="alternative-move-input mini-chessboard">
+        <div class="annotation-container">
+          <div class="annotation-entry">
+            <h3 class="alternative-move-title white-move-title">Alternative white move</h3>
+            <h3 class="alternative-move-title black-move-title">Alternative black move</h3>
+            <form class="alternative-moves-entry entry-fallback">
+            </form>
+            <div class="mini-chessboard-container">
+              <table class="chessboard alternative-moves-chessboard"></table>
+              <table class="chessboard annotate-chessboard alternative-moves-hitarea"></table>
+            </div>
+            <button class="submit-button button annotation-form-button insert-alternative-moves-button"><i class="fa fa-pen"></i> Insert alternative move</button>
+            <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
+          </div>
+          <div class="annotation-list">
+            <ul class="pending-list pending-move-list"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </template>
   <template id="edit-alternative-moves-form">
     <form class="annotation-form alternative-moves-form">
       <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
     </form>
   </template>
-  <template id="annotation-builder">
+  <template id="annotation-editor">
     <form class="annotation-form annotation-form">
-      <ul class="annotation-sequence move-sequence"></ul>
+      <ul class="annotation-components move-components"></ul>
       <div class="annotation-form-container"></div>
     </form>
   </template>
-  <template id="annotation-builder-options">
+  <template id="annotation-editor-options">
     <div class="annotation-button-container">
       <button class="submit-button button annotation-form-button insert-annotation-button"><i class="fa fa-pen"></i> Insert annotation</button>
       <button class="submit-button button annotation-form-button update-annotation-button"><i class="fa fa-pen"></i> Update annotation</button>
@@ -157,9 +185,11 @@
   </template>
   <template id="annotation-type-selector">
     <div class="annotation-button-container">
-      <button class="button annotation-form-button add-text-button"><i class="fa fa-plus"></i> Add text</button>
+      <button class="button annotation-form-button add-text-button"><i class="fa fa-plus"></i> Text</button>
       <button class="button annotation-form-button add-square-button"><i class="fa fa-plus"></i> Highlight square</button>
       <button class="button annotation-form-button add-arrow-button"><i class="fa fa-plus"></i> Draw arrow</button>
+      <button class="button annotation-form-button add-nag-button"><i class="fa fa-plus"></i> Nag</button>
+      <button class="button annotation-form-button add-alternative-moves-button"><i class="fa fa-plus"></i> Alternative move</button>
       <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
     </div>
   </template>
@@ -390,13 +420,13 @@
             <div class="select coordinate-select">
               <select class="coordinate-select select-row-start">
                 <optifon>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>5</option>
-                <option>6</option>
-                <option>7</option>
-                <option>8</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                  <option>6</option>
+                  <option>7</option>
+                  <option>8</option>
               </select>
             </div>
             <div class="coordinate-select coordinate-to-bridge">
@@ -429,7 +459,7 @@
             <div>
               <button class="button annotation-form-button highlight-arrow-button"><i class="fa fa-plus"></i> Add</button>
             </div>
-          </form>          
+          </form>
           <div class="mini-chessboard-container">
             <table class="chessboard annotate-arrow-chessboard"></table>
             <div class="highlight-arrow-container"></div>
@@ -590,4 +620,4 @@
       <option value="$139">$139 Black has severe time control pressure / zeitno</option>
     </select>
   </template>
-  </html>
+</html>
