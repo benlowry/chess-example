@@ -59,8 +59,8 @@
               </div>
             </div>
             <div class="annotations-container">
-              <div class="move-list-container">
-                <menu class="move-list"></menu>
+              <div class="turn-list-container">
+                <menu class="turn-list"></menu>
               </div>
             </div>
             <div class="pgn-container">
@@ -94,15 +94,16 @@
       </div>
     </div>
   </body>
-  <template id="move-components-template">
-    <li class="move-list-item">
-      <ul class="move-components"></ul>
-      <div class="move-forms"></div>
+  <template id="turn-components-template">
+    <li class="turn-list-item">
+      <ul class="turn-components"></ul>
+      <div class="turn-forms"></div>
       <div class="nested-moves"></div>
+      <button class="button annotation-form-button delete-last-turn-button"><i class="fa fa-trash"></i> Delete last turn</button>
     </li>
   </template>
   <template id="sibling-components-template">
-    <ul class="move-list"></ul>
+    <ul class="turn-list"></ul>
   </template>
   <template id="insertion-form-selector">
     <div class="insertion-form-selector">
@@ -144,13 +145,9 @@
   </template>
   <template id="new-alternative-moves-form">
     <div class="annotation-form annotation-form">
-      <div class="alternative-move-input mini-chessboard">
+      <div class="alternative-turn-input mini-chessboard">
         <div class="annotation-container">
           <div class="annotation-entry">
-            <h3 class="alternative-move-title white-move-title">Alternative white move</h3>
-            <h3 class="alternative-move-title black-move-title">Alternative black move</h3>
-            <form class="alternative-moves-entry entry-fallback">
-            </form>
             <div class="mini-chessboard-container">
               <table class="chessboard alternative-moves-chessboard"></table>
               <table class="chessboard annotate-chessboard alternative-moves-hitarea"></table>
@@ -159,7 +156,9 @@
             <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
           </div>
           <div class="annotation-list">
-            <ul class="pending-list pending-move-list"></ul>
+            <ul class="pending-list pending-turn-list">
+              <li><button class="button annotation-form-button undo-button cancel-button"><i class="fa fa-undo"></i> Undo last move</button></li>
+            </ul>
           </div>
         </div>
       </div>
@@ -172,7 +171,7 @@
   </template>
   <template id="annotation-editor">
     <form class="annotation-form annotation-form">
-      <ul class="annotation-components move-components"></ul>
+      <ul class="annotation-components turn-components"></ul>
       <div class="annotation-form-container"></div>
     </form>
   </template>
@@ -188,8 +187,6 @@
       <button class="button annotation-form-button add-text-button"><i class="fa fa-plus"></i> Text</button>
       <button class="button annotation-form-button add-square-button"><i class="fa fa-plus"></i> Highlight square</button>
       <button class="button annotation-form-button add-arrow-button"><i class="fa fa-plus"></i> Draw arrow</button>
-      <button class="button annotation-form-button add-nag-button"><i class="fa fa-plus"></i> Nag</button>
-      <button class="button annotation-form-button add-alternative-moves-button"><i class="fa fa-plus"></i> Alternative move</button>
       <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
     </div>
   </template>

@@ -25,25 +25,25 @@
  .green-arrow { fill: green; stroke:green }
  .yellow-arrow { fill: yellow; stroke: yellow }
  .blue-arrow { fill: blue; stroke: blue }
- .move-arrow { fill: #FFF; stroke:#FFF }
+ .turn-arrow { fill: #FFF; stroke:#FFF }
  /* move list */
  .white-piece-glyph { color: rgba(255, 255, 255, 0.75) }
  .black-piece-glyph { color: rgba(0, 0, 0, 0.75) }
  .white-piece-glyph-wrapper { background-color: rgba(0, 0, 0, 0.5) }
  .black-piece-glyph-wrapper { background-color: rgba(255, 255, 255, 0.5) }
- .move-list { background: rebeccapurple }
- .move-list-item { color: #FFF; border-top-color: rgba(255, 255, 255, 0.25); border-bottom-color: rgba(0, 0, 0, 0.75) }
- .move-list-button { background-color: rgba(0, 0, 0, 0.25); border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.9) }
- .move-list-button:hover { background-color: rgba(0, 0, 0, 0.75) }
+ .turn-list { background: rebeccapurple }
+ .turn-list-item { color: #FFF; border-top-color: rgba(255, 255, 255, 0.25); border-bottom-color: rgba(0, 0, 0, 0.75) }
+ .turn-list-button { background-color: rgba(0, 0, 0, 0.25); border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.9) }
+ .turn-list-button:hover { background-color: rgba(0, 0, 0, 0.75) }
  .annotation-form-button { background-color: rgba(0, 0, 0, 0.75); border-color: rgba(255, 255, 255, 0.25); color: #FFF }
  .annotation-form-button:hover { background-color: rgba(33, 33, 33, 0.75) }
  .annotation-form,
  .insertion-form-selector { background-color: #FFF; border-color: #000; box-shadow: 0 0 1rem 1rem rgba(0, 0, 0, 0.5) }
- .move-option-button { background-color: transparent; border-color: transparent; color: #FFF }
- .move-option-button:hover { background-color: transparent }
- .move-location-button { color: rgba(255, 255, 255, 0.75); background-color: transparent; border-color: transparent; }
- .move-location-button:hover { color: #FFF }
- .selected-position .move-location-button { color: #FFF }
+ .turn-option-button { background-color: transparent; border-color: transparent; color: #FFF }
+ .turn-option-button:hover { background-color: transparent }
+ .turn-location-button { color: rgba(255, 255, 255, 0.75); background-color: transparent; border-color: transparent; }
+ .turn-location-button:hover { color: #FFF }
+ .selected-position .turn-location-button { color: #FFF }
  .selected-position,
  .edit-position { background-color: rgba(255, 255, 255, 0.25)}
  .annotation-form .selected-position, 
@@ -58,28 +58,28 @@
  .select { background-color: rgba(0, 0, 0, 0) }
  .select::after { background-color: rgba(0, 0, 0, 0.5) }
  .coordinate-to-bridge { color: #000 }
- .move-components-item { color: rgba(255, 255, 255, 0.75) }
- .move-components-item:hover { color: #FFF }
- .move-components .move-components-item:first-of-type { border-color: transparent; background-color: transparent }
- .move-components .move-components-item:last-of-type { border-color: rgba(255, 255, 255, 0.5) }
- .annotation-components .move-components-item,
- .annotation-components .move-location-button { color: rgba(0, 0, 0, 0.75) }
+ .turn-components-item { color: rgba(255, 255, 255, 0.75) }
+ .turn-components-item:hover { color: #FFF }
+ .turn-components .turn-components-item:first-of-type { border-color: transparent; background-color: transparent }
+ .turn-components .turn-components-item:last-of-type { border-color: rgba(255, 255, 255, 0.5) }
+ .annotation-components .turn-components-item,
+ .annotation-components .turn-location-button { color: rgba(0, 0, 0, 0.75) }
  .branch-options { background-color: rgba(255, 255, 255, 0.5) }
- .move-list .timeline1 { background:rebeccapurple }
- .move-list .timeline2 { background: darkred }
- .move-list .timeline3 { background: green }
- .move-list .timeline4 { background: midnightblue }
- .move-list .timeline5 { background: olive }
- .move-list .timeline6 { background: purple }
- .move-list .timeline7 { background: teal }
- .move-list .timeline8 { background: steelblue }
- .move-list .timeline9 { background: slategrey }
- .move-list .timeline10 { background: sienna }
- .move-list .timeline11 { background: maroon}
- .move-list .timeline12 { background:dimgray }
- .move-list .timeline13 { background: mediumslateblue }
- .move-list .timeline14 { background: limegreen }
- .move-list .timeline15 { background: goldenrod }
+ .turn-list .timeline1 { background:rebeccapurple }
+ .turn-list .timeline2 { background: darkred }
+ .turn-list .timeline3 { background: green }
+ .turn-list .timeline4 { background: midnightblue }
+ .turn-list .timeline5 { background: olive }
+ .turn-list .timeline6 { background: purple }
+ .turn-list .timeline7 { background: teal }
+ .turn-list .timeline8 { background: steelblue }
+ .turn-list .timeline9 { background: slategrey }
+ .turn-list .timeline10 { background: sienna }
+ .turn-list .timeline11 { background: maroon}
+ .turn-list .timeline12 { background:dimgray }
+ .turn-list .timeline13 { background: mediumslateblue }
+ .turn-list .timeline14 { background: limegreen }
+ .turn-list .timeline15 { background: goldenrod }
 
  /* annotation forms */
  .annotation-tabs { border-bottom-color: rgba(255, 255, 255, 0.5) }
@@ -87,7 +87,7 @@
  .annotation-type-button { color:rgba(255, 255, 255, 0.75); background-color: transparent !important; border-color: rgba(255, 255, 255, 0.5) !important }
  .current-annotation-button { color: #FFF; background-color: rgba(255, 255, 255, 0.25) !important; border-color: rgba(255, 255, 255, 0.5) !important }
  .annotation-text { color: #000; background-color: rgba(0, 0, 0, 0.125); border: thin solid rgba(255, 255, 255, 0.25) }
- .alternative-move-title { color: #000 }
+ .alternative-turn-title { color: #000 }
 
  /* loading pgn */
  .paste-text { border-color: #999 }
@@ -106,7 +106,7 @@
  .frame { background-color: #666; color: #FFF}
  .connecting-line { border-color: #CCC }
  .alternating-frame { background-color:rgba(255, 255, 255, 0.5) !important }
- .current-move-frame { background-color: rgba(255, 255, 0, 0.75) !important }
+ .current-turn-frame { background-color: rgba(255, 255, 0, 0.75) !important }
 
  .timeline1 .timeline-bar { background: rebeccapurple }
  .timeline1 .frame { background-color: rebeccapurple }

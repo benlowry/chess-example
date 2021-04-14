@@ -34,7 +34,7 @@ i { pointer-events: none }
 .chessboard-square sub { position: absolute; bottom: 0.25rem; right: 0.25rem; font-size: 0.6rem }
 .chessboard-pieces { position: absolute; left: 0; top: 0; z-index: 1 }
 .chessboard-piece { position: absolute; width: 12% }
-.chessboard-move-arrows { position: absolute; left: 0; top: 0; z-index: 2 }
+.chessboard-turn-arrows { position: absolute; left: 0; top: 0; z-index: 2 }
 .chessboard-arrows { opacity: 0; position: absolute; left: 0; top: 0; z-index: 2 }
 .chessboard-arrow { position: absolute; left: 0; top: 0; z-index: 3; width: 100%; height: 100%; stroke-linecap: round; }
 .fade-in { opacity: 1; transition: all 1s }
@@ -66,33 +66,33 @@ i { pointer-events: none }
 .tab { border: 0; cursor: pointer; outline: 0; height: 2rem; font-size: 0.8rem; padding-left: 0.5rem; padding-right: 0.5rem }
 
 /* annotations */
-.move-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
-.move-list-item { border-bottom: thin solid; border-top: thin solid; padding: 0.25rem; border-radius: 0.5rem; position: relative }
-.move-list .move-list { display: block; padding: 0; list-style-type: none; overflow: visible; margin: 0.25rem 0.25rem 0.25rem 2.5rem; border-radius: 0.5rem }
+.turn-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
+.turn-list-item { border-bottom: thin solid; border-top: thin solid; padding: 0.25rem; border-radius: 0.5rem; position: relative }
+.turn-list .turn-list { display: block; padding: 0; list-style-type: none; overflow: visible; margin: 0.25rem 0.25rem 0.25rem 2.5rem; border-radius: 0.5rem }
 
-.move-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
-.move-list-button i { opacity: 0.5 }
-.move-list-button:hover i { opacity: 1 }
+.turn-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
+.turn-list-button i { opacity: 0.5 }
+.turn-list-button:hover i { opacity: 1 }
 .annotate-menu { margin: 0; padding: 0 }
 .annotate-button { margin: 0.25rem; border-width: thin; border-radius: 0.25rem }
-.move-components { font-size: 0.8rem; line-height: 1.6rem; margin: 0 0 0.5rem 0; display: flex; list-style-type: none; padding: 0 }
-.move-components-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
+.turn-components { font-size: 0.8rem; line-height: 1.6rem; margin: 0 0 0.5rem 0; display: flex; list-style-type: none; padding: 0 }
+.turn-components-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
 .sequence-position-item { display: none; padding: 0.5rem 0.25rem 0.25rem 0.25rem }
-.move-options-item { margin: 0; padding: 0.25rem; border-radius: 0.5rem }
-.move-option-button { margin: 0; padding: 0.25rem; font-size: 1rem }
-.move-option-button i { opacity: 0.5 }
-.move-option-button:hover { background-color: none }
-.move-option-button:hover i { opacity: 1 }
-.move-location-button { font-size: 1rem; margin: 0; padding: 0; pointer-events: none }
+.turn-options-item { margin: 0; padding: 0.25rem; border-radius: 0.5rem }
+.turn-option-button { margin: 0; padding: 0.25rem; font-size: 1rem }
+.turn-option-button i { opacity: 0.5 }
+.turn-option-button:hover { background-color: none }
+.turn-option-button:hover i { opacity: 1 }
+.turn-location-button { font-size: 1rem; margin: 0; padding: 0; pointer-events: none }
 .edit-annotation-button { margin: 0; padding: 0.25rem; border-color: transparent; border-radius: 0.25rem }
-.show-positioning .move-list .sequence-position-item { display: none !important }
+.show-positioning .turn-list .sequence-position-item { display: none !important }
 .show-positioning .show-positioning .sequence-position-item { display: inline-block !important }
 .show-positioning .sequence-position-item { display: inline-block !important }
 .insertion-form-selector { display: block; margin-left: 2.5rem }
 .selected-position,
 .edit-position { border-radius: 0.25rem }
 .branch-options { padding: 0.25rem }
-.branch-options .move-list-button { margin: 0 0.5rem 0 0 }
+.branch-options .turn-list-button { margin: 0 0.5rem 0 0 }
 .piece-glyph-wrapper { display: inline-block; padding: 0.125rem; border-radius: 0.125rem }
 .piece-glyph { font-size: 1.2rem }
 .annotation-form-button { font-weight: bold; margin: 0; border: none; border-radius: 0.5rem; font-size: 0.7rem; line-height: 1.4rem }
@@ -130,7 +130,7 @@ i { pointer-events: none }
 .pending-list span { font-family: monospace; font-size: 0.7rem; margin-right: 1rem; line-height: 1.4rem }
 .pending-list span i { display: inline-block; font-size: 0.7rem; border: thin solid; padding: 0 0.25rem; border-radius: 0.125rem; line-height: 1.4rem; font-style: normal }
 .pending-list .button { margin-top: 0 }
-.alternative-move-title { font-weight: normal; margin: 0 0 0.5rem 0 }
+.alternative-turn-title { font-weight: normal; margin: 0 0 0.5rem 0 }
 
 /* tags */
 .tags-container { padding: 0 }
