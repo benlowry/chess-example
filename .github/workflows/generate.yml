@@ -12,7 +12,8 @@ jobs:
         node-version: 14
     - name: Generate desktop screenshots
       run: |
-        export SCREENSHOT_PATH=`pwd`/screenshots       
+        DIR=`pwd`
+        export SCREENSHOT_PATH=$DIR/screenshots/desktop/light
         npm install -g http-server
         http-server . &
         git clone https://github.com/benlowry/chess-pgn-player ../player
@@ -20,6 +21,10 @@ jobs:
         npm install
         grunt
         export SCREENSHOT_DEVICE=desktop
+        export SCREENSHOT_SCHEME=light
+        npm test 
+        export SCREENSHOT_PATH=$DIR/screenshots/desktop/dark
+        export SCREENSHOT_SCHEME=dark
         npm test 
     - name: Reindex generated files
       run: |
