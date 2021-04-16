@@ -20,6 +20,7 @@ jobs:
         export SCREENSHOT_DEVICE=desktop
         npm test 
     - name: Reindex generated files
+      run: |
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
         node reindex.js screenshots > screneshots.js
