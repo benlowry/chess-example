@@ -1,21 +1,28 @@
-name: test
+name: generate
 
 on: [push]
 
 jobs:
-  test:
+  generate:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1
       with:
         node-version: 14
-    - name: Run test suite
+    - name: Generate desktop screenshots
       run: |
+        export SCREENSHOT_PATH=`pwd`/screenshots
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
         npm install
         grunt
+        export SCREENSHOT_DEVICE=desktop
+        npm test 
+    - name: Reindex generated files
+        node reindex.js themes > themes.js
+        node reindex.js samples > samples.js
+        node reindex.js screenshots > screneshots.js
     - name: Publish to Github
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:

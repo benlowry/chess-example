@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>PGN editor / player / thing</title>
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="player.css">
+    <script src="themes.js"></script>
+    <script src="samples.js"></script>
+    <script src="screenshots.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      window.onload = () => {
+        // samples
+        const sampleList = document.querySelector('.sample-list')
+        for (const sample of window.samples) {
+          const link = document.createElement('a')
+          link.href = `player.html?url=${sample}`
+          link.innerHTML = sample
+          const li = document.createElement('li')
+          li.appendChild(link)
+          sampleList.appendChild(li)
+        }
+        // screenshots
+      }
+    </script>
+  </head>
+  <body>
+    <div style="display: flex">
+      <h2>Sample links</h2>
+      <ul class="sample-list"></ul>
+    </div>
+    <div>
+      <h2>Screenshots of the tool tests</h2>
+
+      <div style="display: flex">
+        Browser
+        <button>Firefox</button>
+        <button>Chrome</button>
+        Resolution
+        <button>Desktop (1280p)</button>
+        <button>Desktop (1920p)</button>
+        <button>Desktop (3840p)</button>
+      </div>
+      <ul>
+
+      </ul>
+    </div>
+  </body>
+</html>
