@@ -14,7 +14,7 @@ jobs:
       run: |
         DIR=`pwd`
         npm install -g http-server
-        http-server . &
+        http-server . &> /dev/null
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
         npm install
@@ -33,6 +33,7 @@ jobs:
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
         node reindex.js screenshots > screneshots.js
+        killall http-server
     - name: Publish to Github
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:
