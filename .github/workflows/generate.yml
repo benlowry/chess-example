@@ -12,7 +12,9 @@ jobs:
         node-version: 14
     - name: Generate desktop screenshots
       run: |
-        export SCREENSHOT_PATH=`pwd`/screenshots
+        export SCREENSHOT_PATH=`pwd`/screenshots       
+        npm install -g http-server
+        http-server . &
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
         npm install
@@ -21,8 +23,6 @@ jobs:
         npm test 
     - name: Reindex generated files
       run: |
-        npm install -g http-server
-        http-server . &
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
         node reindex.js screenshots > screneshots.js
