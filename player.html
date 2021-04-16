@@ -99,6 +99,7 @@
       <ul class="turn-components"></ul>
       <div class="turn-forms"></div>
       <div class="nested-moves"></div>
+      <button class="button annotation-form-button add-turn-button"><i class="fa fa-plus"></i> Add another turn</button>
       <button class="button annotation-form-button delete-last-turn-button"><i class="fa fa-trash"></i> Delete last turn</button>
     </li>
   </template>
@@ -152,7 +153,7 @@
               <table class="chessboard alternative-moves-chessboard"></table>
               <table class="chessboard annotate-chessboard alternative-moves-hitarea"></table>
             </div>
-            <button class="submit-button button annotation-form-button insert-alternative-moves-button"><i class="fa fa-pen"></i> Insert alternative move</button>
+            <button class="submit-button button annotation-form-button insert-alternative-moves-button"><i class="fa fa-pen"></i> Insert alternative moves</button>
             <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
           </div>
           <div class="annotation-list">
@@ -165,9 +166,25 @@
     </div>
   </template>
   <template id="edit-alternative-moves-form">
-    <form class="annotation-form alternative-moves-form">
-      <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
-    </form>
+    <div class="annotation-form annotation-form">
+      <div class="alternative-turn-input mini-chessboard">
+        <div class="annotation-container">
+          <div class="annotation-entry">
+            <div class="mini-chessboard-container">
+              <table class="chessboard alternative-moves-chessboard"></table>
+              <table class="chessboard annotate-chessboard alternative-moves-hitarea"></table>
+            </div>
+            <button class="submit-button button annotation-form-button update-alternative-moves-button"><i class="fa fa-pen"></i> Update alternative moves</button>
+            <button class="button annotation-form-button cancel-button"><i class="fa fa-window-close"></i> Cancel</button>
+          </div>
+          <div class="annotation-list">
+            <ul class="pending-list pending-turn-list">
+              <li><button class="button annotation-form-button undo-button cancel-button"><i class="fa fa-undo"></i> Undo last move</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
   </template>
   <template id="annotation-editor">
     <form class="annotation-form annotation-form">
