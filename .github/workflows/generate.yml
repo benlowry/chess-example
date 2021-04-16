@@ -21,6 +21,8 @@ jobs:
         npm test 
     - name: Reindex generated files
       run: |
+        npm install -g http-server
+        http-server . &
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
         node reindex.js screenshots > screneshots.js
