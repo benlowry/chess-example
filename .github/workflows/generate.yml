@@ -14,7 +14,7 @@ jobs:
       run: |
         DIR=`pwd`
         npm install -g http-server
-        http-server . &> /dev/null
+        http-server . > /dev/null &
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
         npm install
