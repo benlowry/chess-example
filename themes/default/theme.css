@@ -1,6 +1,169 @@
 
 /* color schemes for light and dark modes */
 @media (prefers-color-scheme: dark) {
+ body { background-color: #FFF }
+ .button { border-color: #CCC; background-color: #CCC }
+ /* chessboard */
+ .chessboard { color: #000 }
+ .white-square { background-color: #DDD; color: #333 }
+ .black-square { background-color: #999; color: #FFF }
+ .mini-chessboard .black-square { background-color: rgba(0, 0, 0, 0.5); color: #FFF }
+ .mini-chessboard .white-square { background-color: rgba(0, 0, 0, 0.15); color: #FFF }
+ .mini-chessboard .highlight-switch { color: rgba(0, 0, 0, 0.75) }
+ .mini-chessboard td:hover { background-color: rgba(0, 0, 0, 0.25) !important }
+ .pending-list { color: rgba(0, 0, 0, 0.5) }
+
+ /* highlights */
+ .red-square { background-color: darkred !important }
+ .green-square { background-color: darkgreen !important }
+ .yellow-square { background-color: darkorange !important }
+ .blue-square { background-color: darkblue !important }
+ .red-arrow { fill: red; stroke: red }
+ .green-arrow { fill: green; stroke:green }
+ .yellow-arrow { fill: yellow; stroke: yellow }
+ .blue-arrow { fill: blue; stroke: blue }
+ .turn-arrow { fill: #FFF; stroke:#FFF }
+ /* move list */
+ .white-piece-glyph { color: rgba(255, 255, 255, 0.75) }
+ .black-piece-glyph { color: rgba(0, 0, 0, 0.75) }
+ .white-piece-glyph-wrapper { background-color: rgba(0, 0, 0, 0.5) }
+ .black-piece-glyph-wrapper { background-color: rgba(255, 255, 255, 0.5) }
+ .turn-list { background: rebeccapurple }
+ .turn-list-item { color: #FFF; border-top-color: rgba(255, 255, 255, 0.25); border-bottom-color: rgba(0, 0, 0, 0.75) }
+ .turn-list-button { background-color: rgba(0, 0, 0, 0.25); border-color: rgba(255, 255, 255, 0.25); color: rgba(255, 255, 255, 0.9) }
+ .turn-list-button:hover { background-color: rgba(0, 0, 0, 0.75) }
+ .annotation-form-button { background-color: rgba(0, 0, 0, 0.75); border-color: rgba(255, 255, 255, 0.25); color: #FFF }
+ .annotation-form-button:hover { background-color: rgba(33, 33, 33, 0.75) }
+ .annotation-form,
+ .insertion-form-selector { background-color: #FFF; border-color: #000; box-shadow: 0 0 1rem 1rem rgba(0, 0, 0, 0.5) }
+ .turn-option-button { background-color: transparent; border-color: transparent; color: #FFF }
+ .turn-option-button:hover { background-color: transparent }
+ .turn-location-button { color: rgba(255, 255, 255, 0.75); background-color: transparent; border-color: transparent; }
+ .turn-location-button:hover { color: #FFF }
+ .selected-position .turn-location-button { color: #FFF }
+ .selected-position,
+ .edit-position { background-color: rgba(255, 255, 255, 0.25)}
+ .annotation-form .selected-position, 
+ .annotation-form .edit-position { background-color: rgba(0, 0, 0, 0.125) }
+ .annotate-button { background-color: rgba(255, 255, 255, 0.75); border-color: rgba(255, 255, 255, 0.5); color: rgba(0, 0, 0, 0.9) }
+ .annotate-button:hover { background-color: #FFF }
+ .cancel-button { font-weight: normal; border-color: transparent; background-color: transparent; color: rgba(0, 0, 0, 0.5) }
+ .cancel-button:hover { color: #FFF }
+ .select select { color: rgba(0, 0, 0, 0.75); border: thin solid rgba(0, 0, 0, 0.25) }
+ .select select:hover,
+ .select select:focus { background-color: #EEE }
+ .select { background-color: rgba(0, 0, 0, 0) }
+ .select::after { background-color: rgba(0, 0, 0, 0.5) }
+ .coordinate-to-bridge { color: #000 }
+ .turn-components-item { color: rgba(255, 255, 255, 0.75) }
+ .turn-components-item:hover { color: #FFF }
+ .turn-components .turn-components-item:first-of-type { border-color: transparent; background-color: transparent }
+ .turn-components .turn-components-item:last-of-type { border-color: rgba(255, 255, 255, 0.5) }
+ .annotation-components .turn-components-item,
+ .annotation-components .turn-location-button { color: rgba(0, 0, 0, 0.75) }
+ .branch-options { background-color: rgba(255, 255, 255, 0.5) }
+ .turn-list .timeline1 { background:rebeccapurple }
+ .turn-list .timeline2 { background: darkred }
+ .turn-list .timeline3 { background: green }
+ .turn-list .timeline4 { background: midnightblue }
+ .turn-list .timeline5 { background: olive }
+ .turn-list .timeline6 { background: purple }
+ .turn-list .timeline7 { background: teal }
+ .turn-list .timeline8 { background: steelblue }
+ .turn-list .timeline9 { background: slategrey }
+ .turn-list .timeline10 { background: sienna }
+ .turn-list .timeline11 { background: maroon}
+ .turn-list .timeline12 { background:dimgray }
+ .turn-list .timeline13 { background: mediumslateblue }
+ .turn-list .timeline14 { background: limegreen }
+ .turn-list .timeline15 { background: goldenrod }
+
+ /* annotation forms */
+ .annotation-tabs { border-bottom-color: rgba(255, 255, 255, 0.5) }
+ .annotation-tab-button,
+ .annotation-type-button { color:rgba(255, 255, 255, 0.75); background-color: transparent !important; border-color: rgba(255, 255, 255, 0.5) !important }
+ .current-annotation-button { color: #FFF; background-color: rgba(255, 255, 255, 0.25) !important; border-color: rgba(255, 255, 255, 0.5) !important }
+ .annotation-text { color: #000; background-color: rgba(0, 0, 0, 0.125); border: thin solid rgba(255, 255, 255, 0.25) }
+ .alternative-turn-title { color: #000 }
+
+ /* loading pgn */
+ .paste-text { border-color: #999 }
+ /* tabs */
+ .current-tab { background-color: #000 !important; color: beige !important }
+ .tab { background-color: gold; color: #333 }
+ .tabs { background-color: gold }
+ .tab:hover { background-color: rgba(255, 255, 255, 0.5) }
+ /* tags */
+ .tag-input { background-color: #FFF; border: thin solid #DDD }
+ .delete-tag-button i { color: #900 }
+ .add-tag-button i { color: rebeccapurple }
+ .add-tag-button:hover i { color: blue }
+ .tag-button:hover i { color: #999 }
+ /* timeline */
+ .frame { background-color: #666; color: #FFF}
+ .connecting-line { border-color: #CCC }
+ .alternating-frame { background-color:rgba(255, 255, 255, 0.5) !important }
+ .current-turn-frame { background-color: rgba(255, 255, 0, 0.75) !important }
+
+ .timeline1 .timeline-bar { background: rebeccapurple }
+ .timeline1 .frame { background-color: rebeccapurple }
+ .timeline1 .connecting-line { border-color: rebeccapurple }
+ 
+ .timeline2 .timeline-bar { background-color: darkred }
+ .timeline2 .frame { background-color: darkred }
+ .timeline2 .connecting-line { border-color: darkred }
+
+ .timeline3 .timeline-bar { background-color: green }
+ .timeline3 .frame { background-color: green }
+ .timeline3 .connecting-line { border-color: green }
+
+ .timeline4 .timeline-bar { background-color: midnightblue }
+ .timeline4 .frame { background-color: midnightblue }
+ .timeline4 .connecting-line { border-color: midnightblue }
+
+ .timeline5 .timeline-bar { background-color: olive }
+ .timeline5 .frame { background-color: olive }
+ .timeline5 .connecting-line { border-color: olive }
+
+ .timeline6 .timeline-bar { background-color: purple }
+ .timeline6 .frame { background-color: purple }
+ .timeline6 .connecting-line { border-color: purple }
+
+ .timeline7 .timeline-bar { background-color: teal }
+ .timeline7 .frame { background-color: teal }
+ .timeline7 .connecting-line { border-color: teal }
+
+ .timeline8 .timeline-bar { background-color:steelblue }
+ .timeline8 .frame { background-color: steelblue }
+ .timeline8 .connecting-line { border-color: steelblue }
+
+ .timeline9 .timeline-bar { background-color: slategrey }
+ .timeline9 .frame { background-color: slategrey }
+ .timeline9 .connecting-line { border-color: slategrey }
+
+ .timeline10 .timeline-bar { background-color: sienna }
+ .timeline10 .frame { background-color: sienna }
+ .timeline10 .connecting-line { border-color: sienna }
+
+ .timeline11 .timeline-bar { background-color: maroon }
+ .timeline11 .frame { background-color: maroon }
+ .timeline11 .connecting-line { border-color: maroon }
+
+ .timeline12 .timeline-bar { background-color: dimgray }
+ .timeline12 .frame { background-color: dimgray }
+ .timeline12 .connecting-line { border-color: dimgray }
+
+ .timeline13 .timeline-bar { background-color: mediumslateblue }
+ .timeline13 .frame { background-color: mediumslateblue }
+ .timeline13 .connecting-line { border-color: mediumslateblue }
+
+ .timeline14 .timeline-bar { background-color: limegreen }
+ .timeline14 .frame { background-color: limegreen }
+ .timeline14 .connecting-line { border-color: limegreen }
+
+ .timeline15 .timeline-bar { background-color: goldenrod }
+ .timeline15 .frame { background-color: goldenrod }
+ .timeline15 .connecting-line { border-color: goldenrod }
 }
 
 @media (prefers-color-scheme: light) {

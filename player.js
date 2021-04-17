@@ -978,16 +978,12 @@
       currentMoveIndex++
       currentIndex++
     }
-    console.log('parentSiblingPGN', parentSiblingPGN)
-    console.log('new PGN', annotationParts.join(' '))
     propogateChanges(turn.parentTurn, parser.tokenizeLine(turn.parentTurn.sequence.join(' ')))
-    console.log('parent now', turn.parentTurn)
     for (const sibling of turn.parentTurn.siblings) {
       for (const child of sibling) {
         child.parentTurn = turn.parentTurn
       }
     }
-
     turnList.innerHTML = ''
     renderTurns(window.pgn.turns, turnList)
   }
@@ -1445,7 +1441,6 @@
     const turn = findTurn(turnContainer)
     let turnArray
     if (!turn.parentTurn) {
-      console.log('no parent turn', turn)
       turnArray = window.pgn.turns
     } else {
       for (const sibling of turn.parentTurn.siblings) {

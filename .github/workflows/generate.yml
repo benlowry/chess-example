@@ -32,7 +32,7 @@ jobs:
       run: |
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
-        node reindex.js screenshots > screneshots.js
+        node reindex.js screenshots > screenshots.js
     - name: Publish to Github
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:
