@@ -19,15 +19,17 @@ jobs:
         cd ../player
         npm install
         grunt
-        export SCREENSHOT_DEVICE=desktop
-        export SCREENSHOT_SCHEME=light
-        export SCREENSHOT_PATH=$DIR/screenshots/$SCREENSHOT_DEVICE/$SCREENSHOT_SCHEME
-        mkdir -p $SCREENSHOT_PATH
-        npm test 
-        export SCREENSHOT_SCHEME=dark
-        export SCREENSHOT_PATH=$DIR/screenshots/$SCREENSHOT_DEVICE/$SCREENSHOT_SCHEME
-        mkdir -p $SCREENSHOT_PATH
-        npm test 
+        for theme of "default"; do 
+          for device of "Desktop" "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
+            for theme of light dark; do
+              export SCREENSHOT_DEVICE=$device
+              export SCREENSHOT_SCHEME=$theme
+              export SCREENSHOT_PATH=$DIR/screenshots/default/$SCREENSHOT_DEVICE/$SCREENSHOT_SCHEME
+              mkdir -p $SCREENSHOT_PATH
+              npm test 
+            done
+          done
+        done
     - name: Reindex generated files
       run: |
         node reindex.js themes > themes.js
