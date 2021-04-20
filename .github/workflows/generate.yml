@@ -19,12 +19,13 @@ jobs:
         cd ../player
         npm install
         grunt
-        for theme of "default"; do 
+        for theme of default; do 
           for device of "Desktop" "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
-            for theme of light dark; do
+            for scheme of light dark; do
               export SCREENSHOT_DEVICE=$device
-              export SCREENSHOT_SCHEME=$theme
-              export SCREENSHOT_PATH=$DIR/screenshots/default/$SCREENSHOT_DEVICE/$SCREENSHOT_SCHEME
+              export SCREENSHOT_SCHEME=$scheme
+              export SCREENSHOT_THEME=$theme
+              export SCREENSHOT_PATH=$DIR/screenshots/$SCREENSHOT_THEME/$SCREENSHOT_DEVICE/$SCREENSHOT_SCHEME
               mkdir -p $SCREENSHOT_PATH
               npm test 
             done
