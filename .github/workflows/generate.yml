@@ -20,7 +20,7 @@ jobs:
         npm install
         grunt
         for browser in chrome firefox; do 
-          for theme in `ls themes`; do 
+          for theme in `ls $DIR/themes`; do 
             for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
               for scheme in light dark; do
                 if [ "$browser" = "firefox" ]; then
