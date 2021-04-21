@@ -13,14 +13,19 @@ switch (group) {
     return console.log(`window.themes = ${JSON.stringify(themeFolders)}`)
   case 'screenshots':
     const screenshots = {}
-    const themes = fs.readdirSync(path.join(__dirname, 'themes'))
+    const screenshotPath = process.env.SCREENSHOT_PATH
+    const themes = fs.readdirSync(screenshotPath)
     for (const theme of themes) {
-      screenshots[theme] = {}
-      const devices = []
+      const themePath = path.join(screenshotPath, theme)
+      const devices = fs.readdirSync(themePath)
       for (const device of devices) {
-        screenshots[theme][device] = {
-          light: [],
-          dark: []
+        const devicePath = path.join(themePath, device)
+        const schemes = fs.readdirSync(devicePath)
+        for (const scheme of schemes) {
+          const schemePath = path.join(devicePath, scheme)
+          console.log(schemePath)
+          screenshots[device] = screenshots[device] || {}
+          screenshots[device][scheme] = fs.readdirSync(schemePath)
         }
       }
     }
