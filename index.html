@@ -18,22 +18,53 @@
           li.appendChild(link)
           sampleList.appendChild(li)
         }
+        // filters
+        const browserSelect = document.querySelector('.browser-select')
+        const deviceSelect = document.querySelector('.device-select')
+        const themeSelect = document.querySelector('.theme-select')
+        const schemeSelect = document.querySelector('.scheme-select')
         // screenshots
+        const indexedDevices = []
+        const indexedThemes = []
+        const indexedSchemes = []
         const screenshotList = document.querySelector('.screenshot-list')
-        for (const theme in window.screenshots) {
-          console.log('theme', theme)
-          for (const device in window.screenshots[theme]) {
-            console.log('->', 'device', device)
-            for (const scheme in window.screenshots[theme][device]) {
-              console.log('-', '->', 'scheme', scheme)
-              for (const screenshot of window.screenshots[theme][device][scheme]) {
-                // console.log('-', '-', '->', screenshot)
-                const link = document.createElement('a')
-                link.href = `screenshots/${theme}/${device}/${scheme}/${screenshot}`
-                link.innerHTML = screenshot
-                const li = document.createElement('li')
-                li.appendChild(link)
-                screenshotList.appendChild(li)
+        for (const browser in window.screenshots) {
+          const browserOption = document.createElement('option')
+          browserOption.value = browser
+          browserOption.text = browser
+          browserSelect.appendChild(browserOption)
+          for (const theme in window.screenshots[browser]) {
+            if (indexedThemes.indexOf(theme) === -1) {
+              const themeOption = document.createElement('option')
+              themeOption.value = theme
+              themeOption.text = theme
+              themeSelect.appendChild(themeOption)
+              indexedThemes.push(theme)
+            }
+            for (const device in window.screenshots[browser][theme]) {
+              if (indexedDevices.indexOf(device) === -1) {
+                const deviceOption = document.createElement('option')
+                deviceOption.value = device
+                deviceOption.text = device
+                deviceSelect.appendChild(deviceOption)
+                indexedDevices.push(device)
+              }
+              for (const scheme in window.screenshots[browser][theme][device]) {
+                if (indexedSchemes.indexOf(scheme) === -1) {
+                  const schemeOption = document.createElement('option')
+                  schemeOption.value = scheme
+                  schemeOption.text = scheme
+                  schemeSelect.appendChild(schemeOption)
+                  indexedSchemes.push(scheme)
+                }
+                for (const screenshot of window.screenshots[browser][theme][device][scheme]) {
+                  const link = document.createElement('a')
+                  link.href = `screenshots/${browser}/${theme}/${device}/${scheme}/${screenshot}`
+                  link.innerHTML = screenshot
+                  const li = document.createElement('li')
+                  li.appendChild(link)
+                  screenshotList.appendChild(li)
+                }
               }
             }
           }
@@ -52,6 +83,8 @@
       li { outline: 0; list-style-type: none; padding: 0; margin: 0 }
       .screenshot-list { margin-top: 1rem }
       .screenshot-list li { padding: 0.5rem; background-color: #FFF; border: thin solid #CCC; display: inline-block; margin: 0 1rem 1rem 0 }
+      .filter-container { display: flex }
+      .filter-container .select { margin-right: 1rem; width: 100% }
       .select { margin-bottom: 0.5rem; display: grid; grid-template-areas: "select"; align-items: center; position: relative; border-radius: 0.25em; font-size: 0.9rem; cursor: pointer; line-height: 1.1rem }
       .select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
       .select::after,
@@ -75,25 +108,27 @@
     </div>
     <div>
       <h2>Screenshots</h2>
-      <div class="select">
-        <select>
-          <option>Browser</option>
-        </select>
-      </div>
-      <div class="select">
-        <select>
-          <option>Theme</option>
-        </select>
-      </div>
-      <div class="select">
-        <select>
-          <option>Color scheme</option>
-        </select>
-      </div>
-      <div class="select">
-        <select>
-          <option>Device</option>
-        </select>
+      <div class="filter-container">
+        <div class="select">
+          <select class="browser-select">
+            <option>Browser</option>
+          </select>
+        </div>
+        <div class="select">
+          <select class="device-select">
+            <option>Device</option>
+          </select>
+        </div>
+        <div class="select">
+          <select class="theme-select">
+            <option>Theme</option>
+          </select>
+        </div>
+        <div class="select">
+          <select class="scheme-select">
+            <option>Color scheme</option>
+          </select>
+        </div>
       </div>
       <ul class="screenshot-list"></ul>
     </div>
