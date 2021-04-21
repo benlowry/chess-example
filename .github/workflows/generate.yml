@@ -31,6 +31,7 @@ jobs:
             done
           done
         done
+        kill http-server
     - name: Reindex generated files
       run: |
         node reindex.js themes > themes.js
