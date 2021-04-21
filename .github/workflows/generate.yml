@@ -20,7 +20,7 @@ jobs:
         npm install
         grunt
         for theme of default; do 
-          for device of "Desktop" "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
+          for device of Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
             for scheme of light dark; do
               export SCREENSHOT_DEVICE=$device
               export SCREENSHOT_SCHEME=$scheme
