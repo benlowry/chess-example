@@ -14,18 +14,23 @@ switch (group) {
   case 'screenshots':
     const screenshots = {}
     const screenshotPath = process.env.SCREENSHOT_PATH
-    const themes = fs.readdirSync(screenshotPath)
-    for (const theme of themes) {
-      const themePath = path.join(screenshotPath, theme)
-      const devices = fs.readdirSync(themePath)
-      for (const device of devices) {
-        const devicePath = path.join(themePath, device)
-        const schemes = fs.readdirSync(devicePath)
-        for (const scheme of schemes) {
-          const schemePath = path.join(devicePath, scheme)
-          console.log(schemePath)
-          screenshots[device] = screenshots[device] || {}
-          screenshots[device][scheme] = fs.readdirSync(schemePath)
+    const browsers = fs.readdirSync(screenshotPath)
+    for (const browser of browsers) {
+      const themePath = path.join(screenshotPath, browser)
+      const themes = fs.readdirSync(themePath)
+      for (const theme of themes) {
+        const themePath = path.join(screenshotPath, theme)
+        const devices = fs.readdirSync(themePath)
+        for (const device of devices) {
+          const devicePath = path.join(themePath, device)
+          const schemes = fs.readdirSync(devicePath)
+          for (const scheme of schemes) {
+            const schemePath = path.join(devicePath, scheme)
+            screenshots[browser] = screenshots[browser] || {}
+            screenshots[browser][theme] = screenshots[theme] || {}
+            screenshots[browser][theme][device] = screenshots[device] || {}
+            screenshots[browser][theme][device][scheme] = fs.readdirSync(schemePath)
+          }
         }
       }
     }

@@ -2,7 +2,6 @@
   <head>
     <title>PGN editor / player / thing</title>
     <link rel="stylesheet" href="fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="player.css">
     <script src="themes.js"></script>
     <script src="samples.js"></script>
     <script src="screenshots.js"></script>
@@ -20,8 +19,54 @@
           sampleList.appendChild(li)
         }
         // screenshots
+        const screenshotList = document.querySelector('.screenshot-list')
+        for (const theme in window.screenshots) {
+          console.log('theme', theme)
+          for (const device in window.screenshots[theme]) {
+            console.log('->', 'device', device)
+            for (const scheme in window.screenshots[theme][device]) {
+              console.log('-', '->', 'scheme', scheme)
+              for (const screenshot of window.screenshots[theme][device][scheme]) {
+                // console.log('-', '-', '->', screenshot)
+                const link = document.createElement('a')
+                link.href = `screenshots/${theme}/${device}/${scheme}/${screenshot}`
+                link.innerHTML = screenshot
+                const li = document.createElement('li')
+                li.appendChild(link)
+                screenshotList.appendChild(li)
+              }
+            }
+          }
+        }
       }
     </script>
+    <style>
+      html { height: 100%; font-size: 100% }
+      body { min-width: 320px; font-family: sans-serif; padding: 1rem; margin: 0; height: 100%; background-color: #EEE }
+      a,
+      button,
+      img,
+      input,
+      textarea,
+      ul,
+      li { outline: 0; list-style-type: none; padding: 0; margin: 0 }
+      .screenshot-list { margin-top: 1rem }
+      .screenshot-list li { padding: 0.5rem; background-color: #FFF; border: thin solid #CCC; display: inline-block; margin: 0 1rem 1rem 0 }
+      .select { margin-bottom: 0.5rem; display: grid; grid-template-areas: "select"; align-items: center; position: relative; border-radius: 0.25em; font-size: 0.9rem; cursor: pointer; line-height: 1.1rem }
+      .select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
+      .select::after,
+      .select select { grid-area: select }
+      .select select { background-color: transparent; appearance: none; border: none; outline: 0; padding: 0.25rem; margin: 0; border-radius: 0.25rem; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit }
+      .select select::-ms-expand { display: none }
+      .select select:hover,
+      .select select:focus { border-radius: 0.25rem } 
+      .select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%); grid-area: select }
+      .select select { color: rgba(0, 0, 0, 0.75); border: thin solid rgba(0, 0, 0, 0.25) }
+      .select select:hover,
+      .select select:focus { background-color: #EEE }
+      .select { background-color: rgba(0, 0, 0, 0) }
+      .select::after { background-color: rgba(0, 0, 0, 0.5) }
+    </style>
   </head>
   <body>
     <div style="display: flex">
@@ -29,20 +74,28 @@
       <ul class="sample-list"></ul>
     </div>
     <div>
-      <h2>Screenshots of the tool tests</h2>
-
-      <div style="display: flex">
-        Browser
-        <button>Firefox</button>
-        <button>Chrome</button>
-        Resolution
-        <button>Desktop (1280p)</button>
-        <button>Desktop (1920p)</button>
-        <button>Desktop (3840p)</button>
+      <h2>Screenshots</h2>
+      <div class="select">
+        <select>
+          <option>Browser</option>
+        </select>
       </div>
-      <ul>
-
-      </ul>
+      <div class="select">
+        <select>
+          <option>Theme</option>
+        </select>
+      </div>
+      <div class="select">
+        <select>
+          <option>Color scheme</option>
+        </select>
+      </div>
+      <div class="select">
+        <select>
+          <option>Device</option>
+        </select>
+      </div>
+      <ul class="screenshot-list"></ul>
     </div>
   </body>
 </html>
