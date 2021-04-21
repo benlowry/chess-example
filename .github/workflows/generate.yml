@@ -22,11 +22,12 @@ jobs:
         for theme in default; do 
           for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
             for scheme in light dark; do
-              export SCREENSHOT_DEVICE=$device
-              export SCREENSHOT_SCHEME=$scheme
-              export SCREENSHOT_THEME=$theme
-              export SCREENSHOT_PATH=$DIR/screenshots/$SCREENSHOT_THEME/$SCREENSHOT_DEVICE/$SCREENSHOT_SCHEME
-              mkdir -p $SCREENSHOT_PATH
+              export SCREENSHOT_DEVICE="$device"
+              export SCREENSHOT_SCHEME="$scheme"
+              export SCREENSHOT_THEME="$theme"
+              export SCREENSHOT_PATH=$DIR/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              mkdir -p "$SCREENSHOT_PATH"
+              echo "path" $SCREENSHOT_PATH
               npm test 
             done
           done
