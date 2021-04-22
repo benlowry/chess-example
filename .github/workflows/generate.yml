@@ -18,6 +18,7 @@ jobs:
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
         npm install
+        PUPPETEER_PRODUCT=firefox npm install puppeteer
         grunt
         for browser in chrome firefox; do 
           for theme in `ls $DIR/themes`; do 
