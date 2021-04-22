@@ -10,7 +10,31 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 14
-    - name: Generate desktop screenshots
+    - name: Generate Firefox screenshots
+      run: |
+        DIR=`pwd`
+        npm install -g http-server
+        http-server . > /dev/null &
+        git clone https://github.com/benlowry/chess-pgn-player ../player
+        cd ../player
+        PUPPETEER_PRODUCT=firefox npm install
+        grunt
+        for theme in `ls $DIR/themes`; do 
+          for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
+            for scheme in light dark; do
+              export FIREFOX=true
+              export SCREENSHOT_DEVICE="$device"
+              export SCREENSHOT_SCHEME="$scheme"
+              export SCREENSHOT_THEME="$theme"
+              export SCREENSHOT_PATH=$DIR/$browser/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              mkdir -p "$SCREENSHOT_PATH"
+              echo "path" $SCREENSHOT_PATH
+              npm test 
+            done
+          done
+        done
+        kill http-server
+    - name: Generate Chrome screenshots
       run: |
         DIR=`pwd`
         npm install -g http-server
@@ -18,26 +42,18 @@ jobs:
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
         npm install
-        npm install puppeteer
-        PUPPETEER_PRODUCT=firefox npm install puppeteer
         grunt
-        for browser in chrome firefox; do 
-          for theme in `ls $DIR/themes`; do 
-            for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
-              for scheme in light dark; do
-                if [ "$browser" = "firefox" ]; then
-                  export FIREFOX=true
-                else
-                  export FIREFOX=""
-                fi
-                export SCREENSHOT_DEVICE="$device"
-                export SCREENSHOT_SCHEME="$scheme"
-                export SCREENSHOT_THEME="$theme"
-                export SCREENSHOT_PATH=$DIR/$browser/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
-                mkdir -p "$SCREENSHOT_PATH"
-                echo "path" $SCREENSHOT_PATH
-                npm test 
-              done
+        for theme in `ls $DIR/themes`; do 
+          for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
+            for scheme in light dark; do
+              export FIREFOX=""
+              export SCREENSHOT_DEVICE="$device"
+              export SCREENSHOT_SCHEME="$scheme"
+              export SCREENSHOT_THEME="$theme"
+              export SCREENSHOT_PATH=$DIR/$browser/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              mkdir -p "$SCREENSHOT_PATH"
+              echo "path" $SCREENSHOT_PATH
+              npm test 
             done
           done
         done
