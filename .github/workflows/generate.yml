@@ -33,11 +33,10 @@ jobs:
             done
           done
         done
-        kill http-server
+        kill http-server || true
     - name: Generate Chrome screenshots
       run: |
         DIR=`pwd`
-        npm install -g http-server
         http-server . > /dev/null &
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
@@ -57,7 +56,7 @@ jobs:
             done
           done
         done
-        kill http-server
+        kill http-server || true
     - name: Reindex generated files
       run: |
         node reindex.js themes > themes.js
