@@ -26,7 +26,7 @@ jobs:
               export SCREENSHOT_DEVICE="$device"
               export SCREENSHOT_SCHEME="$scheme"
               export SCREENSHOT_THEME="$theme"
-              export SCREENSHOT_PATH=$DIR/$browser/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              export SCREENSHOT_PATH=$DIR/firefox/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
               mkdir -p "$SCREENSHOT_PATH"
               echo "path" $SCREENSHOT_PATH
               npm test 
@@ -50,7 +50,7 @@ jobs:
               export SCREENSHOT_DEVICE="$device"
               export SCREENSHOT_SCHEME="$scheme"
               export SCREENSHOT_THEME="$theme"
-              export SCREENSHOT_PATH=$DIR/$browser/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              export SCREENSHOT_PATH=$DIR/chrome/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
               mkdir -p "$SCREENSHOT_PATH"
               echo "path" $SCREENSHOT_PATH
               npm test 
