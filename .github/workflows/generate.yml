@@ -13,7 +13,7 @@ jobs:
     - name: Generate Firefox screenshots
       run: |
         DIR=`pwd`
-        npm install -g http-server
+        npm install -g http-server grunt
         http-server . > /dev/null &
         git clone https://github.com/benlowry/chess-pgn-player ../player
         cd ../player
