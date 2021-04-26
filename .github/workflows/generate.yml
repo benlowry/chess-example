@@ -38,8 +38,6 @@ jobs:
       run: |
         DIR=`pwd`
         http-server . > /dev/null &
-        git clone https://github.com/benlowry/chess-pgn-player ../player
-        cd ../player
         npm install
         grunt
         for theme in `ls $DIR/themes`; do 
