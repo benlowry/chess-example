@@ -20,54 +20,146 @@
         }
         // filters
         const browserSelect = document.querySelector('.browser-select')
+        browserSelect.onchange = refreshThumbnails
         const deviceSelect = document.querySelector('.device-select')
+        deviceSelect.onchange = refreshThumbnails
         const themeSelect = document.querySelector('.theme-select')
+        themeSelect.onchange = refreshThumbnails
         const schemeSelect = document.querySelector('.scheme-select')
+        schemeSelect.onchange = refreshThumbnails
         // screenshots
-        const indexedDevices = []
-        const indexedThemes = []
-        const indexedSchemes = []
+        const uniqueDevices = []
+        const uniqueThemes = []
+        const uniqueSchemes = []
         const screenshotList = document.querySelector('.screenshot-list')
         for (const browser in window.screenshots) {
           const browserOption = document.createElement('option')
           browserOption.value = browser
-          browserOption.text = browser
+          browserOption.text = browser[0].toUpperCase() + browser.substring(1) + ' browser'
           browserSelect.appendChild(browserOption)
           for (const theme in window.screenshots[browser]) {
-            if (indexedThemes.indexOf(theme) === -1) {
+            if (uniqueThemes.indexOf(theme) === -1) {
               const themeOption = document.createElement('option')
               themeOption.value = theme
-              themeOption.text = theme
+              themeOption.text = theme[0].toUpperCase() + theme.substring(1) + ' theme' 
               themeSelect.appendChild(themeOption)
-              indexedThemes.push(theme)
+              uniqueThemes.push(theme)
             }
             for (const device in window.screenshots[browser][theme]) {
-              if (indexedDevices.indexOf(device) === -1) {
+              if (uniqueDevices.indexOf(device) === -1) {
                 const deviceOption = document.createElement('option')
                 deviceOption.value = device
                 deviceOption.text = device
                 deviceSelect.appendChild(deviceOption)
-                indexedDevices.push(device)
+                uniqueDevices.push(device)
               }
               for (const scheme in window.screenshots[browser][theme][device]) {
-                if (indexedSchemes.indexOf(scheme) === -1) {
+                if (uniqueSchemes.indexOf(scheme) === -1) {
                   const schemeOption = document.createElement('option')
                   schemeOption.value = scheme
-                  schemeOption.text = scheme
+                  schemeOption.text = scheme[0].toUpperCase() + scheme.substring(1) + ' mode'
                   schemeSelect.appendChild(schemeOption)
-                  indexedSchemes.push(scheme)
-                }
-                for (const screenshot of window.screenshots[browser][theme][device][scheme]) {
-                  const link = document.createElement('a')
-                  link.href = `screenshots/${browser}/${theme}/${device}/${scheme}/${screenshot}`
-                  link.innerHTML = screenshot
-                  const li = document.createElement('li')
-                  li.appendChild(link)
-                  screenshotList.appendChild(li)
+                  uniqueSchemes.push(scheme)
                 }
               }
             }
           }
+        }
+        browserSelect.selectedIndex = 1
+        deviceSelect.selectedIndex = 1
+        themeSelect.selectedIndex = 1
+        schemeSelect.selectedIndex = 1
+        return refreshThumbnails()
+      }
+
+      function refreshThumbnails (event) {
+        if (event && event.preventDefault) {
+          event.preventDefault()
+        }
+        const browserSelect = document.querySelector('.browser-select')
+        if (!browserSelect.value) {
+          return
+        }
+        const deviceSelect = document.querySelector('.device-select')
+        if (!deviceSelect.value) {
+          return
+        }
+        const themeSelect = document.querySelector('.theme-select')
+        if (!themeSelect.value) {
+          return
+        }
+        const schemeSelect = document.querySelector('.scheme-select')
+        if (!schemeSelect.value) {
+          return
+        }
+        const browser = browserSelect.value
+        const theme = themeSelect.value
+        const device = deviceSelect.value
+        const scheme = schemeSelect.value
+        const screenshots = window.screenshots[browser][theme][device][scheme]
+        const width = 256
+        let height
+        switch (device) {
+          case 'Desktop':
+            height = 1080 / 1920 * 256
+            break
+          case 'iPad Mini':
+            height = 1020 / 760 * 256
+            break
+          case 'iPad Pro':
+            height = 1360 / 1020 * 256
+            break
+          case 'iPhone SE':
+            height = 560 / 320 * 256
+            break
+          case 'Pixel 2 XL':
+            height = 820 / 410 * 256
+            break
+        }
+        height = Math.floor(height)
+        const screenshotOrder = {}
+        const tilesheetOrder = []
+        const screenshotHTML = []
+        for (const screenshot of screenshots) {
+          let name = screenshot.substring(0, screenshot.lastIndexOf('-'))
+          if (name.endsWith('-1') || name.endsWith('-2') || name.endsWith('-3')) {
+            name = name.substring(0, name.lastIndexOf('-'))
+          }
+          if (!screenshotOrder[name]) {
+            screenshotOrder[name] = [screenshot]
+            tilesheetOrder.push(name)
+          } else {
+            screenshotOrder[name].push(screenshot)
+          }
+        }
+        const screenshotContainer = document.querySelector('.screenshot-container')
+        screenshotContainer.innerHTML = ''
+        let lastName, screenshotList
+        for (const screenshot of screenshots) {
+          let name = screenshot.substring(0, screenshot.lastIndexOf('-'))
+          if (name.endsWith('-1') || name.endsWith('-2') || name.endsWith('-3')) {
+            name = name.substring(0, name.lastIndexOf('-'))
+          }
+          if (name !== lastName) {
+            const title = document.createElement('h3')
+            title.innerHTML = name[0].toUpperCase() + name.substring(1).split('-').join(' ')
+            screenshotContainer.appendChild(title)
+            screenshotList = document.createElement('ul')
+            screenshotList.className = 'screenshot-list'
+            screenshotContainer.appendChild(screenshotList)
+          }
+          lastName = name
+          const tilesheetNumber = tilesheetOrder.indexOf(name)
+          const screenshotNumber = screenshotOrder[name].indexOf(screenshot)
+          const link = document.createElement('a')
+          link.style.backgroundImage = `url("screenshots/${browser}/${theme}/${device}/${scheme}/tilesheet.png")`
+          link.style.backgroundPositionX = -(screenshotNumber * width) + 'px'
+          link.style.backgroundPositionY = -(tilesheetNumber * height) + 'px'
+          link.style.width = width + 'px'
+          link.style.height = height + 'px'
+          const li = document.createElement('li')
+          li.appendChild(link)
+          screenshotList.appendChild(li)
         }
       }
     </script>
@@ -82,7 +174,8 @@
       ul,
       li { outline: 0; list-style-type: none; padding: 0; margin: 0 }
       .screenshot-list { margin-top: 1rem }
-      .screenshot-list li { padding: 0.5rem; background-color: #FFF; border: thin solid #CCC; display: inline-block; margin: 0 1rem 1rem 0 }
+      .screenshot-list li { background-color: #FFF; border: thin solid #CCC; display: inline-block; margin: 0 1rem 1rem 0 }
+      .screenshot-list li a { display: block }
       .filter-container { display: flex }
       .filter-container .select { margin-right: 1rem; width: 100% }
       .select { margin-bottom: 0.5rem; display: grid; grid-template-areas: "select"; align-items: center; position: relative; border-radius: 0.25em; font-size: 0.9rem; cursor: pointer; line-height: 1.1rem }
@@ -111,26 +204,28 @@
       <div class="filter-container">
         <div class="select">
           <select class="browser-select">
-            <option>Browser</option>
+            <option disabled>Browser</option>
           </select>
         </div>
         <div class="select">
           <select class="device-select">
-            <option>Device</option>
+            <option disabled>Device</option>
           </select>
         </div>
         <div class="select">
           <select class="theme-select">
-            <option>Theme</option>
+            <option disabled>Theme</option>
           </select>
         </div>
         <div class="select">
           <select class="scheme-select">
-            <option>Color scheme</option>
+            <option disabled>Color scheme</option>
           </select>
         </div>
       </div>
-      <ul class="screenshot-list"></ul>
+      <div class="screenshot-container">
+
+      </div>
     </div>
   </body>
 </html>
