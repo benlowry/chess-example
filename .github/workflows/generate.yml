@@ -12,8 +12,8 @@ jobs:
         node-version: 14
     - name: Delete old screenshots
       run: |
-        git rm -rf screenshots
-        git rm -rf --cached screenshots
+        git rm -rf screenshots || true
+        git rm -rf --cached screenshots || true
     - name: Generate Firefox screenshots
       run: |
         DIR=`pwd`
