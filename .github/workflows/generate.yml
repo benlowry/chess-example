@@ -16,7 +16,7 @@ jobs:
         git rm -rf --cached screenshots || true
     - name: Generate Firefox screenshots
       run: |
-        DIR=`pwd`
+        DIR=`pwd/screenshots`
         npm install -g http-server grunt
         http-server . > /dev/null &
         git clone https://github.com/benlowry/chess-pgn-player ../player
@@ -40,7 +40,7 @@ jobs:
         kill http-server || true
     - name: Generate Chrome screenshots
       run: |
-        DIR=`pwd`
+        DIR=`pwd/screenshots`
         http-server . > /dev/null &
         cd ../player
         rm -rf node_modules
@@ -63,7 +63,7 @@ jobs:
         kill http-server || true
     - name: Reindex generated files
       run: |
-        export SCREENSHOT_PATH=`pwd`
+        export SCREENSHOT_PATH=`pwd/screenshots`
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
         node reindex.js screenshots > screenshots.js
