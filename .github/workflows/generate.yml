@@ -16,7 +16,7 @@ jobs:
         git rm -rf --cached screenshots || true
     - name: Generate Firefox screenshots
       run: |
-        DIR=`pwd`/screenshots
+        DIR=`pwd`
         npm install -g http-server grunt
         http-server . > /dev/null &
         git clone https://github.com/benlowry/chess-pgn-player ../player
@@ -30,7 +30,7 @@ jobs:
               export SCREENSHOT_DEVICE="$device"
               export SCREENSHOT_SCHEME="$scheme"
               export SCREENSHOT_THEME="$theme"
-              export SCREENSHOT_PATH=$DIR/firefox/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              export SCREENSHOT_PATH=$DIR/screenshots/firefox/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
               mkdir -p "$SCREENSHOT_PATH"
               echo "path" $SCREENSHOT_PATH
               npm test 
@@ -40,7 +40,7 @@ jobs:
         kill http-server || true
     - name: Generate Chrome screenshots
       run: |
-        DIR=`pwd`/screenshots
+        DIR=`pwd`
         http-server . > /dev/null &
         cd ../player
         rm -rf node_modules
@@ -53,7 +53,7 @@ jobs:
               export SCREENSHOT_DEVICE="$device"
               export SCREENSHOT_SCHEME="$scheme"
               export SCREENSHOT_THEME="$theme"
-              export SCREENSHOT_PATH=$DIR/chrome/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              export SCREENSHOT_PATH=$DIR/screenshots/chrome/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
               mkdir -p "$SCREENSHOT_PATH"
               echo "path" $SCREENSHOT_PATH
               npm test 
