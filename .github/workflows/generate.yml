@@ -10,6 +10,10 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 14
+    - name: Delete old screenshots
+      run: |
+        git rm -rf screenshots
+        git rm -rf --cached screenshots
     - name: Generate Firefox screenshots
       run: |
         DIR=`pwd`
@@ -59,6 +63,7 @@ jobs:
         kill http-server || true
     - name: Reindex generated files
       run: |
+        export SCREENSHOT_PATH=`pwd`
         node reindex.js themes > themes.js
         node reindex.js samples > samples.js
         node reindex.js screenshots > screenshots.js
