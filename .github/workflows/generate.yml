@@ -38,6 +38,7 @@ jobs:
       run: |
         DIR=`pwd`
         http-server . > /dev/null &
+        npm install -g http-server grunt
         npm install
         grunt
         for theme in `ls $DIR/themes`; do 
