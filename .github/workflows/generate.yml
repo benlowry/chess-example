@@ -38,7 +38,7 @@ jobs:
       run: |
         DIR=`pwd`
         http-server . > /dev/null &
-        npm install -g http-server grunt
+        cd ../player
         npm install
         grunt
         for theme in `ls $DIR/themes`; do 
