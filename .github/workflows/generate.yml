@@ -39,12 +39,13 @@ jobs:
         DIR=`pwd`
         http-server . > /dev/null &
         cd ../player
+        rm -rf node_modules
         npm install
         grunt
+        export FIREFOX=""
         for theme in `ls $DIR/themes`; do 
           for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
             for scheme in light dark; do
-              export FIREFOX=""
               export SCREENSHOT_DEVICE="$device"
               export SCREENSHOT_SCHEME="$scheme"
               export SCREENSHOT_THEME="$theme"
