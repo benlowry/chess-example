@@ -12,11 +12,13 @@
   --yellow: yellow;
   /* white or black */
   --bow: black;
+  --bow125: rgba(0, 0, 0, 0.125);
   --bow25: rgba(0, 0, 0, 0.25);
   --bow50: rgba(0, 0, 0, 0.5);
   --bow75: rgba(0, 0, 0, 0.75);
   /* black or white */
   --wob: white;
+  --wob125: rgba(255, 255, 255, 0.125);
   --wob25: rgba(255, 255, 255, 0.25);
   --wob50: rgba(255, 255, 255, 0.5);
   --wob75: rgba(255, 255, 255, 0.75);
@@ -81,11 +83,13 @@
   --yellow: yellow;
   /* white or black */
   --wob: black;
+  --wob125: rgba(0, 0, 0, 0.125);
   --wob25: rgba(0, 0, 0, 0.25);
   --wob50: rgba(0, 0, 0, 0.5);
   --wob75: rgba(0, 0, 0, 0.75);
   /* black or white */
   --bow: white;
+  --bow125: rgba(255, 255, 255, 0.125);
   --bow25: rgba(255, 255, 255, 0.25);
   --bow50: rgba(255, 255, 255, 0.5);
   --bow75: rgba(255, 255, 255, 0.75);

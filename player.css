@@ -57,8 +57,8 @@ i { pointer-events: none }
 .frame:last-of-type { border-top-right-radius: 0.25rem; border-bottom-right-radius: 00.25rem }
 .connecting-line { position: absolute; top: 1rem; border-left: solid }
 .playback-controls { padding: 0; margin: 0 }
-.playback-controls .checkbox { font-size: 0.75rem }
-.playback-controls .checkbox input { padding: 0; margin: 0 0.25rem 0 0.5rem }
+.playback-controls .checkbox { cursor: pointer; font-size: 0.75rem; padding: 0; margin: 0 0.25rem 0 0.5rem; color: var(--bow75) }
+.playback-controls input { display: none }
 .playback-control { height: 2rem }
 
 /* tabs */
@@ -135,12 +135,15 @@ i { pointer-events: none }
 /* tags */
 .tags-container { padding: 0 }
 .tags-table { border-collapse: collapse; margin: 0.5rem }
+.tags-table tr:last-of-type td { padding-top: 1rem }
 .tags-table td { padding: 0.125rem }
 .tags-table .tag-name { width: 8rem }
 .tags-table .tag-value { width: 10rem }
-.tag-input { width: 100%; font-size: 0.8rem; line-height: 1rem; padding: 0.25rem }
-.tags-table tr:last-of-type td { padding-top: 1rem }
-.tag-button { margin-left: 0.5rem; background-color: transparent; border: none; padding: 0; font-size: 0.8rem; display: block; cursor: pointer }
+.tags-table .tag-input { width: 100%; font-size: 0.8rem; line-height: 1rem; padding: 0.25rem; background-color: var(--wob25); border: thin solid var(--bow50); color: var(--bow75) }
+.tags-table .tag-button { color: var(--bow75); margin-left: 0.5rem; background-color: transparent; border: none; padding: 0; font-size: 0.8rem; display: block; cursor: pointer }
+.tags-table .tag-button:hover,
+.tags-table .tag-button:hover i { color: var(--bow) }
+
 
 /* PGN */ 
 .pgn-container { margin: 0; padding: 0 }
@@ -148,7 +151,7 @@ i { pointer-events: none }
 .pgn { padding: 0.5rem; margin: 0; outline: 0; max-width: 50rem; white-space: pre-wrap; font-size: 0.8rem }
 .file-control { margin: 0.25rem }
 .paste-pgn-container { display: none; margin: 0.25rem }
-.paste-pgn { outline: 0; border: 1px solid; padding: 0.5rem; width: 90%; height: 10rem; display: block; margin: 0 0 0.25rem 0 }
+.paste-pgn { outline: 0; border: 1px solid var(--bow50); color: var(--bow75); background-color: var(--bow125); padding: 0.5rem; width: 90%; height: 10rem; display: block; margin: 0 0 0.25rem 0 }
 .paste-pgn-container .file-control { margin-top: 0; margin-left: 0 }
 
 body { background-color: var(--wob) }
@@ -187,7 +190,7 @@ body { background-color: var(--wob) }
 .insertion-form-selector { background-color: var(--wob); border-color: var(--bow); box-shadow: 0 0 1rem 1rem var(--wob50) }
 .turn-option-button { background-color: transparent; border-color: transparent; color: var(--wob) }
 .turn-option-button:hover { background-color: transparent }
-.turn-location-button { color: var(--bow75); background-color: transparent; border-color: transparent; }
+.turn-location-button { color: var(--wob75); background-color: transparent; border-color: transparent; }
 .turn-location-button:hover { color: var(--wob) }
 .selected-position .turn-location-button { color: var(--wob) }
 .selected-position,
@@ -226,10 +229,6 @@ body { background-color: var(--wob) }
 .tab { background-color: var(--tabs); color: var(--grey11) }
 .tabs { background-color: var(--tabs) }
 .tab:hover { background-color: var(--bow50) }
-/* tags */
-.tag-input { background-color: var(--wob); border: thin solid var(--grey1) }
-.add-tag-button:hover i { color: var(--blue) }
-.tag-button:hover i { color: var(--grey5) }
 /* timelines */
 .frame { background-color: var(--grey8); color: var(--wob)}
 .connecting-line { border-color: var(--grey2) }

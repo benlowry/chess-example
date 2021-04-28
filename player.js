@@ -2803,6 +2803,18 @@ window.setupPlayback = () => {
   renderNestedTimeline(window.pgn.turns, null, null)
   // playback frame-move buttons
   const playNestedMoves = document.querySelector('.play-nested-moves')
+  playNestedMoves.mouseChildren = false
+  playNestedMoves.parentElement.onclick = () => {
+    playNestedMoves.checked = !playNestedMoves.checked
+    const i = playNestedMoves.parentElement.firstElementChild
+    if (playNestedMoves.checked) {
+      i.classList.add('fa-check-square')
+      i.classList.remove('fa-square')
+    } else {
+      i.classList.remove('fa-check-square')
+      i.classList.add('fa-square')
+    }
+  }
   const backToStartButton = document.querySelector('.playback-start')
   if (backToStartButton) {
     backToStartButton.onclick = () => {
