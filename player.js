@@ -1,35 +1,48 @@
 ((exports) => {
-  exports.setupAnnotations = setupAnnotations
-  exports.refreshAnnotations = refreshAnnotations
   exports.expandAnnotationSequence = expandAnnotationSequence
+  exports.nextTurnNumber = nextTurnNumber
+  exports.propogateChanges = propogateChanges
+  exports.refreshAnnotations = refreshAnnotations
+  exports.setupAnnotations = setupAnnotations
 
-  let moveList, lastRenderedPGN
+  let parser, container, turnList, lastRenderedPGN, timeline
 
+  if (typeof require !== 'undefined') {
+    parser = require('pgn-parser')
+  }
   function setupAnnotations () {
-    moveList = document.querySelector('.move-list')
+    container = document.querySelector('.annotations-container')
+    turnList = document.querySelector('.turn-list')
+    document.onmousedown = startHighlightArrow
+    document.onmouseturn = previewHighlightArrow
+    document.onmouseup = stopHighlightArrow
+    if (typeof window !== 'undefined') {
+      parser = window.parser
+    }
   }
 
   function refreshAnnotations () {
-    if (!moveList) {
+    if (!turnList || container.style.display === 'none') {
       return
     }
     if (lastRenderedPGN !== window.pgn) {
+      timeline = 1
       lastRenderedPGN = window.pgn
-      moveList.innerHTML = ''
-      moveList.classList.add('timeline1')
-      renderMoves(window.pgn.turns, moveList, 1)
+      turnList.innerHTML = ''
+      turnList.classList.add('timeline1')
+      renderTurns(window.pgn.turns, turnList)
     }
     if (document.body.offsetHeight > document.body.offsetWidth) {
-      moveList.style.height = (document.body.offsetHeight - document.querySelector('.tabs-container').offsetHeight - document.querySelector('.left').offsetHeight) + 'px'
+      turnList.style.height = (document.body.offsetHeight - document.querySelector('.tabs-container').offsetHeight - document.querySelector('.left').offsetHeight) + 'px'
     } else {
-      moveList.style.height = (document.body.offsetHeight - document.querySelector('.tabs-container').offsetHeight - 1) + 'px'
+      turnList.style.height = (document.body.offsetHeight - document.querySelector('.tabs-container').offsetHeight - 1) + 'px'
     }
   }
 
-  function expandSequence (sequence) {
+  function expandSequence (sequence, expandAnnotations) {
     const expanded = [' ']
     for (const item of sequence) {
-      if (!item.startsWith('{')) {
+      if (!expandAnnotations || !item.startsWith('{')) {
         expanded.push(item, ' ')
         continue
       }
@@ -38,20 +51,6 @@
         expanded.push(part, ' ')
       }
     }
-    console.log('expanded', sequence, expanded)
-    // const splice = []
-    // for (const i in expanded) {
-    //   const int = parseInt(i, 10)
-    //   if (int < expanded.length - 1) {
-    //     const next = int + 1
-    //     if (expanded[i] === ' ' && expanded[next] === ' ') {
-    //       splice.unshift(i)
-    //     }
-    //   }
-    // }
-    // for (const i of splice) {
-    //   expanded = expanded.splice(i, 1)
-    // }
     return expanded
   }
 
@@ -104,38 +103,37 @@
       return ['{', '}']
     }
     const lineParts = ['{']
-    let copy = annotationSequence.substring(1, annotationSequence.length - 1)
-    console.log('copy', copy)
+    let copy = annotationSequence.substring(1, annotationSequence.length - 1).trim()
     while (copy.length) {
       const firstCharacter = copy.charAt(0)
       if (firstCharacter === '$') {
         const nag = copy.substring(0, copy.indexOf(' '))
         lineParts.push(nag)
-        copy = copy.substring(nag.length)
+        copy = copy.substring(nag.length).trim()
         continue
       }
       if (firstCharacter === '[') {
         const highlight = copy.substring(0, copy.indexOf(']') + 1)
         lineParts.push(highlight)
-        copy = copy.substring(highlight.length)
+        copy = copy.substring(highlight.length).trim()
         continue
       }
       if (firstCharacter === '(') {
         const closingIndex = findClosingBracket(0, copy)
-        const nestedMoves = copy.substring(0, closingIndex + 1)
-        lineParts.push(nestedMoves)
-        copy = copy.substring(nestedMoves.length)
+        const nestedTurns = copy.substring(0, closingIndex + 1)
+        lineParts.push(nestedTurns)
+        copy = copy.substring(nestedTurns.length).trim()
         continue
       }
       if (firstCharacter === '{') {
         const closingIndex = findClosingBracket(0, copy)
         const nestedAnnotation = copy.substring(0, closingIndex + 1)
         lineParts.push(nestedAnnotation)
-        copy = copy.substring(nestedAnnotation.length)
+        copy = copy.substring(nestedAnnotation.length).trim()
         continue
       }
       const nextSegment = copy.substring(0, firstInterruption(copy))
-      copy = copy.substring(nextSegment.length)
+      copy = copy.substring(nextSegment.length).trim()
       lineParts.push(nextSegment)
     }
     lineParts.push('}')
@@ -166,7 +164,6 @@
     valid.sort((a, b) => {
       return a.value > b.value ? 1 : -1
     })
-    console.log('valid', valid)
     return valid[0].value
   }
 
@@ -184,302 +181,1091 @@
     while (joined.indexOf('  ') > -1) {
       joined = joined.split('  ').join(' ')
     }
-    return window.parser.tokenizeLine(joined)
+    return parser.tokenizeLine(joined)
   }
 
-  function renderMoves (blocks, parent, timeline) {
-    for (const move of blocks) {
-      const li = document.createElement('li')
-      li.moveIndex = move.move
-      li.move = move
-      li.className = 'move-list-item'
-      const addAnnotationButton = document.createElement('button')
-      addAnnotationButton.className = 'button move-option-button'
-      addAnnotationButton.innerHTML = '<i class="fas fa-edit"></i>'
-      addAnnotationButton.annotateForm = 'annotation'
-      addAnnotationButton.onclick = showEditOptions
-      const showSpacing = document.createElement('li')
-      showSpacing.className = 'move-options-item'
-      showSpacing.appendChild(addAnnotationButton)
-      const sequence = document.createElement('ul')
-      sequence.className = 'move-sequence'
-      renderSequence(move.sequence, sequence)
-      sequence.insertBefore(showSpacing, sequence.firstChild)
-      li.appendChild(sequence)
-      if (move.color === 'w') {
-        li.classList.add('white-move-link')
-      } else {
-        li.classList.add('black-move-link')
-      }
-      if (move.siblings) {
-        for (const sibling of move.siblings) {
-          timeline++
-          const ul = document.createElement('ul')
-          ul.className = `move-list timeline${timeline}`
-          li.appendChild(ul)
-          timeline = renderMoves(sibling, ul, timeline)
-          const branchOptions = document.createElement('li')
-          branchOptions.className = 'branch-options'
-          const addBranchButton = document.createElement('button')
-          addBranchButton.className = 'button move-list-button'
-          addBranchButton.innerHTML = '<i class="fas fa-plus"></i></span> Add move'
-          addBranchButton.title = 'Add move'
-          branchOptions.appendChild(addBranchButton)
-          const deleteLastButton = document.createElement('button')
-          deleteLastButton.className = 'button move-list-button'
-          deleteLastButton.innerHTML = '<i class="fas fa-trash"></i></span> Delete last move'
-          branchOptions.appendChild(deleteLastButton)
-          const deleteBranchButton = document.createElement('button')
-          deleteBranchButton.className = 'button move-list-button'
-          deleteBranchButton.innerHTML = '<i class="fas fa-trash"></i></span> Delete branch'
-          branchOptions.appendChild(deleteBranchButton)
-          ul.appendChild(branchOptions)
+  function renderTurns (turns, parent) {
+    if (turns === window.pgn.turns) {
+      timeline = 1
+    }
+    for (const turn of turns) {
+      let li
+      if (turn.turnContainer && 2 === 1) {
+        li = turn.turnContainer
+        if (li.classList.contains('show-positioning')) {
+          toggleEditOptions({ target: li.firstChild })
         }
+      } else {
+        li = createFromTemplate('#turn-components-template')
       }
-      parent.appendChild(li)
+      const sequence = li.querySelector('.turn-components')
+      renderSequence(turn.sequence, sequence, false)
+      if (!li.parentNode) {
+        parent.appendChild(li)
+        li = turn.turnContainer = parent.lastElementChild
+      }
+      if (turn.color === 'w') {
+        li.classList.add('white-turn-link')
+        li.classList.remove('black-turn-link')
+      } else {
+        li.classList.add('black-turn-link')
+        li.classList.remove('white-turn-link')
+      }
+      const addTurnButton = li.querySelector('.add-turn-button')
+      const deleteLastTurnButton = li.querySelector('.delete-last-turn-button')
+      if (turn === turns[turns.length - 1]) {
+        deleteLastTurnButton.onclick = deleteLastTurn
+        addTurnButton.onclick = addTurn
+      } else {
+        deleteLastTurnButton.style.display = 'none'
+        addTurnButton.style.display = 'none'
+      }
+      resetTurnContainerButtons(li)
+      if (!turn.siblings || !turn.siblings.length) {
+        continue
+      }
+      for (const sibling of turn.siblings) {
+        timeline++
+        let ul = createFromTemplate('#sibling-components-template')
+        ul.pgn = sibling.join(' ')
+        li.appendChild(ul)
+        ul = li.lastElementChild
+        ul.classList.add(`timeline${timeline}`)
+        renderTurns(sibling, ul)
+      }
     }
     return timeline
   }
 
   function renderSequence (sequence, container, insideSpacingOnly) {
     container.innerHTML = ''
-    const expandedSequence = expandSequence(sequence)
-    console.log('rendering sequence', sequence, expandedSequence)
+    const expandedSequence = expandSequence(sequence, !!insideSpacingOnly)
     if (insideSpacingOnly) {
       expandedSequence.pop()
       expandedSequence.shift()
     }
+    const renderingAnnotation = container.classList.contains('annotation-components')
     for (const i in expandedSequence) {
       const item = expandedSequence[i]
       const li = document.createElement('li')
-      li.onclick = selectPosition
+      li.title = item
+      li.position = i
+      const nag = item.startsWith('$')
+      const annotation = item.startsWith('{')
+      const space = item === ' '
+      if (nag || annotation || space || renderingAnnotation) {
+        if (renderingAnnotation) {
+          if (item !== '{' && item !== '}') {
+            li.onmousedown = selectAnnotationSequencePosition
+            li.mouseEnabled = true
+          } else {
+            li.mouseEnabled = false
+          }
+        } else {
+          li.onmousedown = selectTurnComponentsPosition
+          li.mouseEnabled = true
+        }
+      } else {
+        li.mouseEnabled = false
+      }
       container.appendChild(li)
       if (item === ' ') {
         li.className = 'sequence-position-item'
-        li.innerHTML = '<button class="button move-location-button"><i class="fas fa-circle"></i></button>'
+        li.innerHTML = '<button class="button turn-location-button"><i class="fas fa-circle"></i></button>'
+        li.firstChild.mouseEnabled = false
         continue
       }
-      li.className = 'move-sequence-item'
+      li.className = 'turn-components-item'
       if (item.length > 30) {
         li.innerHTML = item.substring(0, 20) + '...'
+        if (item.charAt(0) === '{') {
+          li.innerHTML += '}'
+        }
+        if (item.charAt(0) === '(') {
+          li.innerHTML += ')'
+        }
       } else {
         li.innerHTML = item
       }
     }
+    return container
   }
 
-  function selectPosition (event) {
+  function selectTurnComponentsPosition (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
-    const positionList = event.target.parentNode.parentNode
-    if (!positionList.classList.contains('move-sequence')) {
-      return
-    }
+    const turnContainer = findTurnContainer(event.target)
+    const positionList = turnContainer.querySelector('.turn-components')
+    let editing
     for (const child of positionList.children) {
+      if (child.classList.contains('edit-position')) {
+        child.classList.remove('edit-position')
+      }
+      if (child.classList.contains('selected-position')) {
+        child.classList.remove('selected-position')
+      }
       if (!child.classList.contains('sequence-position-item')) {
+        if (child === event.target) {
+          if (child.innerHTML === '{' || child.innerHTML === '}') {
+            continue
+          }
+          editing = true
+        }
         continue
       }
-      if (child.firstChild === event.target) {
+      if (child.firstChild === event.target || child === event.target) {
         child.classList.add('selected-position')
         child.firstChild.firstChild.classList.remove('fa-circle')
         child.firstChild.firstChild.classList.add('fa-dot-circle')
       } else {
-        child.classList.remove('selected-position')
         child.firstChild.firstChild.classList.add('fa-circle')
         child.firstChild.firstChild.classList.remove('fa-dot-circle')
       }
     }
-    if (positionList.classList.contains('annotation-sequence')) {
+    if (editing) {
+      return editTurnComponentsPosition(event)
+    }
+    const newForm = makeInsertionTypeSelector(turnContainer)
+    const turnForms = turnContainer.querySelector('.turn-forms')
+    turnForms.innerHTML = ''
+    turnForms.appendChild(newForm)
+  }
+
+  function editTurnComponentsPosition (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    expandTurnContainer(turnContainer)
+    const sequence = turnContainer.querySelector('.turn-components')
+    let selectedPosition
+    for (const child of sequence.children) {
+      if (child === event.target) {
+        child.classList.add('edit-position')
+        selectedPosition = child
+      } else if (child.classList.contains('edit-position')) {
+        child.classList.remove('edit-position')
+      }
+    }
+    const existingForm = turnContainer.querySelector('.annotation-form')
+    if (existingForm) {
+      existingForm.parentNode.appendChild(existingForm)
+    }
+    const formSelector = turnContainer.querySelector('.insertion-form-selector')
+    if (formSelector) {
+      formSelector.parentNode.appendChild(formSelector)
+    }
+    const turnForms = turnContainer.querySelector('.turn-forms')
+    turnForms.innerHTML = ''
+    // editing a nag
+    if (selectedPosition.innerHTML.startsWith('$')) {
+      const newForm = makeNagForm('#edit-nag-form')
+      const nagSelect = newForm.querySelector('.nag-select')
+      nagSelect.selectedIndex = parseInt(selectedPosition.innerHTML.substring(1), 10)
+      const cancelButton = newForm.querySelector('.cancel-button')
+      cancelButton.onclick = cancelAndCloseForm
+      const formSelector = turnContainer.querySelector('.insertion-form-selector')
+      if (formSelector) {
+        formSelector.parentNode.appendChild(formSelector)
+      }
+      turnForms.appendChild(newForm)
       return
     }
-    const moveContainer = positionList.parentNode
-    let foundForms = false
-    for (const child of moveContainer.children) {
-      if (child.classList.contains('annotation-forms')) {
-        foundForms = true
+    // editing an annotation
+    if (selectedPosition.innerHTML.startsWith('{')) {
+      const sequence = parser.tokenizeLine(selectedPosition.title)
+      const newForm = makeAnnotationEditor(turnContainer, sequence)
+      turnForms.appendChild(newForm)
+      return setupAnnotationEditor(turnContainer)
+    }
+  }
+
+  function selectAnnotationSequencePosition (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const positionList = turnContainer.querySelector('.annotation-components')
+    let editing
+    for (const child of positionList.children) {
+      if (child.classList.contains('edit-position')) {
+        child.classList.remove('edit-position')
+      }
+      if (child.classList.contains('selected-position')) {
+        child.classList.remove('selected-position')
+      }
+      if (!child.classList.contains('sequence-position-item')) {
+        if (child === event.target) {
+          if (child.innerHTML === '{' || child.innerHTML === '}') {
+            continue
+          }
+          editAnnotationSequencePosition(event)
+          editing = true
+        }
+        continue
+      }
+      if (child.firstChild === event.target || child === event.target) {
+        child.classList.add('selected-position')
+        child.firstChild.firstChild.classList.remove('fa-circle')
+        child.firstChild.firstChild.classList.add('fa-dot-circle')
+      } else {
+        child.firstChild.firstChild.classList.add('fa-circle')
+        child.firstChild.firstChild.classList.remove('fa-dot-circle')
+      }
+    }
+    if (editing) {
+      return
+    }
+    const newForm = makeAnnotationTypeSelector(turnContainer)
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    formContainer.appendChild(newForm)
+  }
+
+  function editAnnotationSequencePosition (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const components = turnContainer.querySelector('.annotation-components')
+    const position = findElementChildIndex(event.target)
+    let selectedPosition
+    for (const child of components.children) {
+      if (child === event.target) {
+        child.classList.add('edit-position')
+        selectedPosition = child
+      } else if (child.classList.contains('edit-position')) {
+        child.classList.remove('edit-position')
+      }
+    }
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    expandedSequence.pop()
+    expandedSequence.shift()
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    const editing = expandedSequence[position]
+    if (selectedPosition.innerHTML.startsWith('[%cal')) {
+      const newForm = makeAnnotationArrowForm(turnContainer, '#edit-arrow-annotation-form')
+      formContainer.appendChild(newForm)
+      let arrowData = selectedPosition.title.substring('[%cal '.length)
+      arrowData = arrowData.substring(0, arrowData.indexOf(']'))
+      const pendingList = formContainer.querySelector('.pending-list')
+      const arrows = arrowData.split(',')
+      for (const arrow of arrows) {
+        let color
+        switch (arrow[0]) {
+          case 'R':
+            color = 'red'
+            break
+          case 'G':
+            color = 'green'
+            break
+          case 'Y':
+            color = 'yellow'
+            break
+          case 'B':
+            color = 'blue'
+            break
+        }
+        const activeColorButton = formContainer.querySelector(`.${color}-arrow-button`)
+        const colorText = activeColorButton.innerHTML.substring(activeColorButton.innerHTML.indexOf('</i>') + 4)
+        const column1 = arrow[1]
+        const row1 = arrow[2]
+        const coordinate1 = `${column1}${row1}`
+        const column2 = arrow[3]
+        const row2 = arrow[4]
+        const coordinate2 = `${column2}${row2}`
+        const listItem = document.createElement('li')
+        listItem.innerHTML = `<span class="${color}">${colorText} <i>${coordinate1}</i> <i>${coordinate2}</i></span>`
+        const chessBoard = formContainer.querySelector('.chessboard')
+        const highlightContainer = formContainer.querySelector('.highlight-arrow-container')
+        const arrowSVG = drawArrow(coordinate1, coordinate2, chessBoard, highlightContainer)
+        arrowSVG.classList.add('chessboard-arrow')
+        arrowSVG.classList.add(`${color}-arrow`)
+        arrowSVG.style.width = chessBoard.offsetWidth
+        arrowSVG.style.height = chessBoard.offsetHeight
+        arrowSVG.innerHTML += ''
+        const deleteButton = document.createElement('button')
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'
+        deleteButton.className = 'button annotation-form-button'
+        deleteButton.color = color
+        deleteButton.arrow = arrowSVG
+        deleteButton.onclick = deleteArrow
+        listItem.appendChild(deleteButton)
+        pendingList.appendChild(listItem)
+      }
+      const cancelButton = formContainer.querySelector('.cancel-button')
+      cancelButton.onclick = cancelAndCloseForm
+      return
+    }
+    if (selectedPosition.innerHTML.startsWith('[%csl')) {
+      const newForm = makeAnnotationSquareForm(turnContainer, '#edit-square-annotation-form')
+      formContainer.appendChild(newForm)
+      let squareData = selectedPosition.title.substring('[%cal '.length)
+      squareData = squareData.substring(0, squareData.indexOf(']'))
+      const pendingList = formContainer.querySelector('.pending-list')
+      const squares = squareData.split(',')
+      for (const square of squares) {
+        let color
+        switch (square.charAt(0)) {
+          case 'R':
+            color = 'red'
+            break
+          case 'G':
+            color = 'green'
+            break
+          case 'Y':
+            color = 'yellow'
+            break
+          case 'B':
+            color = 'blue'
+            break
+        }
+        const activeColorButton = formContainer.querySelector(`.${color}-square-button`)
+        const colorText = activeColorButton.innerHTML.substring(activeColorButton.innerHTML.indexOf('</i>') + 4)
+        const column = square[1]
+        const row = square[2]
+        const coordinate = `${column}${row}`
+        const cell = formContainer.querySelector(`.coordinate-${column}${row}`)
+        cell.classList.add(`${color}-square`)
+        const listItem = document.createElement('li')
+        listItem.innerHTML = `<span class="${color}">${colorText} <i>${coordinate}</i></span>`
+        const deleteButton = document.createElement('button')
+        deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'
+        deleteButton.className = 'button annotation-form-button'
+        deleteButton.square = cell
+        deleteButton.color = color
+        deleteButton.onclick = deleteSquare
+        listItem.appendChild(deleteButton)
+        pendingList.appendChild(listItem)
+      }
+      const cancelButton = formContainer.querySelector('.cancel-button')
+      cancelButton.onclick = cancelAndCloseForm
+      return
+    }
+    // a text block
+    const newForm = makeAnnotationTextForm(turnContainer, '#edit-text-annotation-form')
+    const textarea = newForm.querySelector('.annotation-text')
+    textarea.value = editing
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.onclick = cancelAndCloseForm
+    formContainer.appendChild(newForm)
+  }
+
+  function cancelAndCloseForm (event) {
+    event.preventDefault()
+    const turnContainer = findTurnContainer(event.target)
+    const turnForms = turnContainer.querySelector('.turn-forms')
+    turnForms.innerHTML = ''
+    unexpandTurnContainer(turnContainer)
+    unselectTurnComponentsPosition(turnContainer)
+  }
+
+  function switchForm (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const button = event.target
+    const formCreator = button.formCreator
+    const turnContainer = findTurnContainer(event.target)
+    const newForm = formCreator(turnContainer)
+    if (button.formContainer) {
+      button.formContainer.innerHTML = ''
+      return button.formContainer.appendChild(newForm)
+    }
+    const turnForms = turnContainer.querySelector('.turn-forms')
+    turnForms.innerHTML = ''
+    turnForms.appendChild(newForm)
+    if (button.formSetup) {
+      button.formSetup(turnContainer)
+    }
+  }
+
+  function makeInsertionTypeSelector () {
+    const template = document.querySelector('#insertion-form-selector')
+    const form = document.importNode(template.content, true)
+    const nagButton = form.querySelector('.nag-button')
+    nagButton.formCreator = makeNagForm
+    nagButton.onclick = switchForm
+    const annotationButton = form.querySelector('.annotation-button')
+    annotationButton.formCreator = makeAnnotationEditor
+    annotationButton.formSetup = setupAnnotationEditor
+    annotationButton.onclick = switchForm
+    const alternativeTurnsButton = form.querySelector('.alternative-moves-button')
+    alternativeTurnsButton.formCreator = makeAlternativeTurnsForm
+    alternativeTurnsButton.onclick = switchForm
+    const quizButton = form.querySelector('.quiz-button')
+    quizButton.formCreator = makeQuizForm
+    quizButton.onclick = switchForm
+    const cancelButton = form.querySelector('.cancel-button')
+    cancelButton.onclick = cancelAndCloseForm
+    return form
+  }
+
+  function makeAnnotationEditor (turnContainer, annotationSequence) {
+    const form = createFromTemplate('#annotation-editor')
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const annotationComponents = form.querySelector('.annotation-components')
+    turnContainer.annotationSequence = annotationSequence || ['{}']
+    renderSequence(turnContainer.annotationSequence, annotationComponents, true)
+    const formContainer = form.querySelector('.annotation-form-container')
+    const editing = !!turnComponents.querySelector('.edit-position')
+    makeAnnotationOptionSelector(formContainer, editing)
+    const cancelButton = formContainer.querySelector('.cancel-button')
+    cancelButton.onclick = cancelAndCloseForm
+    return form
+  }
+
+  function setupAnnotationEditor (turnContainer) {
+    const annotationComponents = turnContainer.querySelector('.annotation-components')
+    const preselectPosition = annotationComponents.children.length === 5 ? annotationComponents.children[2] : annotationComponents.children[annotationComponents.children.length - 2]
+    selectAnnotationSequencePosition({
+      target: preselectPosition
+    })
+  }
+
+  function makeAnnotationOptionSelector (formContainer, editing) {
+    const form = createFromTemplate('#annotation-editor-options')
+    formContainer.innerHTML = ''
+    formContainer.appendChild(form)
+    const insertAnnotationButton = formContainer.querySelector('.insert-annotation-button')
+    insertAnnotationButton.onclick = addAnnotation
+    insertAnnotationButton.style.display = editing ? 'none' : 'inline-block'
+    const updateAnnotationButton = formContainer.querySelector('.update-annotation-button')
+    updateAnnotationButton.onclick = updateAnnotation
+    updateAnnotationButton.style.display = editing ? 'inline-block' : 'none'
+    const cancelButton = formContainer.querySelector('.cancel-button')
+    cancelButton.formCreator = makeInsertionTypeSelector
+    cancelButton.onclick = switchForm
+    return form
+  }
+
+  function makeAnnotationTypeSelector (turnContainer) {
+    const form = createFromTemplate('#annotation-type-selector')
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    const addTextButton = form.querySelector('.add-text-button')
+    addTextButton.formCreator = makeAnnotationTextForm
+    addTextButton.formContainer = formContainer
+    addTextButton.onclick = switchForm
+    const addSquareButton = form.querySelector('.add-square-button')
+    addSquareButton.formCreator = makeAnnotationSquareForm
+    addSquareButton.formContainer = formContainer
+    addSquareButton.onclick = switchForm
+    const addArrowButton = form.querySelector('.add-arrow-button')
+    addArrowButton.formCreator = makeAnnotationArrowForm
+    addArrowButton.formContainer = formContainer
+    addArrowButton.onclick = switchForm
+    const cancelButton = form.querySelector('.cancel-button')
+    cancelButton.formCreator = makeAnnotationEditor
+    cancelButton.onclick = switchForm
+    return form
+  }
+
+  function makeNagForm (eventOrTemplate) {
+    const template = eventOrTemplate && eventOrTemplate.substring ? eventOrTemplate : '#new-nag-form'
+    const newForm = createFromTemplate(template)
+    const nagIndex = document.querySelector('#nag-index')
+    const nagSelect = newForm.querySelector('.nag-select')
+    nagSelect.innerHTML = nagIndex.content.firstElementChild.innerHTML
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.formCreator = makeInsertionTypeSelector
+    cancelButton.onclick = switchForm
+    const addNagButton = newForm.querySelector('.add-nag-button')
+    if (addNagButton) {
+      addNagButton.onclick = addNag
+    }
+    const updateNagButton = newForm.querySelector('.update-nag-button')
+    if (updateNagButton) {
+      updateNagButton.onclick = updateNag
+    }
+    const deleteNagButton = newForm.querySelector('.delete-nag-button')
+    if (deleteNagButton) {
+      deleteNagButton.onclick = deleteNag
+    }
+    return newForm
+  }
+
+  function makeAlternativeTurnsForm (turnContainer, templateid) {
+    const turn = findTurn(turnContainer)
+    const newForm = createFromTemplate(templateid || '#new-alternative-moves-form')
+    const chessBoard = newForm.querySelector('.chessboard')
+    const previousTurnState = {}
+    if (turnContainer.alternativeTurns) {
+      previousTurnState.pieces = turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1].pieces
+    } else {
+      previousTurnState.pieces = turn.previousPieces
+    }
+    const hitArea = chessBoard.parentNode.querySelector('.alternative-moves-hitarea')
+    hitArea.onmousedown = selectPiece
+    hitArea.onmouseup = movePiece
+    turnContainer.alternativeTurns = turnContainer.alternativeTurns || []
+    setupMiniChessBoard(chessBoard, hitArea, previousTurnState, true)
+    const pendingList = newForm.querySelector('.pending-turn-list')
+    if (turnContainer.alternativeTurns.length) {
+      for (const turn of turnContainer.alternativeTurns) {
+        const listItem = document.createElement('li')
+        const dots = turn.color === 'w' ? '.' : '...'
+        if (!turn.piece) {
+          for (const piece of turn.pieces) {
+            if (piece.coordinateBefore) {
+              turn.piece = piece
+              break
+            }
+          }
+        }
+        listItem.innerHTML = `<span>${turn.moveNumber}${dots} ${turn.type} <i>${turn.piece.coordinateBefore}</i> to <i>${turn.to}</i></span>`
+        pendingList.insertBefore(listItem, pendingList.lastElementChild)
+      }
+      pendingList.style.display = ''
+    } else {
+      pendingList.style.display = 'none'
+    }
+    const insertButton = newForm.querySelector('.insert-alternative-moves-button')
+    if (insertButton) {
+      insertButton.onclick = insertAlternativeTurns
+    }
+    const updateButton = newForm.querySelector('.update-alternative-moves-button')
+    if (updateButton) {
+      updateButton.onclick = updateAlternativeTurns
+    }
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.formCreator = makeInsertionTypeSelector
+    cancelButton.onclick = switchForm
+    pendingList.querySelector('.cancel-button').onclick = undoLastPendingTurn
+    return newForm
+  }
+
+  function selectPiece (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const coordinate = event.target.className.split('-').pop()
+    if ('abcdefgh'.indexOf(coordinate[0]) === -1) {
+      return
+    }
+    if ('12345678'.indexOf(coordinate[1]) === -1) {
+      return
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    let requiredColor, pieces
+    if (turnContainer.alternativeTurns && turnContainer.alternativeTurns.length) {
+      requiredColor = turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1].color === 'w' ? 'b' : 'w'
+      pieces = turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1].pieces
+    } else {
+      requiredColor = turn.color === 'w' ? 'w' : 'b'
+      pieces = turn.previousPieces
+    }
+    let selectedPiece
+    for (const piece of pieces) {
+      if (piece.coordinate === coordinate) {
+        selectedPiece = piece
         break
       }
     }
-    if (!foundForms) {
-      const annotationTabsTemplate = document.querySelector('#annotation-tabs')
-      const annotationTabs = document.importNode(annotationTabsTemplate.content, true)
-      moveContainer.insertBefore(annotationTabs, positionList.nextSibling)
-      // tabs for different types of insertion
-      const tabButtons = moveContainer.querySelectorAll('.annotation-tab-button')
-      for (const button of tabButtons) {
-        button.onclick = showAnnotationTab
-      }
-      showAnnotationTab({ target: tabButtons[0] })
-      // inserting annotation
-      const insertAnnotationButton = moveContainer.querySelector('.add-annotation-button')
-      insertAnnotationButton.onclick = commitAnnotation
-      // tabs for different annotation segments
-      const addTextButton = moveContainer.querySelector('.add-text-button')
-      addTextButton.onclick = showAnnotationTypeForm
-      const addSquareButton = moveContainer.querySelector('.add-square-button')
-      addSquareButton.onclick = showAnnotationTypeForm
-      const addArrowButton = moveContainer.querySelector('.add-arrow-button')
-      addArrowButton.onclick = showAnnotationTypeForm
-      // set up nag form, nags are inserted directly into the move PGN
-      const commitNagButton = moveContainer.querySelector('.add-nag-button')
-      commitNagButton.onclick = commitNag
-      const nagSelect = moveContainer.querySelector('.nag-select')
-      const nagIndex = document.querySelector('#nag-index')
-      const nagCopy = document.importNode(nagIndex.content, true)
-      for (const option of nagCopy.children) {
-        nagSelect.appendChild(option)
-      }
-      // set up annotation form, annotations are created from text,
-      // arrow and square highlights and then inserted into the move PGN
-      const moveSequence = moveContainer.querySelector('.annotation-sequence')
-      moveContainer.annotationSequence = ['{}']
-      renderSequence(moveContainer.annotationSequence, moveSequence, true)
-      moveSequence.children[1].classList.add('selected-position')
-      moveSequence.children[1].firstChild.firstChild.classList.remove('fa-circle')
-      moveSequence.children[1].firstChild.firstChild.classList.add('fa-dot-circle')
-      // annotation arrows
-      const arrowColors = moveContainer.querySelectorAll('.arrow-color')
-      for (const colorButton of arrowColors) {
-        colorButton.onclick = selectColor
-      }
-      const insertArrowButton = moveContainer.querySelector('.insert-text-button')
-      insertArrowButton.onclick = insertArrowText
-      const arrowChessBoard = moveContainer.querySelector('.annotate-arrow-chessboard')
-      arrowChessBoard.parentNode.onmousedown = startOrStopHighlightArrow
-      arrowChessBoard.parentNode.onmouseup = startOrStopHighlightArrow
-      arrowChessBoard.colorButtons = arrowColors
-      arrowChessBoard.mouseEnabled = false
-      const resetArrowChessBoardButton = moveContainer.querySelector('.reset-arrows-button')
-      resetArrowChessBoardButton.onclick = (event) => {
-        if (event && event.preventDefault) {
-          event.preventDefault()
-        }
-        const moveContainer = findMoveContainer(event.target)
-        const arrowChessBoard = moveContainer.querySelector('.annotate-arrow-chessboard')
-        const arrows = moveContainer.querySelectorAll('svg')
-        if (arrows && arrows.length) {
-          for (const arrow of arrows) {
-            arrow.parentNode.removeChild(arrow)
-          }
-        }
-        if (!arrowChessBoard.rows.length) {
-          setupMiniChessBoard(arrowChessBoard, moveContainer.move)
-        }
-      }
-      resetArrowChessBoardButton.onclick({ target: resetArrowChessBoardButton })
-      // annotation squares
-      const squareColors = moveContainer.querySelectorAll('.square-color')
-      for (const colorButton of squareColors) {
-        colorButton.onclick = selectColor
-      }
-      const insertSquareButton = moveContainer.querySelector('.insert-square-button')
-      insertSquareButton.onclick = insertSquareText
-      const squareChessBoard = moveContainer.querySelector('.annotate-square-chessboard')
-      squareChessBoard.colorButtons = squareColors
-      squareChessBoard.onclick = clickHighlightSquareCell
-      const resetSquareChessBoardButton = moveContainer.querySelector('.reset-squares-button')
-      resetSquareChessBoardButton.onclick = (event) => {
-        if (event && event.preventDefault) {
-          event.preventDefault()
-        }
-        const moveContainer = findMoveContainer(event.target)
-        const squareChessBoard = moveContainer.querySelector('.annotate-square-chessboard')
-        squareChessBoard.innerHTML = ''
-        setupMiniChessBoard(squareChessBoard, moveContainer.move)
-      }
-      resetSquareChessBoardButton.onclick({ target: resetSquareChessBoardButton })
-      // annotation text
-      const insertTextButton = moveContainer.querySelector('.insert-text-button')
-      insertTextButton.onclick = insertAnnotationText
-      // cancel buttons
-      const cancelButtons = Array.from(moveContainer.querySelectorAll('.cancel-button'))
-      for (const button of cancelButtons) {
-        if (button.classList.contains('cancel-annotation-button')) {
-          button.onclick = cancelAndCloseAnnotationForm
-        } else {
-          button.onclick = cancelAndCloseForm
-        }
-      }
-    }
-  }
-
-  function showAnnotationTypeForm (event) {
-    event.preventDefault()
-    console.log('show annotationt ype form', event.target.className)
-    const moveContainer = findMoveContainer(event.target)
-    const typeButtons = moveContainer.querySelector('.annotation-button-container')
-    typeButtons.style.display = 'none'
-    const textInput = moveContainer.querySelector('.text-input')
-    textInput.style.display = 'none'
-    const arrowInput = moveContainer.querySelector('.arrow-input')
-    arrowInput.style.display = 'none'
-    const squareInput = moveContainer.querySelector('.square-input')
-    squareInput.style.diplay = 'none'
-    if (event.target.classList.contains('add-text-button')) {
-      textInput.style.display = 'block'
-    } else if (event.target.classList.contains('add-square-button')) {
-      squareInput.style.display = 'block'
-    } else {
-      arrowInput.style.display = 'block'
-    }
-  }
-  let startingArrow = false
-
-  function startOrStopHighlightArrow (event) {
-    let container = event.target
-    while (!container.classList.contains('mini-chessboard-container')) {
-      container = container.parentNode
-    }
-    const offset = getOffset(container)
-    const xPosition = event.clientX - offset.left
-    const yPosition = event.clientY - offset.top
-    const cellWidth = container.offsetWidth / 8
-    const cellX = Math.floor(xPosition / cellWidth)
-    const cellY = Math.floor(yPosition / cellWidth)
-    const row = '87654321'.charAt(cellY)
-    const column = 'abcdefgh'.charAt(cellX)
-    if (startingArrow) {
-      const target = container.querySelector(`.coordinate-${column}${row}`)
-      target.coordinate = `${column}${row}`
-      console.log('adjusted event target', 'coordinate', `${column}${row}`, 'event target', event.target, 'new target', target)
-      endHighlightArrow({ target })
-      startingArrow = false
-    } else {
-      startingArrow = `${column}${row}`
-    }
-  }
-
-  function getOffset (element) {
-    let top = 0
-    let left = 0
-    while (element && !isNaN(element.offsetLeft) && !isNaN(element.offsetTop)) {
-      left += element.offsetLeft - element.scrollLeft
-      top += element.offsetTop - element.scrollTop
-      element = element.offsetParent
-    }
-    return { top, left }
-  }
-
-  function endHighlightArrow (event) {
-    console.log('end highlight arrow', startingArrow, event.target)
-    if (!startingArrow) {
+    if (!selectedPiece || selectedPiece.color !== requiredColor) {
+      delete (turnContainer.selectedPiece)
       return
     }
-    let table = event.target
-    while (table.tagName !== 'TABLE') {
-      table = table.parentNode
+    turnContainer.selectedPiece = selectedPiece
+  }
+
+  function movePiece (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
     }
+    const turnContainer = findTurnContainer(event.target)
+    if (!turnContainer.selectedPiece) {
+      return
+    }
+    const coordinate = event.target.className.split('-').pop()
+    if ('abcdefgh'.indexOf(coordinate[0]) === -1) {
+      return
+    }
+    if ('12345678'.indexOf(coordinate[1]) === -1) {
+      return
+    }
+    const turn = findTurn(turnContainer)
+    let pieces, moveNumber, dots, color
+    if (turnContainer.alternativeTurns.length) {
+      pieces = turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1].pieces
+      moveNumber = nextTurnNumber(turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1])
+      dots = turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1].color === 'w' ? '...' : '.'
+      color = turnContainer.alternativeTurns[turnContainer.alternativeTurns.length - 1].color === 'w' ? 'b' : 'w'
+    } else {
+      pieces = turn.previousPieces
+      moveNumber = turn.moveNumber
+      dots = turn.color === 'w' ? '.' : '...'
+      color = turn.color === 'w' ? 'w' : 'b'
+    }
+    const alternativeTurn = {
+      color,
+      moveNumber,
+      to: coordinate,
+      sequence: [`${moveNumber}${dots}`, `${turnContainer.selectedPiece.type}${coordinate}`],
+      pieces: JSON.parse(JSON.stringify(pieces)),
+      previousPieces: JSON.parse(JSON.stringify(pieces)),
+      piece: turnContainer.selectedPiece
+    }
+    const movement = parser.calculatePieceMovement(alternativeTurn.piece, alternativeTurn, alternativeTurn.pieces)
+    if (!movement) {
+      return
+    }
+    for (const piece of alternativeTurn.pieces) {
+      if (piece.type === alternativeTurn.piece.type && piece.coordinate === alternativeTurn.piece.coordinate) {
+        piece.coordinate = coordinate
+        break
+      }
+    }
+    turnContainer.alternativeTurns.push(alternativeTurn)
+    // todo:
+    // 1) captured pieces do not process
+    // 2) promoted pieces do not process
+    // 5) inserted text is excesssively specific (1. Pee4 vs 1. e2 with type and column inferred)
+    // 7) cannot "edit" existing alternative turns ie delete last or add next turn
+    const chessBoard = turnContainer.querySelector('.alternative-moves-chessboard')
+    const cellBefore = chessBoard.querySelector(`.coordinate-${turnContainer.selectedPiece.coordinate}`)
+    const cellAfter = chessBoard.querySelector(`.coordinate-${coordinate}`)
+    cellAfter.style.backgroundImage = cellBefore.style.backgroundImage
+    cellBefore.style.backgroundImage = ''
+    const pendingList = turnContainer.querySelector('.pending-turn-list')
+    const listItem = document.createElement('li')
+    listItem.innerHTML = `<span>${moveNumber}${dots} ${alternativeTurn.piece.type} <i>${alternativeTurn.piece.coordinate}</i> to <i>${coordinate}</i></span>`
+    pendingList.insertBefore(listItem, pendingList.lastElementChild)
+    pendingList.style.display = ''
+  }
+
+  function undoLastPendingTurn (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const lastTurn = turnContainer.alternativeTurns.pop()
+    const chessBoard = turnContainer.querySelector('.alternative-moves-chessboard')
+    for (const piece of lastTurn.pieces) {
+      if (!piece.coordinateBefore) {
+        continue
+      }
+      const cellBefore = chessBoard.querySelector(`.coordinate-${piece.coordinate}`)
+      const cellAfter = chessBoard.querySelector(`.coordinate-${piece.coordinateBefore}`)
+      cellAfter.style.backgroundImage = cellBefore.style.backgroundImage
+      cellBefore.style.backgroundImage = ''
+    }
+    const pendingList = turnContainer.querySelector('.pending-turn-list')
+    pendingList.removeChild(pendingList.children[pendingList.children.length - 2])
+    if (pendingList.children.length === 1) {
+      pendingList.style.display = 'none'
+    }
+  }
+
+  function nextTurnNumber (previousTurn) {
+    const previousNumber = parseInt(previousTurn.moveNumber, 10)
+    if (previousTurn.color === 'w') {
+      return previousNumber
+    }
+    return previousNumber + 1
+  }
+
+  function insertAlternativeTurns (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    const pendingList = turnContainer.querySelector('.pending-turn-list')
+    const annotationParts = []
+    let lastMoveNumber
+    for (const child of pendingList.children) {
+      if (child.firstElementChild.tagName === 'BUTTON') {
+        continue
+      }
+      let moveNumber = child.innerHTML.substring('<span>'.length)
+      moveNumber = moveNumber.substring(0, moveNumber.indexOf(' '))
+      let coordinate = child.innerHTML.substring(child.innerHTML.lastIndexOf('<i>') + 3)
+      coordinate = coordinate.substring(0, coordinate.indexOf('<'))
+      let coordinateBefore = child.innerHTML.substring(child.innerHTML.indexOf('<i>') + 3)
+      coordinateBefore = coordinateBefore[0]
+      let piece = child.innerHTML.substring(child.innerHTML.indexOf(' ') + 1)
+      piece = piece[0]
+      // TODO: this is a very verbose "1.Kde4" structure, it should be
+      // possible to calculate the smallest unambiguous expression
+      if (moveNumber === lastMoveNumber || moveNumber === `${lastMoveNumber}..`) {
+        annotationParts.push(`${piece}${coordinateBefore}${coordinate}`)
+      } else {
+        annotationParts.push(`${moveNumber}${piece}${coordinateBefore}${coordinate}`)
+      }
+      lastMoveNumber = moveNumber
+    }
+    const moveData = parser.tokenizeLines(annotationParts.join(' '))
+    const sibling = parser.parseRecursively(moveData)
+    const pieces = JSON.parse(JSON.stringify(turn.previousPieces))
+    for (const child of sibling) {
+      child.parentTurn = turn
+      parser.processTurn(child, sibling, pieces)
+    }
+    turn.siblings = turn.siblings || []
+    turn.siblings.push(sibling)
+    const selectedPosition = turnContainer.querySelector('.selected-position')
+    const expandedSequence = expandSequence(turn.sequence)
+    const position = selectedPosition.position
+    expandedSequence.splice(position, 0, ' ', `(${annotationParts.join(' ')})`)
+    propogateChanges(turn, contractExpandedSequence(expandedSequence))
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  function updateAlternativeTurns (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    const pendingList = turnContainer.querySelector('.pending-turn-list')
+    const annotationParts = []
+    let lastMoveNumber
+    for (const child of pendingList.children) {
+      if (child.firstElementChild.tagName === 'BUTTON') {
+        continue
+      }
+      let moveNumber = child.innerHTML.substring('<span>'.length)
+      moveNumber = moveNumber.substring(0, moveNumber.indexOf(' '))
+      let coordinate = child.innerHTML.substring(child.innerHTML.lastIndexOf('<i>') + 3)
+      coordinate = coordinate.substring(0, coordinate.indexOf('<'))
+      let coordinateBefore = child.innerHTML.substring(child.innerHTML.indexOf('<i>') + 3)
+      coordinateBefore = coordinateBefore[0]
+      let piece = child.innerHTML.substring(child.innerHTML.indexOf(' ') + 1)
+      piece = piece[0]
+      // TODO: this is a very verbose "1.Kde4" structure, it should be
+      // possible to calculate the smallest unambiguous expression
+      if (moveNumber === lastMoveNumber || moveNumber === `${lastMoveNumber}..`) {
+        annotationParts.push(`${piece}${coordinateBefore}${coordinate}`)
+      } else {
+        annotationParts.push(`${moveNumber}${piece}${coordinateBefore}${coordinate}`)
+      }
+      lastMoveNumber = moveNumber
+    }
+    turn.parentTurn.siblings = turn.parentTurn.siblings || []
+    let parentSiblingPGN
+    for (const sibling of turn.parentTurn.siblings) {
+      if (sibling.indexOf(turn) === -1) {
+        continue
+      }
+      const pgnParts = []
+      for (const child of sibling) {
+        pgnParts.push(child.sequence.join(' '))
+      }
+      parentSiblingPGN = '(' + parser.cleanSpacing(pgnParts.join(' ')) + ')'
+      break
+    }
+    // find the sequence part to update
+    const moveLists = Array.from(turn.parentTurn.turnContainer.querySelectorAll('.turn-list'))
+    const moveIndex = moveLists.indexOf(turn.turnContainer.parentNode)
+    let currentIndex = 0
+    let currentMoveIndex = 0
+    while (true) {
+      if (currentIndex === turn.parentTurn.sequence.length) {
+        break
+      }
+      if (!turn.parentTurn.sequence[currentIndex].startsWith('(')) {
+        currentIndex++
+        continue
+      }
+      if (currentMoveIndex === moveIndex) {
+        turn.parentTurn.sequence[currentIndex] = parentSiblingPGN
+        break
+      }
+      currentMoveIndex++
+      currentIndex++
+    }
+    propogateChanges(turn.parentTurn, parser.tokenizeLine(turn.parentTurn.sequence.join(' ')))
+    for (const sibling of turn.parentTurn.siblings) {
+      for (const child of sibling) {
+        child.parentTurn = turn.parentTurn
+      }
+    }
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  function makeQuizForm () {
+    const newForm = createFromTemplate('#new-quiz-form')
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.formCreator = makeInsertionTypeSelector
+    cancelButton.onclick = switchForm
+    return newForm
+  }
+
+  function makeAnnotationTextForm (turnContainer, template) {
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    const newForm = createFromTemplate(template || '#new-text-annotation-form')
+    const insertTextButton = newForm.querySelector('.insert-text-button')
+    if (insertTextButton) {
+      insertTextButton.onclick = insertAnnotationText
+    }
+    const updateButton = newForm.querySelector('.update-text-button')
+    if (updateButton) {
+      updateButton.onclick = updateAnnotationText
+    }
+    const deleteButton = newForm.querySelector('.delete-text-button')
+    if (deleteButton) {
+      deleteButton.onclick = deleteAnnotationText
+    }
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.formCreator = makeAnnotationTypeSelector
+    cancelButton.formContainer = formContainer
+    cancelButton.onclick = switchForm
+    return newForm
+  }
+
+  function makeAnnotationSquareForm (turnContainer, templateid) {
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    const newForm = createFromTemplate(templateid || '#new-square-annotation-form')
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.formCreator = makeAnnotationTypeSelector
+    cancelButton.formContainer = formContainer
+    cancelButton.onclick = switchForm
+    if (templateid) {
+      const updateButton = newForm.querySelector('.update-squares-text-button')
+      updateButton.onclick = updateSquareText
+    } else {
+      const insertButton = newForm.querySelector('.insert-squares-text-button')
+      insertButton.onclick = insertSquareText
+    }
+    const colors = newForm.querySelectorAll('.square-color')
+    for (const color of colors) {
+      color.onclick = selectColor
+    }
+    const manualAddButton = newForm.querySelector('.highlight-square-button')
+    manualAddButton.onclick = manuallyAddSquare
+    const resetButton = newForm.querySelector('.reset-squares-button')
+    resetButton.onclick = (event) => {
+      if (event && event.preventDefault) {
+        event.preventDefault()
+      }
+      const chessBoard = (event ? findTurnContainer(event.target) : newForm).querySelector('.chessboard')
+      chessBoard.onclick = clickHighlightSquareCell
+      chessBoard.innerHTML = ''
+      const turnContainerFromButton = event ? findTurnContainer(event.target) : turnContainer
+      const turn = findTurn(turnContainerFromButton)
+      setupMiniChessBoard(chessBoard, null, turn)
+      const pendingList = (event ? findTurnContainer(event.target) : newForm).querySelector('.pending-list')
+      pendingList.innerHTML = ''
+    }
+    resetButton.onclick()
+    return newForm
+  }
+
+  function manuallyAddSquare (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const chessboard = turnContainer.querySelector('.annotate-square-chessboard')
+    const column = document.querySelector('.select-column')
+    const row = document.querySelector('.select-row')
+    const coordinate = column.value + row.value
+    column.selectedIndex = 0
+    row.selectedIndex = 0
+    return clickHighlightSquareCell({
+      target: chessboard.querySelector(`.coordinate-${coordinate}`)
+    })
+  }
+
+  function makeAnnotationArrowForm (turnContainer, templateid) {
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    const newForm = createFromTemplate(templateid || '#new-arrow-annotation-form')
+    const cancelButton = newForm.querySelector('.cancel-button')
+    cancelButton.formCreator = makeAnnotationTypeSelector
+    cancelButton.formContainer = formContainer
+    cancelButton.onclick = switchForm
+    if (templateid) {
+      const updateButton = newForm.querySelector('.update-arrows-text-button')
+      updateButton.onclick = updateArrowText
+    } else {
+      const insertButton = newForm.querySelector('.insert-arrows-text-button')
+      insertButton.onclick = insertArrowText
+    }
+    const colors = newForm.querySelectorAll('.arrow-color')
+    for (const color of colors) {
+      color.onclick = selectColor
+    }
+    const manualAddButton = newForm.querySelector('.highlight-arrow-button')
+    manualAddButton.onclick = manuallyAddArrow
+    const resetButton = newForm.querySelector('.reset-arrows-button')
+    resetButton.onclick = (event) => {
+      if (event && event.preventDefault) {
+        event.preventDefault()
+      }
+      const chessBoard = (event ? findTurnContainer(event.target) : newForm).querySelector('.chessboard')
+      chessBoard.innerHTML = ''
+      const hitArea = chessBoard.parentNode.querySelector('.annotate-arrow-hitarea')
+      hitArea.innerHTML = ''
+      const turnContainerFromButton = event ? findTurnContainer(event.target) : turnContainer
+      const turn = findTurn(turnContainerFromButton)
+      setupMiniChessBoard(chessBoard, hitArea, turn)
+      const pendingList = (event ? findTurnContainer(event.target) : newForm).querySelector('.pending-list')
+      pendingList.innerHTML = ''
+    }
+    resetButton.onclick()
+    return newForm
+  }
+
+  function manuallyAddArrow (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const chessboard = turnContainer.querySelector('.annotate-arrow-chessboard')
+    const column1 = document.querySelector('.select-column-start')
+    const row1 = document.querySelector('.select-row-start')
+    const coordinate1 = column1.value + row1.value
+    column1.selectedIndex = 0
+    row1.selectedIndex = 0
+    startHighlightArrow({
+      target: chessboard.querySelector(`.coordinate-${coordinate1}`)
+    })
+    const column2 = document.querySelector('.select-column-end')
+    const row2 = document.querySelector('.select-row-end')
+    const coordinate2 = column2.value + row2.value
+    column2.selectedIndex = 0
+    row2.selectedIndex = 0
+    stopHighlightArrow({
+      target: chessboard.querySelector(`.coordinate-${coordinate2}`)
+    })
+  }
+
+  function createFromTemplate (templateid) {
+    const template = document.querySelector(templateid)
+    const newForm = document.importNode(template.content, true)
+    return newForm
+  }
+
+  function startHighlightArrow (event) {
+    const turnContainer = findTurnContainer(event.target)
+    if (!turnContainer) {
+      return
+    }
+    const previewContainer = turnContainer.querySelector('.preview-arrow-container')
+    if (!previewContainer) {
+      return
+    }
+    previewContainer.innerHTML = ''
     if (event.target.tagName !== 'TD' && event.target.parentNode.tagName !== 'TD') {
       return
     }
-    const moveContainer = findMoveContainer(event.target)
-    const chessboard = moveContainer.querySelector('.annotate-arrow-chessboard')
+    let arrowStartingCoordinate
+    for (const className of event.target.classList) {
+      if (!className.startsWith('coordinate-')) {
+        continue
+      }
+      arrowStartingCoordinate = className.split('-')[1]
+    }
+    turnContainer.startingCoordinate = arrowStartingCoordinate
+  }
+
+  function stopHighlightArrow (event) {
+    const turnContainer = findTurnContainer(event.target)
+    if (!turnContainer) {
+      return
+    }
+    const previewContainer = turnContainer.querySelector('.preview-arrow-container')
+    if (!previewContainer) {
+      return
+    }
+    previewContainer.innerHTML = ''
+    if (!turnContainer.startingCoordinate) {
+      return
+    }
+    const arrowStartingCoordinate = turnContainer.startingCoordinate
+    let arrowEndingCoordinate
+    for (const className of event.target.classList) {
+      if (!className.startsWith('coordinate-')) {
+        continue
+      }
+      arrowEndingCoordinate = className.split('-')[1]
+    }
+    delete (turnContainer.startingCoordinate)
+    if (event.target.tagName !== 'TD' && (!event.target.parentNode || event.target.parentNode.tagName !== 'TD')) {
+      return
+    }
+    const chessboard = turnContainer.querySelector('.annotate-arrow-chessboard')
+    const colors = ['red', 'green', 'blue', 'yellow']
+    let i = -1
+    let color, activeColorButton
+    const colorButtons = turnContainer.querySelectorAll('.arrow-color')
+    for (const colorButton of colorButtons) {
+      i++
+      if (!colorButton.firstChild.classList.contains('fa-dot-circle')) {
+        continue
+      }
+      activeColorButton = colorButton
+      color = colors[i]
+      break
+    }
+    const highlightContainer = turnContainer.querySelector('.highlight-arrow-container')
+    const arrow = drawArrow(arrowStartingCoordinate, arrowEndingCoordinate, chessboard, highlightContainer)
+    if (!arrow) {
+      return
+    }
+    arrow.classList.add('chessboard-arrow')
+    arrow.classList.add(`${color}-arrow`)
+    arrow.style.width = chessboard.offsetWidth
+    arrow.style.height = chessboard.offsetHeight
+    arrow.innerHTML += ''
+    const pendingList = turnContainer.querySelector('.pending-arrow-list')
+    const listItem = document.createElement('li')
+    listItem.innerHTML = `<span>${activeColorButton.innerHTML.substring(activeColorButton.innerHTML.indexOf('</i>') + 4)} <i>${arrowStartingCoordinate}</i> to <i>${arrowEndingCoordinate}</i></span>`
+    const deleteButton = document.createElement('button')
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'
+    deleteButton.className = 'button annotation-form-button'
+    deleteButton.arrow = arrow
+    deleteButton.onclick = deleteArrow
+    listItem.appendChild(deleteButton)
+    pendingList.appendChild(listItem)
+  }
+
+  function deleteArrow (event) {
+    if (event.preventDefault) {
+      event.preventDefault()
+    }
+    const button = event.target
+    const listItem = button.parentNode
+    const list = listItem.parentNode
+    list.removeChild(listItem)
+    const arrow = event.target.arrow
+    arrow.parentNode.removeChild(arrow)
+  }
+
+  function previewHighlightArrow (event) {
+    const turnContainer = findTurnContainer(event.target)
+    if (!turnContainer) {
+      return
+    }
+    const previewContainer = turnContainer.querySelector('.preview-arrow-container')
+    if (!previewContainer) {
+      return
+    }
+    previewContainer.innerHTML = ''
+    if (!turnContainer.startingCoordinate) {
+      return
+    }
+    const arrowStartingCoordinate = turnContainer.startingCoordinate
+    let arrowEndingCoordinate
+    for (const className of event.target.classList) {
+      if (!className.startsWith('coordinate-')) {
+        continue
+      }
+      arrowEndingCoordinate = className.split('-')[1]
+    }
+    if (event.target.tagName !== 'TD' && (!event.target.parentNode || event.target.parentNode.tagName !== 'TD')) {
+      return
+    }
+    const chessboard = turnContainer.querySelector('.annotate-arrow-chessboard')
     const colors = ['red', 'green', 'blue', 'yellow']
     let i = -1
     let color
-    const colorButtons = moveContainer.querySelectorAll('.arrow-color')
-    console.log('color buttons', colorButtons)
+    const colorButtons = turnContainer.querySelectorAll('.arrow-color')
     for (const colorButton of colorButtons) {
       i++
       if (!colorButton.firstChild.classList.contains('fa-dot-circle')) {
@@ -488,44 +1274,89 @@
       color = colors[i]
       break
     }
-    const arrow = drawArrow(startingArrow, event.target.coordinate, chessboard)
+    const arrow = drawArrow(arrowStartingCoordinate, arrowEndingCoordinate, chessboard, previewContainer)
+    if (!arrow) {
+      return
+    }
     arrow.classList.add('chessboard-arrow')
     arrow.classList.add(`${color}-arrow`)
     arrow.style.width = chessboard.offsetWidth
     arrow.style.height = chessboard.offsetHeight
-    arrow.parentNode.innerHTML += ''
+    arrow.innerHTML += ''
   }
 
   function clickHighlightSquareCell (event) {
-    event.preventDefault()
-    let table = event.target
-    while (table.tagName !== 'TABLE') {
-      table = table.parentNode
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    if (!turnContainer) {
+      return
     }
     if (event.target.tagName !== 'TD' && event.target.parentNode.tagName !== 'TD') {
       return
     }
-    const cell = event.target.tagName === 'TD' ? event.target : event.target.parentNode
-    const colors = ['red-square', 'green-square', 'blue-square', 'yellow-square']
+    const colors = ['red', 'green', 'blue', 'yellow']
     let i = -1
-    const colorButtons = table.parentNode.firstChild.children
+    let color, activeColorButton
+    const colorButtons = turnContainer.querySelectorAll('.square-color')
     for (const colorButton of colorButtons) {
       i++
       if (!colorButton.firstChild.classList.contains('fa-dot-circle')) {
         continue
       }
-      for (const color of colors) {
-        if (color === colors[i]) {
-          continue
-        }
-        cell.classList.remove(color)
+      color = colors[i]
+      activeColorButton = colorButton
+      break
+    }
+    let coordinate
+    for (const className of event.target.classList) {
+      if (!className.startsWith('coordinate-')) {
+        continue
       }
-      if (cell.classList.contains(colors[i])) {
-        cell.classList.remove(colors[i])
-      } else {
-        cell.classList.add(colors[i])
+      coordinate = className.split('-')[1]
+      break
+    }
+    const pendingList = turnContainer.querySelector('.pending-square-list')
+    const cell = event.target.tagName === 'TD' ? event.target : event.target.parentNode
+    const colorText = activeColorButton.innerHTML.substring(activeColorButton.innerHTML.indexOf('</i>') + 4)
+    for (const colorid of colors) {
+      if (cell.classList.contains(`${colorid}-square`)) {
+        cell.classList.remove(`${colorid}-square`)
+        for (const child of pendingList.children) {
+          if (child.innerHTML.indexOf(colorid) === -1 || child.innerHTML.indexOf(coordinate) === -1) {
+            continue
+          }
+          pendingList.appendChild(child)
+        }
+        if (colorid === color) {
+          return
+        }
       }
     }
+    cell.classList.add(`${color}-square`)
+    const listItem = document.createElement('li')
+    listItem.innerHTML = `<span class="${color}">${colorText} <i>${coordinate}</i></span>`
+    const deleteButton = document.createElement('button')
+    deleteButton.innerHTML = '<i class="fas fa-trash"></i> Delete'
+    deleteButton.className = 'button annotation-form-button'
+    deleteButton.square = cell
+    deleteButton.color = color
+    deleteButton.onclick = deleteSquare
+    listItem.appendChild(deleteButton)
+    pendingList.appendChild(listItem)
+  }
+
+  function deleteSquare (event) {
+    if (event.preventDefault) {
+      event.preventDefault()
+    }
+    const button = event.target
+    const listItem = button.parentNode
+    const list = listItem.parentNode
+    list.removeChild(listItem)
+    const square = event.target.square
+    square.classList.remove(`${event.target.color}-square`)
   }
 
   function selectColor (event) {
@@ -542,150 +1373,527 @@
     }
   }
 
-  function showAnnotationTab (event) {
+  function toggleEditOptions (event) {
+    const turnContainer = findTurnContainer(event.target)
+    if (turnContainer.classList.contains('show-positioning')) {
+      unexpandTurnContainer(turnContainer)
+      unselectTurnComponentsPosition(turnContainer)
+      const turnForms = turnContainer.querySelector('.turn-forms')
+      turnForms.innerHTML = ''
+    } else {
+      return expandTurnContainer(turnContainer)
+    }
+  }
+
+  /**
+   * adds annotation to the turn sequence
+   * @param {} event
+   * @returns
+   */
+  function addAnnotation (event) {
+    event.preventDefault()
+    const turnContainer = findTurnContainer(event.target)
+    let annotation = turnContainer.annotationSequence.join(' ')
+    const selectedPosition = turnContainer.querySelector('.selected-position')
+    if (!selectedPosition) {
+      return
+    }
+    const position = findElementChildIndex(selectedPosition)
+    const turn = findTurn(turnContainer)
+    const expandedSequence = expandSequence(turn.sequence)
+    if (expandedSequence.indexOf('{') > -1 && expandedSequence.indexOf('{') < position - 1 && expandedSequence.indexOf('}') > position - 1) {
+      annotation = annotation.slice(1, annotation.length - 1)
+    }
+    expandedSequence.splice(position, 0, ' ', annotation)
+    propogateChanges(turn, contractExpandedSequence(expandedSequence))
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  function updateAnnotation (event) {
+    event.preventDefault()
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    const annotation = turnContainer.annotationSequence.join(' ')
+    const editPosition = turnContainer.querySelector('.edit-position')
+    if (!editPosition) {
+      return
+    }
+    const position = findElementChildIndex(editPosition)
+    const expandedSequence = expandSequence(turn.sequence)
+    expandedSequence[position - 1] = annotation
+    propogateChanges(turn, contractExpandedSequence(expandedSequence))
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  function deleteAnnotation (event) {
     if (event && event.preventDefault) {
       event.preventDefault()
     }
-    console.log('now show annotation form')
-    const moveContainer = findMoveContainer(event.target)
-    const buttons = moveContainer.querySelectorAll('.annotation-tab-button')
-    for (const button of buttons) {
-      if (button === event.target) {
-        button.classList.add('current-annotation-button')
-      } else if (button.classList.contains('current-annotation-button')) {
-        button.classList.remove('current-annotation-button')
-      }
-    }
-    const tabs = moveContainer.querySelectorAll('.annotation-tab')
-    const buttonIndex = findElementChildIndex(event.target.parentNode)
-    let tabIndex = -1
-    for (const tab of tabs) {
-      tabIndex++
-      if (buttonIndex === tabIndex) {
-        tab.classList.add('current-annotation-tab')
-      } else if (tab.classList.contains('current-annotation-tab')) {
-        tab.classList.remove('current-annotation-tab')
-      }
-    }
   }
 
-  function showEditOptions (event) {
-    const button = event.target
-    const buttonMenu = button.parentNode.parentNode
-    if (button.firstChild.classList.contains('fa-edit')) {
-      buttonMenu.parentNode.classList.add('show-positioning')
-      button.firstChild.classList.remove('fa-edit')
-      button.firstChild.classList.add('fa-minus-circle')
+  function addTurn (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    let turnArray
+    if (!turn.parentTurn) {
+      turnArray = window.pgn.turns
     } else {
-      buttonMenu.parentNode.classList.remove('show-positioning')
-      button.firstChild.classList.add('fa-edit')
-      button.firstChild.classList.remove('fa-minus-circle')
+      for (const sibling of turn.parentTurn.siblings) {
+        if (sibling.indexOf(turn) > -1) {
+          turnArray = sibling
+          break
+        }
+      }
     }
+    turnContainer.alternativeTurns = turnArray
+    const newForm = makeAlternativeTurnsForm(turnContainer, '#edit-alternative-moves-form')
+    const turnForms = turnContainer.querySelector('.turn-forms')
+    turnForms.innerHTML = ''
+    turnForms.appendChild(newForm)
   }
 
-  function commitAnnotation (event) {
+  function deleteLastTurn (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const deletingTurn = findTurn(turnContainer)
+    if (!deletingTurn.parentTurn) {
+      window.pgn.turns.splice(window.pgn.turns.indexOf(deletingTurn), 1)
+    } else {
+      for (const i in deletingTurn.parentTurn.siblings) {
+        const index = deletingTurn.parentTurn.siblings[i].indexOf(deletingTurn)
+        if (index === -1) {
+          continue
+        }
+        deletingTurn.parentTurn.siblings[i].splice(index, 1)
+        break
+      }
+      const newSequence = [].concat(deletingTurn.parentTurn.sequence)
+      let siblingNumber = 0
+      for (const j in newSequence) {
+        if (!newSequence[j].startsWith('(')) {
+          continue
+        }
+        newSequence[j] = recombineNestedMoves(deletingTurn.parentTurn.siblings[siblingNumber])
+        siblingNumber++
+      }
+      propogateChanges(deletingTurn.parentTurn, newSequence)
+    }
+    turnContainer.parentNode.removeChild(turnContainer)
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  function recombineNestedMoves (turnArray) {
+    if (!turnArray.length) {
+      return ''
+    }
+    const pgnParts = []
+    for (const turn of turnArray) {
+      pgnParts.push(turn.sequence.join(' '))
+    }
+    return '(' + parser.cleanSpacing(pgnParts.join(' ')) + ')'
+  }
+
+  /**
+   * adds a nag to the turn sequence
+   * @param {} event
+   * @returns
+   */
+  function addNag (event) {
     event.preventDefault()
+    const turnContainer = findTurnContainer(event.target)
+    const nag = turnContainer.querySelector('.nag-select').value
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const selectedPosition = turnComponents.querySelector('.selected-position')
+    const turn = findTurn(turnContainer)
+    const expandedSequence = expandSequence(turn.sequence)
+    const position = selectedPosition.position
+    expandedSequence.splice(position, 0, ' ', nag)
+    propogateChanges(turn, contractExpandedSequence(expandedSequence))
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
   }
 
-  function commitNag (event) {
+  function updateNag (event) {
     event.preventDefault()
-    const moveContainer = findMoveContainer(event.target)
-    const nag = moveContainer.querySelector('.nag-select').value
-    const selectedPosition = moveContainer.querySelector('.selected-position')
-    const position = findElementChildIndex(selectedPosition)
-    const move = moveContainer.move
-    const expandedSequence = expandSequence(move.sequence)
-    expandedSequence.splice(position || 0, 0, ' ', nag)
-    move.sequence = contractExpandedSequence(expandedSequence)
-    const addAnnotationButton = document.createElement('button')
-    addAnnotationButton.className = 'button move-option-button'
-    addAnnotationButton.innerHTML = '<i class="fas fa-edit"></i>'
-    addAnnotationButton.annotateForm = 'annotation'
-    addAnnotationButton.onclick = showEditOptions
-    const showSpacing = document.createElement('li')
-    showSpacing.className = 'move-options-item'
-    showSpacing.appendChild(addAnnotationButton)
-    const sequence = selectedPosition.parentNode
-    renderSequence(move.sequence, sequence)
-    sequence.insertBefore(showSpacing, sequence.firstChild)
-    return cancelAndCloseForm(event)
+    const turnContainer = findTurnContainer(event.target)
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const selectedPosition = turnComponents.querySelector('.edit-position')
+    const turn = findTurn(turnContainer)
+    const expandedSequence = expandSequence(turn.sequence)
+    const newNag = turnContainer.querySelector('.nag-select').value
+    expandedSequence[parseInt(selectedPosition.position, 10)] = newNag
+    propogateChanges(turn, contractExpandedSequence(expandedSequence))
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
   }
 
+  function deleteNag (event) {
+    event.preventDefault()
+    const turnContainer = findTurnContainer(event.target)
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const selectedPosition = turnComponents.querySelector('.edit-position')
+    const turn = findTurn(turnContainer)
+    const expandedSequence = expandSequence(turn.sequence)
+    expandedSequence.splice(parseInt(selectedPosition.position, 10), 1)
+    propogateChanges(turn, contractExpandedSequence(expandedSequence))
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  /**
+   * adds text to the annotation block
+   * @param {} event
+   * @returns
+   */
   function insertAnnotationText (event) {
     event.preventDefault()
-    const moveContainer = findMoveContainer(event.target)
-    const textArea = moveContainer.querySelector('.annotation-text')
+    const turnContainer = findTurnContainer(event.target)
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.selected-position')
+    turnContainer.annotationSequence = turnContainer.annotationSequence || ['{', '}']
+    const textArea = turnContainer.querySelector('.annotation-text')
+    const annotationText = textArea.value
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    textArea.value = ''
+    expandedSequence.splice(parseInt(annotationPosition.position, 10) + 1, 0, ' ', annotationText)
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    renderSequence(turnContainer.annotationSequence, annotationSequence, true)
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    const editing = !!turnContainer.querySelector('.edit-position')
+    return makeAnnotationOptionSelector(formContainer, editing)
+  }
+
+  function updateAnnotationText (event) {
+    event.preventDefault()
+    const turnContainer = findTurnContainer(event.target)
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.edit-position')
+    const textArea = turnContainer.querySelector('.annotation-text')
     const annotationText = textArea.value
     textArea.value = ''
-    const moveSequence = moveContainer.querySelector('.annotation-sequence')
-    const selectedPosition = moveSequence.querySelector('.selected-position')
-    const position = findElementChildIndex(selectedPosition)
-    const expandedSequence = expandSequence(moveContainer.annotationSequence)
-    expandedSequence.splice((position || 0) + 1, 0, ' ', annotationText)
-    moveContainer.annotationSequence = contractExpandedSequence(expandedSequence)
-    renderSequence(moveContainer.annotationSequence, moveSequence, true)
-    moveSequence.children[moveSequence.children.length - 2].classList.add('selected-position')
-    moveSequence.children[moveSequence.children.length - 2].firstChild.firstChild.classList.remove('fa-circle')
-    moveSequence.children[moveSequence.children.length - 2].firstChild.firstChild.classList.add('fa-dot-circle')
-    return cancelAndCloseAnnotationForm(event)
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    const position = findElementChildIndex(annotationPosition)
+    expandedSequence[position + 1] = annotationText
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    renderSequence(turnContainer.annotationSequence, annotationSequence, true)
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    return makeAnnotationOptionSelector(formContainer, true)
   }
 
+  function deleteAnnotationText (event) {
+    if (event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.edit-position')
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    expandedSequence.splice(parseInt(annotationPosition.position, 10) + 1, 1)
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const turnPosition = turnComponents.querySelector('.edit-position')
+    const expandedTurnComponents = expandSequence(turn.sequence)
+    if (turnContainer.annotationSequence.length === 1 && turnContainer.annotationSequence[0] === '{}') {
+      expandedTurnComponents.splice(turnPosition.position, 1)
+      propogateChanges(turn, contractExpandedSequence(expandedTurnComponents))
+    }
+    turnList.innerHTML = ''
+    renderTurns(window.pgn.turns, turnList)
+  }
+
+  /**
+   * adds [% csl] to the annotation block
+   * @param {*} event
+   * @returns
+   */
   function insertSquareText (event) {
-    event.preventDefault()
-    const moveContainer = findMoveContainer(event.target)
-    const annotationText = '[%csl Ra1,b1,b3]'
-    const moveSequence = moveContainer.querySelector('.annotation-sequence')
-    const selectedPosition = moveSequence.querySelector('.selected-position')
-    const position = findElementChildIndex(selectedPosition)
-    const expandedSequence = expandSequence(moveContainer.annotationSequence)
-    expandedSequence.splice((position || 0) + 1, 0, ' ', annotationText)
-    console.log('insert square', annotationText, 'insert position', position)
-    console.log('sequence', moveContainer.annotationSequence)
-    console.log('expanded sequence before insertion', expandSequence(moveContainer.annotationSequence))
-    console.log('expanded sequence after insertion', expandedSequence)
-    moveContainer.annotationSequence = contractExpandedSequence(expandedSequence)
-    console.log('contracted sequence', moveContainer.annotationSequence)
-    renderSequence(moveContainer.annotationSequence, moveSequence, true)
-    moveSequence.children[moveSequence.children.length - 2].classList.add('selected-position')
-    moveSequence.children[moveSequence.children.length - 2].firstChild.firstChild.classList.remove('fa-circle')
-    moveSequence.children[moveSequence.children.length - 2].firstChild.firstChild.classList.add('fa-dot-circle')
-    const resetSquareChessBoardButton = moveContainer.querySelector('.reset-squares-button')
-    resetSquareChessBoardButton.onclick({ target: resetSquareChessBoardButton })
-    return cancelAndCloseAnnotationForm(event)
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const colors = {
+      red: [],
+      green: [],
+      blue: [],
+      yellow: []
+    }
+    const squareChessBoard = turnContainer.querySelector('.annotate-square-chessboard')
+    for (const row of squareChessBoard.rows) {
+      for (const cell of row.cells) {
+        let coordinate
+        for (const className of cell.classList) {
+          if (!className.startsWith('coordinate-')) {
+            continue
+          }
+          coordinate = className.split('-')[1]
+          break
+        }
+        if (cell.classList.contains('red-square')) {
+          colors.red.push(`R${coordinate}`)
+        } else if (cell.classList.contains('blue-square')) {
+          colors.blue.push(`B${coordinate}`)
+        } else if (cell.classList.contains('green-square')) {
+          colors.green.push(`G${coordinate}`)
+        } else if (cell.classList.contains('yellow-square')) {
+          colors.yellow.push(`Y${coordinate}`)
+        }
+      }
+    }
+    let annotationParts = []
+    for (const color in colors) {
+      if (!colors[color].length) {
+        continue
+      }
+      annotationParts = annotationParts.concat(colors[color])
+    }
+    if (annotationParts.length) {
+      const annotationText = `[%csl ${annotationParts.join(',')}]`
+      const annotationSequence = turnContainer.querySelector('.annotation-components')
+      const annotationPosition = annotationSequence.querySelector('.selected-position')
+      const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+      expandedSequence.splice(parseInt(annotationPosition.position, 10) + 1, 0, annotationText)
+      turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+      renderSequence(turnContainer.annotationSequence, annotationSequence, true)
+    }
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    const editing = !!turnContainer.querySelector('.edit-position')
+    return makeAnnotationOptionSelector(formContainer, editing)
   }
 
+  function updateSquareText (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const colors = {
+      red: [],
+      green: [],
+      blue: [],
+      yellow: []
+    }
+    const squareChessBoard = turnContainer.querySelector('.annotate-square-chessboard')
+    for (const row of squareChessBoard.rows) {
+      for (const cell of row.cells) {
+        let coordinate
+        for (const className of cell.classList) {
+          if (!className.startsWith('coordinate-')) {
+            continue
+          }
+          coordinate = className.split('-')[1]
+          break
+        }
+        if (cell.classList.contains('red-square')) {
+          colors.red.push(`R${coordinate}`)
+        } else if (cell.classList.contains('blue-square')) {
+          colors.blue.push(`B${coordinate}`)
+        } else if (cell.classList.contains('green-square')) {
+          colors.green.push(`G${coordinate}`)
+        } else if (cell.classList.contains('yellow-square')) {
+          colors.yellow.push(`Y${coordinate}`)
+        }
+      }
+    }
+    let annotationParts = []
+    for (const color in colors) {
+      if (!colors[color].length) {
+        continue
+      }
+      annotationParts = annotationParts.concat(colors[color])
+    }
+    if (!annotationParts.length) {
+      return deleteSquareText(event)
+    }
+    const annotationText = `[%csl ${annotationParts.join(',')}]`
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.edit-position')
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    expandedSequence[parseInt(annotationPosition.position, 10) + 1] = annotationText
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    renderSequence(turnContainer.annotationSequence, annotationSequence, true)
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    return makeAnnotationOptionSelector(formContainer, true)
+  }
+
+  function deleteSquareText (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.edit-position')
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    expandedSequence.splice(parseInt(annotationPosition.position, 10) + 1, 1)
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const turnPosition = turnComponents.querySelector('.edit-position')
+    const expandedTurnComponents = expandSequence(turn.sequence)
+    if (turnContainer.annotationSequence.length === 1 && turnContainer.annotationSequence[0] === '{}') {
+      expandedTurnComponents.splice(turnPosition.position, 1)
+      propogateChanges(turn, contractExpandedSequence(expandedTurnComponents))
+      turnList.innerHTML = ''
+      renderTurns(window.pgn.turns, turnList)
+    } else {
+      renderSequence(turnContainer.annotationSequence, annotationSequence)
+      const formContainer = turnContainer.querySelector('.annotation-form-container')
+      formContainer.innerHTML = ''
+      return makeAnnotationOptionSelector(formContainer, true)
+    }
+  }
+
+  function propogateChanges (turn, newSequence) {
+    const oldPGNText = parser.cleanSpacing(turn.sequence.join(' '))
+    const newPGNText = parser.cleanSpacing(newSequence.join(' '))
+    let t = turn
+    t.sequence = newSequence
+    while (t.parentTurn) {
+      t = t.parentTurn
+      for (const i in t.sequence) {
+        if (t.sequence[i] === oldPGNText) {
+          t.sequence[i] = oldPGNText
+        } else if (t.sequence[i].indexOf(oldPGNText) > -1) {
+          t.sequence[i] = t.sequence[i].replace(oldPGNText, newPGNText)
+        }
+      }
+    }
+  }
+
+  /**
+   * adds [%cal] to the annotation
+   * @param {} event
+   * @returns
+   */
   function insertArrowText (event) {
     event.preventDefault()
-    const moveContainer = findMoveContainer(event.target)
-    const annotationText = '[%csl Ra1,b1,b3]'
-    const moveSequence = moveContainer.querySelector('.annotation-sequence')
-    const selectedPosition = moveSequence.querySelector('.selected-position')
-    const position = findElementChildIndex(selectedPosition)
-    const expandedSequence = expandSequence(moveContainer.annotationSequence)
-    expandedSequence.splice((position || 0) + 1, 0, ' ', annotationText)
-    moveContainer.annotationSequence = contractExpandedSequence(expandedSequence)
-    renderSequence(moveContainer.annotationSequence, moveSequence, true)
-    moveSequence.children[moveSequence.children.length - 2].classList.add('selected-position')
-    moveSequence.children[moveSequence.children.length - 2].firstChild.firstChild.classList.remove('fa-circle')
-    moveSequence.children[moveSequence.children.length - 2].firstChild.firstChild.classList.add('fa-dot-circle')
-    const resetArrowChessBoardButton = moveContainer.querySelector('.reset-arrows-button')
-    resetArrowChessBoardButton.onclick({ target: resetArrowChessBoardButton })
-    return cancelAndCloseAnnotationForm(event)
+    const turnContainer = findTurnContainer(event.target)
+    const colors = {
+      red: [],
+      green: [],
+      blue: [],
+      yellow: []
+    }
+    const pendingList = turnContainer.querySelector('.pending-arrow-list')
+    for (const child of pendingList.children) {
+      const span = child.firstChild
+      let color = span.innerHTML.trim()
+      color = color.substring(0, color.indexOf(' ')).toLowerCase()
+      const coordinates = span.querySelectorAll('i')
+      colors[color].push(color[0].toUpperCase() + coordinates[0].innerHTML + coordinates[1].innerHTML)
+    }
+    let annotationParts = []
+    for (const color in colors) {
+      if (!colors[color].length) {
+        continue
+      }
+      annotationParts = annotationParts.concat(colors[color])
+    }
+    if (annotationParts.length) {
+      const annotationText = `[%cal ${annotationParts.join(',')}]`
+      const annotationSequence = turnContainer.querySelector('.annotation-components')
+      const annotationPosition = annotationSequence.querySelector('.selected-position')
+      const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+      expandedSequence.splice(parseInt(annotationPosition.position, 10) + 1, 0, ' ', annotationText)
+      turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+      renderSequence(turnContainer.annotationSequence, annotationSequence, true)
+    }
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    const editing = !!turnContainer.querySelector('.edit-position')
+    return makeAnnotationOptionSelector(formContainer, editing)
   }
 
-  function drawArrow (firstCoordinate, lastCoordinate, chessboard) {
+  function updateArrowText (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const colors = {
+      red: [],
+      green: [],
+      blue: [],
+      yellow: []
+    }
+    const pendingList = turnContainer.querySelector('.pending-arrow-list')
+    for (const child of pendingList.children) {
+      const span = child.firstChild
+      let color = span.innerHTML.trim()
+      color = color.substring(0, color.indexOf(' ')).toLowerCase()
+      const coordinates = span.querySelectorAll('i')
+      colors[color].push(color[0].toUpperCase() + coordinates[0].innerHTML + coordinates[1].innerHTML)
+    }
+    let annotationParts = []
+    for (const color in colors) {
+      if (!colors[color].length) {
+        continue
+      }
+      annotationParts = annotationParts.concat(colors[color])
+    }
+    if (!annotationParts.length) {
+      return deleteArrowText(event)
+    }
+    const annotationText = `[%cal ${annotationParts.join(',')}]`
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.edit-position')
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    expandedSequence[parseInt(annotationPosition.position, 10) + 1] = annotationText
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    renderSequence(turnContainer.annotationSequence, annotationSequence, true)
+    const formContainer = turnContainer.querySelector('.annotation-form-container')
+    formContainer.innerHTML = ''
+    return makeAnnotationOptionSelector(formContainer, true)
+  }
+
+  function deleteArrowText (event) {
+    if (event && event.preventDefault) {
+      event.preventDefault()
+    }
+    const turnContainer = findTurnContainer(event.target)
+    const turn = findTurn(turnContainer)
+    const turnComponents = turnContainer.querySelector('.turn-components')
+    const annotationSequence = turnContainer.querySelector('.annotation-components')
+    const annotationPosition = annotationSequence.querySelector('.edit-position')
+    const expandedSequence = expandSequence(turnContainer.annotationSequence, true)
+    expandedSequence.splice(parseInt(annotationPosition.position, 10) + 1, 1)
+    turnContainer.annotationSequence = contractExpandedSequence(expandedSequence)
+    const expandedTurnComponents = expandSequence(turn.sequence)
+    const turnPosition = turnComponents.querySelector('.edit-position')
+    if (turnContainer.annotationSequence.length === 1 && turnContainer.annotationSequence[0] === '{}') {
+      expandedTurnComponents.splice(turnPosition.position, 1)
+      propogateChanges(turn, contractExpandedSequence(expandedTurnComponents))
+      turnList.innerHTML = ''
+      renderTurns(window.pgn.turns, turnList)
+    } else {
+      renderSequence(turnContainer.annotationSequence, annotationSequence)
+      const formContainer = turnContainer.querySelector('.annotation-form-container')
+      formContainer.innerHTML = ''
+      return makeAnnotationOptionSelector(formContainer, true)
+    }
+  }
+
+  function drawArrow (firstCoordinate, lastCoordinate, chessboard, container) {
+    if (!firstCoordinate || !lastCoordinate || !chessboard) {
+      return
+    }
     const previousValues = {}
-    const moveSteps = [firstCoordinate, lastCoordinate]
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    chessboard.parentNode.appendChild(svg)
-    svg = chessboard.parentNode.lastChild
+    const turnSteps = [firstCoordinate, lastCoordinate]
     const sixteenthCellSize = chessboard.offsetWidth / 8 / 8 / 2
     const eighthCellSize = sixteenthCellSize * 2
     const quarterCellSize = eighthCellSize * 2
     const halfCellSize = quarterCellSize * 2
-    svg.style.strokeWidth = (sixteenthCellSize * 1.5) + 'px'
     const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs')
-    svg.appendChild(defs)
     const markerWidth = eighthCellSize
     const markerHeight = eighthCellSize
     const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker')
@@ -700,13 +1908,19 @@
     polygon.setAttributeNS(null, 'points', `0,0 ${markerWidth},${markerHeight / 2} 0,${markerHeight}`)
     polygon.style.strokeWidth = 0
     marker.appendChild(polygon)
-    console.log('move steps', moveSteps)
-    for (const i in moveSteps) {
-      const stepCoordinate = moveSteps[i]
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    if (container) {
+      container.appendChild(svg)
+      svg = container.lastChild
+    } else {
+      chessboard.parentNode.insertBefore(svg, chessboard.parentNode.children[1])
+      svg = chessboard.parentNode.children[chessboard.parentNode.children.length - 2]
+    }
+    svg.style.strokeWidth = (sixteenthCellSize * 1.5) + 'px'
+    svg.appendChild(defs)
+    for (const i in turnSteps) {
+      const stepCoordinate = turnSteps[i]
       const cell = chessboard.querySelector(`.coordinate-${stepCoordinate}`)
-      if (!cell) {
-        console.log('could not find cell for coordinate', stepCoordinate, 'in chessboard', chessboard)
-      }
       if (stepCoordinate === firstCoordinate) {
         const xPosition = cell.offsetLeft + halfCellSize
         const yPosition = cell.offsetTop + halfCellSize
@@ -731,17 +1945,22 @@
     return svg
   }
 
-  function setupMiniChessBoard (table, move) {
+  function setupMiniChessBoard (table, hitarea, turn) {
     const rows = '87654321'.split('')
     const columns = 'abcdefgh'.split('')
     let white = false
     for (const r of rows) {
       const row = table.insertRow(table.rows.length)
+      let clickableRow
+      if (hitarea) {
+        clickableRow = hitarea.insertRow(hitarea.rows.length)
+      }
       white = !white
       for (const c of columns) {
         const cell = row.insertCell(row.cells.length)
         cell.className = `coordinate-${c}${r} chessboard-square ` + (white ? 'white-square' : 'black-square')
         cell.coordinate = `${c}${r}`
+        cell.style.backgroundSize = 'cover'
         white = !white
         if (r === '1') {
           cell.innerHTML = '<sub>' + c + '</sub>'
@@ -751,52 +1970,98 @@
         }
         cell.style.width = '12%'
         cell.style.height = '12%'
-        for (const piece of move.pieces) {
+        if (!turn) {
+          continue
+        }
+        for (const piece of turn.pieces) {
           if (piece.coordinate !== `${c}${r}`) {
             continue
           }
           const color = piece.color === 'w' ? 'o' : 'b'
           cell.style.backgroundImage = `url(themes/${window.themeName}/${color}${piece.type}.png)`
-          cell.style.backgroundSize = 'cover'
         }
+        if (!hitarea) {
+          continue
+        }
+        const clickableCell = clickableRow.insertCell(clickableRow.cells.length)
+        clickableCell.style.width = '12%'
+        clickableCell.style.height = '12%'
+        clickableCell.coordinate = `${c}${r}`
+        clickableCell.className = `coordinate-${c}${r}`
       }
     }
   }
 
-  function cancelAndCloseAnnotationForm (event) {
-    event.preventDefault()
-    const moveContainer = findMoveContainer(event.target)
-    const typeButtons = moveContainer.querySelector('.annotation-button-container')
-    typeButtons.style.display = 'block'
-    const textInput = moveContainer.querySelector('.text-input')
-    textInput.style.display = 'none'
-    const arrowInput = moveContainer.querySelector('.arrow-input')
-    arrowInput.style.display = 'none'
-    const squareInput = moveContainer.querySelector('.square-input')
-    squareInput.style.display = 'none'
-    const resetArrowChessBoardButton = moveContainer.querySelector('.reset-arrows-button')
-    resetArrowChessBoardButton.onclick({ target: resetArrowChessBoardButton })
-    const resetSquareChessBoardButton = moveContainer.querySelector('.reset-squares-button')
-    resetSquareChessBoardButton.onclick({ target: resetSquareChessBoardButton })
-  }
-
-  function cancelAndCloseForm (event) {
-    event.preventDefault()
-    const moveContainer = findMoveContainer(event.target)
-    moveContainer.classList.remove('show-positioning')
-    const minusCircle = moveContainer.querySelector('.fa-minus-circle')
-    if (minusCircle) {
-      minusCircle.classList.remove('fa-minus-circle')
-      minusCircle.classList.add('fa-edit')
+  function expandTurnContainer (turnContainer) {
+    turnContainer.classList.add('show-positioning')
+    const circle = turnContainer.querySelector('.fa-edit')
+    if (circle) {
+      circle.classList.add('fa-minus-circle')
+      circle.classList.remove('fa-edit')
     }
   }
 
-  function findMoveContainer (element) {
-    let moveContainer = element.parentNode
-    while (moveContainer && !moveContainer.classList.contains('move-list-item')) {
-      moveContainer = moveContainer.parentNode
+  function unexpandTurnContainer (turnContainer) {
+    turnContainer.classList.remove('show-positioning')
+    const circle = turnContainer.querySelector('.fa-minus-circle')
+    if (circle) {
+      circle.classList.remove('fa-minus-circle')
+      circle.classList.add('fa-edit')
     }
-    return moveContainer
+  }
+
+  function unselectTurnComponentsPosition (turnContainer) {
+    turnContainer.classList.remove('show-positioning')
+    const list = turnContainer.querySelector('.turn-components')
+    for (const child of list.children) {
+      if (child.classList.contains('selected-position')) {
+        child.classList.remove('selected-position')
+        child.firstChild.firstChild.classList.add('fa-circle')
+        child.firstChild.firstChild.classList.remove('fa-dot-circle')
+      }
+      if (child.classList.contains('edit-position')) {
+        child.classList.remove('edit-position')
+      }
+    }
+  }
+
+  function resetTurnContainerButtons (turnContainer) {
+    const toggleInsertionSpacesButton = document.createElement('button')
+    toggleInsertionSpacesButton.className = 'button turn-option-button'
+    toggleInsertionSpacesButton.innerHTML = '<i class="fas fa-edit"></i>'
+    toggleInsertionSpacesButton.annotateForm = 'annotation'
+    toggleInsertionSpacesButton.onclick = toggleEditOptions
+    const showSpacing = document.createElement('li')
+    showSpacing.className = 'turn-options-item'
+    showSpacing.appendChild(toggleInsertionSpacesButton)
+    const sequence = turnContainer.querySelector('.turn-components')
+    sequence.insertBefore(showSpacing, sequence.firstChild)
+  }
+
+  function findTurnContainer (element) {
+    let turnContainer = element.parentNode
+    while (turnContainer && turnContainer.classList && !turnContainer.classList.contains('turn-list-item')) {
+      turnContainer = turnContainer.parentNode
+    }
+    return turnContainer
+  }
+
+  function findTurn (turnContainer, turns) {
+    turns = turns || window.pgn.turns
+    for (const turn of turns) {
+      if (turn.turnContainer === turnContainer) {
+        return turn
+      }
+      if (!turn.siblings || !turn.siblings.length) {
+        continue
+      }
+      for (const sibling of turn.siblings) {
+        const nestedTurn = findTurn(turnContainer, sibling)
+        if (nestedTurn) {
+          return nestedTurn
+        }
+      }
+    }
   }
 
   function findElementChildIndex (selectedPosition) {
@@ -1172,7 +2437,7 @@ window.refreshHeader = () => {
     properties.push('Black')
   }
   if (properties.indexOf('Result') === -1) {
-    properties.push('*')
+    properties.push('Result')
   }
   for (const property of properties) {
     const element = document.querySelector(`.header-${property.toLowerCase()}`)
@@ -1240,31 +2505,24 @@ window.onload = function () {
   ]
   const urlParams = new URLSearchParams(window.location.search)
   window.themeName = window.localStorage.getItem('theme') || urlParams.get('theme') || themes[0]
-  const link = document.createElement('link')
-  link.href = `themes/${window.themeName}/theme.css`
-  link.rel = 'stylesheet'
-  document.head.appendChild(link)
+  const themeCSS = document.createElement('link')
+  themeCSS.href = `themes/${window.themeName}/theme.css`
+  themeCSS.rel = 'stylesheet'
+  document.head.insertBefore(themeCSS, document.head.firstChild)
+  const playerCSS = document.createElement('link')
+  playerCSS.href = 'player.css'
+  playerCSS.rel = 'stylesheet'
+  document.head.appendChild(playerCSS)
   // shared method for loading PGN file/text
   window.loadPGNFile = (pgnFileData) => {
     window.turn = -1
     window.pieces = JSON.parse(window.defaultPieces)
     window.pgnRaw = pgnFileData
     try {
-      console.log('parsing pgn', pgnFileData)
       window.pgn = window.parser.parse(pgnFileData)
-      console.log('parsed pgn', window.pgn)
     } catch (error) {
-      console.log(error)
       return errorMessage(error.message)
     }
-    // try {
-    //   window.processPGNBoardStates(window.pgn, window.pieces)
-    //   console.log('processed pgn', window.pgn)
-    // } catch (error) {
-    //   console.log(error)
-    //   return errorMessage(error.message)
-    // }
-    console.log(window.annotations)
     window.turns = window.pgn.turns
     if (!window.components || !window.components.length) {
       const allComponents = [
@@ -1281,14 +2539,9 @@ window.onload = function () {
       for (const component of allComponents) {
         const element = document.getElementsByClassName(component.name)
         if (!element || !component.setup) {
-          console.log('not using component ' + component.name)
           continue
         }
-        try {
-          component.setup()
-        } catch (error) {
-          console.log('error setting up component', error)
-        }
+        component.setup()
         window.components.push(component)
       }
       window.addEventListener('refresh', refresh)
@@ -1311,11 +2564,7 @@ window.onload = function () {
     }
     for (const component of window.components) {
       if (component.refresh) {
-        try {
-          component.refresh(event)
-        } catch (error) {
-          console.log(error)
-        }
+        component.refresh(event)
       }
     }
   }
@@ -1476,6 +2725,7 @@ window.setupPGN = () => {
       }
     }
   }
+  const menuContainer = document.querySelector('.pgn-controls')
   const loadPasteButton = document.querySelector('.file-load-pasted-pgn')
   if (loadPasteButton) {
     loadPasteButton.onclick = () => {
@@ -1486,17 +2736,16 @@ window.setupPGN = () => {
       window.loadPGNFile(loadText.value)
       loadText.value = ''
       pasteContainer.style.display = 'none'
-      pgnContainer.style.display = 'block'
+      viewPGN.style.display = 'block'
+      menuContainer.style.display = 'block'
     }
   }
-  const menuContainer = document.querySelector('.view-pgn-controls')
   const pasteContainer = document.querySelector('.paste-pgn-container')
-  const pgnContainer = document.querySelector('.view-pgn')
   const cancelPastebutton = document.querySelector('.file-cancel-paste')
   if (cancelPastebutton) {
     cancelPastebutton.onclick = () => {
       pasteContainer.style.display = 'none'
-      pgnContainer.style.display = 'block'
+      viewPGN.style.display = 'block'
       menuContainer.style.display = 'block'
     }
   }
@@ -1504,7 +2753,7 @@ window.setupPGN = () => {
   if (pasteTextButton) {
     pasteTextButton.onclick = () => {
       pasteContainer.style.display = 'block'
-      pgnContainer.style.display = 'none'
+      viewPGN.style.display = 'none'
       menuContainer.style.display = 'none'
     }
   }
@@ -1554,6 +2803,18 @@ window.setupPlayback = () => {
   renderNestedTimeline(window.pgn.turns, null, null)
   // playback frame-move buttons
   const playNestedMoves = document.querySelector('.play-nested-moves')
+  playNestedMoves.mouseChildren = false
+  playNestedMoves.parentElement.onclick = () => {
+    playNestedMoves.checked = !playNestedMoves.checked
+    const i = playNestedMoves.parentElement.firstElementChild
+    if (playNestedMoves.checked) {
+      i.classList.add('fa-check-square')
+      i.classList.remove('fa-square')
+    } else {
+      i.classList.remove('fa-check-square')
+      i.classList.add('fa-square')
+    }
+  }
   const backToStartButton = document.querySelector('.playback-start')
   if (backToStartButton) {
     backToStartButton.onclick = () => {
@@ -2304,24 +3565,24 @@ function createTagRow (tag, last) {
     for (const turn of turns) {
       processTurn(turn, turns, pieces)
     }
-    return {
+    const pgnData = {
       FEN: startingFEN,
       tags,
       turns,
       toString: () => {
         const tagText = []
-        const tagKeys = Object.keys(tags)
+        const tagKeys = Object.keys(pgnData.tags)
         for (const tag of tagKeys) {
-          tagText.push(`[${tag} "${tags[tag]}"]`)
+          tagText.push(`[${tag} "${pgnData.tags[tag]}"]`)
         }
         const moveText = []
         for (const turn of turns) {
-          const prepend = turn.pgn.substring(0, turn.pgn.indexOf(turn.sequence[0]))
-          moveText.push(prepend + turn.sequence.join(' '))
+          moveText.push(turn.sequence.join(' '))
         }
-        return `${tagText.join('\n')}\n\n${moveText.join(' ')}`
+        return `${tagText.join('\n')}\n\n${cleanSpacing(moveText.join(' '))}`
       }
     }
+    return pgnData
   }
 
   /*
@@ -2339,8 +3600,13 @@ function createTagRow (tag, last) {
           continue
         }
         const itemLines = tokenizeLines(item.substring(1, item.length - 1))
+        const siblingTurns = parseRecursively(itemLines)
         turn.siblings = turn.siblings || []
-        turn.siblings.push(parseRecursively(itemLines))
+        turn.siblings.push(siblingTurns)
+        for (const nestedTurn of siblingTurns) {
+          nestedTurn.parentTurn = turn
+          nestedTurn.parentTurns = results
+        }
       }
     }
     return results
@@ -2399,10 +3665,11 @@ function createTagRow (tag, last) {
       for (const sibling of turn.siblings) {
         const piecesFork = JSON.parse(previousPieces)
         for (const turn of sibling) {
-          processTurn(turn, JSON.parse(JSON.stringify(turns)), piecesFork)
+          processTurn(turn, turns, piecesFork)
         }
       }
     }
+    turn.previousPieces = JSON.parse(previousPieces)
     turn.pieces = JSON.parse(JSON.stringify(pieces))
     turn.fen = toFen(pieces, turn, turns)
   }
@@ -2557,6 +3824,8 @@ function createTagRow (tag, last) {
       }
       text = text.split(`${i}. `).join(`${i}.`)
       text = text.split(`${i}... `).join(`${i}...`)
+      text = text.split(`${i}.{`).join(`${i}. {`)
+      text = text.split(`${i}...{`).join(`${i}... {`)
     }
     return text.trim()
   }
@@ -2584,6 +3853,10 @@ function createTagRow (tag, last) {
         tokens.push(line.trim())
       }
     }
+    if (tokens[0].startsWith('$')) {
+      const first = tokens.shift()
+      tokens[0] = `${first} ${tokens[0]}`
+    }
     return tokens
   }
 
@@ -2599,6 +3872,9 @@ function createTagRow (tag, last) {
     *    [ 'f3', '(2. d4 {an annotated turn})' ]
     *   '2... a6'
     *    [ '2...', 'a6' ]
+    *
+    *   '$0 3... a6'
+    *    [ '$0', '3...', 'a6 ]
     */
   function tokenizeLine (lineData) {
     const parts = lineData.split(' ')
@@ -3011,7 +4287,7 @@ function createTagRow (tag, last) {
             if (enPassantCoordinate) {
               const upPiece = checkObstructed(enPassantCoordinate, pieces)
               if (upPiece && upPiece.type === 'P' && upPiece.color !== piece.color) {
-                return [piece.coordinate, captureRight]
+                return [piece.coordinate, captureLeft]
               }
             }
           }

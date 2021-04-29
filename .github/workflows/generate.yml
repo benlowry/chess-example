@@ -1,0 +1,76 @@
+name: generate
+
+on: [push]
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - name: Delete old screenshots
+      run: |
+        git rm -rf screenshots || true
+        git rm -rf --cached screenshots || true
+    - name: Generate Firefox screenshots
+      run: |
+        DIR=`pwd`
+        npm install -g http-server grunt
+        http-server . > /dev/null &
+        git clone https://github.com/benlowry/chess-pgn-player ../player
+        cd ../player
+        PUPPETEER_PRODUCT=firefox npm install
+        grunt
+        for theme in `ls $DIR/themes`; do 
+          for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
+            for scheme in light dark; do
+              export FIREFOX=true
+              export SCREENSHOT_DEVICE="$device"
+              export SCREENSHOT_SCHEME="$scheme"
+              export SCREENSHOT_THEME="$theme"
+              export SCREENSHOT_PATH=$DIR/screenshots/firefox/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              mkdir -p "$SCREENSHOT_PATH"
+              echo "path" $SCREENSHOT_PATH
+              npm test 
+            done
+          done
+        done
+        kill http-server || true
+    - name: Generate Chrome screenshots
+      run: |
+        DIR=`pwd`
+        http-server . > /dev/null &
+        cd ../player
+        rm -rf node_modules
+        npm install
+        grunt
+        export FIREFOX=""
+        for theme in `ls $DIR/themes`; do 
+          for device in Desktop "iPad Pro" "iPad Mini" "Pixel 2 XL" "iPhone SE"; do 
+            for scheme in light dark; do
+              export SCREENSHOT_DEVICE="$device"
+              export SCREENSHOT_SCHEME="$scheme"
+              export SCREENSHOT_THEME="$theme"
+              export SCREENSHOT_PATH=$DIR/screenshots/chrome/"$SCREENSHOT_THEME"/"$SCREENSHOT_DEVICE"/"$SCREENSHOT_SCHEME"
+              mkdir -p "$SCREENSHOT_PATH"
+              echo "path" $SCREENSHOT_PATH
+              npm test 
+            done
+          done
+        done
+        kill http-server || true
+    - name: Reindex generated files
+      run: |
+        export SCREENSHOT_PATH=`pwd`/screenshots
+        node reindex.js themes > themes.js
+        node reindex.js samples > samples.js
+        node reindex.js screenshots > screenshots.js
+    - name: Publish to Github
+      uses: stefanzweifel/git-auto-commit-action@v4.1.6
+      with:
+        commit_message: Automatically regenerated against current version
+        branch: ${{ github.head_ref }}
+        commit_options: '--no-verify --signoff'
+        repository: .

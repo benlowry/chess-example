@@ -1,5 +1,5 @@
 html { height: 100%; font-size: 100% }
-body { min-width: 320px; font-family: sans-serif; padding: 0; margin: 0; height: 100% }
+body { min-width: 320px; font-family: sans-serif; padding: 0; margin: 0; height: 100%; color: var(--bow); background-color: var(--wob); }
 a,
 button,
 img,
@@ -34,7 +34,7 @@ i { pointer-events: none }
 .chessboard-square sub { position: absolute; bottom: 0.25rem; right: 0.25rem; font-size: 0.6rem }
 .chessboard-pieces { position: absolute; left: 0; top: 0; z-index: 1 }
 .chessboard-piece { position: absolute; width: 12% }
-.chessboard-move-arrows { position: absolute; left: 0; top: 0; z-index: 2 }
+.chessboard-turn-arrows { position: absolute; left: 0; top: 0; z-index: 2 }
 .chessboard-arrows { opacity: 0; position: absolute; left: 0; top: 0; z-index: 2 }
 .chessboard-arrow { position: absolute; left: 0; top: 0; z-index: 3; width: 100%; height: 100%; stroke-linecap: round; }
 .fade-in { opacity: 1; transition: all 1s }
@@ -57,8 +57,8 @@ i { pointer-events: none }
 .frame:last-of-type { border-top-right-radius: 0.25rem; border-bottom-right-radius: 00.25rem }
 .connecting-line { position: absolute; top: 1rem; border-left: solid }
 .playback-controls { padding: 0; margin: 0 }
-.playback-controls .checkbox { font-size: 0.75rem }
-.playback-controls .checkbox input { padding: 0; margin: 0 0.25rem 0 0.5rem }
+.playback-controls .checkbox { cursor: pointer; font-size: 0.75rem; padding: 0; margin: 0 0.25rem 0 0.5rem; color: var(--bow75) }
+.playback-controls input { display: none }
 .playback-control { height: 2rem }
 
 /* tabs */
@@ -66,72 +66,84 @@ i { pointer-events: none }
 .tab { border: 0; cursor: pointer; outline: 0; height: 2rem; font-size: 0.8rem; padding-left: 0.5rem; padding-right: 0.5rem }
 
 /* annotations */
-.move-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
-.move-list-item { border-bottom: thin solid; padding: 0.25rem }
-.move-list .move-list-item:last-of-type { padding-bottom: 2rem }
-.move-list .move-list { display: block; padding: 0; list-style-type: none; margin: 0.5rem 0 0.5rem 0.5rem; overflow: visible }
-.move-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
-.move-list-button i { opacity: 0.5 }
-.move-list-button:hover i { opacity: 1 }
+.turn-list { font-size: 0.8rem; margin: 0; padding: 0; list-style-type: none; overflow: scroll }
+.turn-list-item { border-bottom: thin solid; border-top: thin solid; padding: 0.25rem; border-radius: 0.5rem; position: relative }
+.turn-list .turn-list { display: block; padding: 0; list-style-type: none; overflow: visible; margin: 0.25rem 0.25rem 0.25rem 2.5rem; border-radius: 0.5rem }
+
+.turn-list-button { margin: 0.25rem; border-width: thin; border-radius: 0.5rem }
+.turn-list-button i { opacity: 0.5 }
+.turn-list-button:hover i { opacity: 1 }
 .annotate-menu { margin: 0; padding: 0 }
 .annotate-button { margin: 0.25rem; border-width: thin; border-radius: 0.25rem }
-.move-sequence { width: 80%; font-size: 0.8rem; line-height: 1.6rem; margin: 0; display: flex; list-style-type: none; padding: 0 }
-.move-sequence-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
+.turn-components { font-size: 0.8rem; line-height: 1.6rem; margin: 0 0 0.5rem 0; display: flex; list-style-type: none; padding: 0 }
+.turn-components-item {  display: inline-block; padding: 0.5rem 0.25rem 0 0.25rem; cursor: pointer }
 .sequence-position-item { display: none; padding: 0.5rem 0.25rem 0.25rem 0.25rem }
-.move-options-item { margin: 0; padding: 0.25rem }
-.move-option-button { margin: 0; padding: 0.25rem; font-size: 1rem }
-.move-option-button i { opacity: 0.5 }
-.move-option-button:hover { background-color: none }
-.move-option-button:hover i { opacity: 1 }
-.move-location-button { font-size: 1rem; margin: 0; padding: 0 }
+.turn-options-item { margin: 0; padding: 0.25rem; border-radius: 0.5rem }
+.turn-option-button { margin: 0; padding: 0.25rem; font-size: 1rem }
+.turn-option-button i { opacity: 0.5 }
+.turn-option-button:hover { background-color: none }
+.turn-option-button:hover i { opacity: 1 }
+.turn-location-button { font-size: 1rem; margin: 0; padding: 0; pointer-events: none }
 .edit-annotation-button { margin: 0; padding: 0.25rem; border-color: transparent; border-radius: 0.25rem }
-.show-positioning .move-list .sequence-position-item { display: none !important }
+.show-positioning .turn-list .sequence-position-item { display: none !important }
 .show-positioning .show-positioning .sequence-position-item { display: inline-block !important }
 .show-positioning .sequence-position-item { display: inline-block !important }
-.show-positioning .annotation-forms { display: block }
+.insertion-form-selector { display: block; margin-left: 2.5rem }
+.selected-position,
+.edit-position { border-radius: 0.25rem }
 .branch-options { padding: 0.25rem }
-.branch-options .move-list-button { margin: 0 0.5rem 0 0 }
+.branch-options .turn-list-button { margin: 0 0.5rem 0 0 }
 .piece-glyph-wrapper { display: inline-block; padding: 0.125rem; border-radius: 0.125rem }
 .piece-glyph { font-size: 1.2rem }
-.annotation-tabs { display: block; margin: 0; list-style-type: none; padding: 0; border-bottom: thin solid }
-.annotation-tab-item { display: inline-block; line-height: normal; margin-right: 0.125rem }
-.annotation-tab-item:first-of-type { margin-left: 0.5rem }
-.annotation-tab-item:last-of-type { margin-right: 2rem }
-.annotation-tab-button,
-.annotation-type-button { border: thin solid; border-bottom: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0 }
-.annotation-type { display: none; padding: 0.5rem 0 0 1rem }
-.annotation-tab { display: none; padding: 0.5rem 0 0 1rem }
-.annotation-forms { display: none }
-.annotation-form-button { margin: 0.5rem 0 0 0; border: none; border-radius: 0.5rem; font-size: 0.7rem; line-height: 1.4rem }
-.annotation-form-button i { opacity: 0.5 }
+.annotation-form-button { font-weight: bold; margin: 0; border: none; border-radius: 0.5rem; font-size: 0.7rem; line-height: 1.4rem }
+.annotation-form-button i { opacity: 0.75 }
 .annotation-form-button:hover i { opacity: 1 }
-.highlight-switch { font-size: 0.7rem; background-color: transparent !important; border-color: transparent !important; padding: 0; margin: 0 }
-.current-annotation-tab { display: block !important }
-.nag-select { appearance: none; background-color: transparent; color: #FFF; border: none; outline: 0; padding: 0.25rem; margin: 0; width: 100%; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit; z-index: 1; outline: none }
-.nag-select::-ms-expand { display: none }
-.nag-select:hover,
-.nag-select:focus { background-color: rgba(255, 255, 255, 0.25); border-radius: 0.25rem }
-.select { display: grid; grid-template-areas: "select"; align-items: center; position: relative; min-width: 15ch; max-width: 30ch; border-radius: 0.25em; font-size: 1.25rem; cursor: pointer; line-height: 1.1; background-color: rgba(255, 255, 255, 0.25) }
-.select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; background-color: rgba(255, 255, 255, 0.5); clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
-.nag-select,
-.select::after { grid-area: select }
-.text-input { width: 100% }
-.annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 }
-.mini-chessboard-container { position: relative; height: 16rem; width: 16rem }
-.mini-chessboard .chessboard { pointer-events: none; width: 16rem; height: 16rem; position: absolute }
-.mini-chessboard svg { pointer-events: none; position: absolute; z-index: 1; top: 0; left: 0 }
+.insertion-form-selector,
+.annotation-form { padding: 0.5rem; border-radius: 0.5rem; display: inline-block; width: auto; border: thin solid }
+.annotation-form,
+.insertion-form-selector { position: absolute; z-index: 999 }
+.entry-fallback { display: flex }
+.highlight-switch { font-size: 0.7rem; background-color: transparent !important; border-color: transparent !important; padding: 0 0.25rem; margin: 0 }
+.select { margin-bottom: 0.5rem; display: grid; grid-template-areas: "select"; align-items: center; position: relative; border-radius: 0.25em; font-size: 0.9rem; cursor: pointer; line-height: 1.1rem }
+.select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
+.select::after,
+.select select { grid-area: select }
+.select select { background-color: transparent; appearance: none; border: none; outline: 0; padding: 0.25rem; margin: 0; border-radius: 0.25rem; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit }
+.select select::-ms-expand { display: none }
+.select select:hover,
+.select select:focus { border-radius: 0.25rem } 
+.select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%); grid-area: select }
+.nag-select { min-width: 15rem; max-width: 30rem; width: 100% }
+.coordinate-select { margin: 0 0.25rem 0 0; width: 2.5rem; font-size: 0.7rem; line-height: 0.9rem }
+.coordinate-to-bridge { color: var(--bow); padding: 0.25rem 0.5rem 0.25rem 0.25rem; width: auto; margin: 0 }
+.text-input { width: 100%; max-width: 40rem }
+.annotation-text { padding: 0.25rem; border-radius: 0.25rem; width: 100%; max-width: 40rem; height: 10rem; display: block; margin: 0 0 0.5rem 0 }
+.mini-chessboard-container { position: relative; height: 24rem; width: 24rem; margin-bottom: 0.5rem }
+.mini-chessboard .chessboard { width: 24rem; height: 24rem; position: absolute }
+.mini-chessboard svg { position: absolute; z-index: 1; top: 0; left: 0 }
+.annotate-chessboard { z-index: 2 }
 .mini-chessboard { margin-right: 0.5rem }
 .mini-chessboard td { cursor: pointer }
+.annotation-container { display: flex }
+.pending-list { min-width: 10rem; margin: 1rem 0 0 1rem; padding: 0; list-style-type: none }
+.pending-list li { display: flex; margin-bottom: 0.5rem; line-height: 1.2rem }
+.pending-list span { font-family: monospace; font-size: 0.7rem; margin-right: 1rem; line-height: 1.4rem }
+.pending-list span i { display: inline-block; font-size: 0.7rem; border: thin solid; padding: 0 0.25rem; border-radius: 0.125rem; line-height: 1.4rem; font-style: normal }
+.pending-list .button { margin-top: 0 }
+.alternative-turn-title { font-weight: normal; margin: 0 0 0.5rem 0 }
 
 /* tags */
 .tags-container { padding: 0 }
 .tags-table { border-collapse: collapse; margin: 0.5rem }
+.tags-table tr:last-of-type td { padding-top: 1rem }
 .tags-table td { padding: 0.125rem }
 .tags-table .tag-name { width: 8rem }
 .tags-table .tag-value { width: 10rem }
-.tag-input { width: 100%; font-size: 0.8rem; line-height: 1rem; padding: 0.25rem }
-.tags-table tr:last-of-type td { padding-top: 1rem }
-.tag-button { margin-left: 0.5rem; background-color: transparent; border: none; padding: 0; font-size: 0.8rem; display: block; cursor: pointer }
+.tags-table .tag-input { width: 100%; font-size: 0.8rem; line-height: 1rem; padding: 0.25rem; background-color: var(--wob25); border: thin solid var(--bow50); color: var(--bow75) }
+.tags-table .tag-button { color: var(--bow75); margin-left: 0.5rem; background-color: transparent; border: none; padding: 0; font-size: 0.8rem; display: block; cursor: pointer }
+.tags-table .tag-button:hover,
+.tags-table .tag-button:hover i { color: var(--bow) }
+
 
 /* PGN */ 
 .pgn-container { margin: 0; padding: 0 }
@@ -139,6 +151,235 @@ i { pointer-events: none }
 .pgn { padding: 0.5rem; margin: 0; outline: 0; max-width: 50rem; white-space: pre-wrap; font-size: 0.8rem }
 .file-control { margin: 0.25rem }
 .paste-pgn-container { display: none; margin: 0.25rem }
-.paste-pgn { outline: 0; border: 1px solid; padding: 0.5rem; width: 90%; height: 10rem; display: block; margin: 0 0 0.25rem 0 }
+.paste-pgn { outline: 0; border: 1px solid var(--bow50); color: var(--bow75); background-color: var(--bow125); padding: 0.5rem; width: 90%; height: 10rem; display: block; margin: 0 0 0.25rem 0 }
 .paste-pgn-container .file-control { margin-top: 0; margin-left: 0 }
 
+body { background-color: var(--wob) }
+.button { border-color: var(--grey2); background-color: var(--grey2) }
+/* chessboard */
+.chessboard { color: var(--bow) }
+.white-square { background-color: var(--grey1); color: var(--grey11) }
+.black-square { background-color: var(--grey5); color: var(--wob) }
+.mini-chessboard .black-square { background-color: var(--wob50); color: var(--wob) }
+.mini-chessboard .white-square { background-color: var(--wob25); color: var(--wob) }
+.mini-chessboard .highlight-switch { color: var(--wob75) }
+.mini-chessboard td:hover { background-color: var(--wob25) !important }
+.pending-list { color: var(--wob50) }
+
+/* highlights */
+.red-square { background-color: var(--darkred) !important }
+.green-square { background-color: var(--darkgreen) !important }
+.yellow-square { background-color: var(--darkorange) !important }
+.blue-square { background-color: var(--darkblue) !important }
+.red-arrow { fill: var(--red); stroke: var(--red) }
+.green-arrow { fill: var(--green); stroke: var(--green) }
+.yellow-arrow { fill: var(--yellow); stroke: var(--yellow) }
+.blue-arrow { fill: var(--blue); stroke: var(--blue) }
+.turn-arrow { fill: var(--wob); stroke: var(--wob) }
+/* move list */
+.white-piece-glyph { color: var(--bow75) }
+.black-piece-glyph { color: var(--wob75) }
+.white-piece-glyph-wrapper { background-color: var(--wob50) }
+.black-piece-glyph-wrapper { background-color: var(--bow50) }
+.turn-list-item { color: var(--wob); border-top-color: var(--bow25); border-bottom-color: var(--wob75) }
+.turn-list-button { background-color: var(--wob25); border-color: var(--bow25); color: var(--wob75) }
+.turn-list-button:hover { background-color: var(--wob75) }
+.annotation-form-button { background-color: var(--wob75); border-color: var(--bow25); color: var(--wob) }
+.annotation-form-button:hover { background-color: var(--wob75) }
+.annotation-form,
+.insertion-form-selector { background-color: var(--wob); border-color: var(--bow); box-shadow: 0 0 1rem 1rem var(--wob50) }
+.turn-option-button { background-color: transparent; border-color: transparent; color: var(--wob) }
+.turn-option-button:hover { background-color: transparent }
+.turn-location-button { color: var(--wob75); background-color: transparent; border-color: transparent; }
+.turn-location-button:hover { color: var(--wob) }
+.selected-position .turn-location-button { color: var(--wob) }
+.selected-position,
+.edit-position { background-color: var(--bow25)}
+.annotation-form .selected-position, 
+.annotation-form .edit-position { background-color: var(--wob25) }
+.annotate-button { background-color: var(--bow75); border-color: var(--bow50); color: var(--wob75) }
+.annotate-button:hover { background-color: var(--wob) }
+.cancel-button { font-weight: normal; border-color: transparent; background-color: transparent; color: var(--wob50) }
+.cancel-button:hover { color: var(--wob) }
+.select select { color: var(--wob75); border: thin solid var(--wob25) }
+.select select:hover,
+.select select:focus { background-color: var(--wob) }
+.select::after { background-color: var(--wob50) }
+.coordinate-to-bridge { color: var(--bow) }
+.turn-components-item { color: var(--bow75) }
+.turn-components-item:hover { color: var(--wob) }
+.turn-components .turn-components-item:first-of-type { border-color: transparent; background-color: transparent }
+.turn-components .turn-components-item:last-of-type { border-color: var(--bow50) }
+.annotation-components .turn-components-item,
+.annotation-components .turn-location-button { color: var(--wob75) }
+.branch-options { background-color: var(--bow50) }
+
+/* annotation forms */
+.annotation-tabs { border-bottom-color: var(--bow50) }
+.annotation-tab-button,
+.annotation-type-button { color:var(--bow75); background-color: transparent !important; border-color: var(--bow50) !important }
+.current-annotation-button { color: var(--wob); background-color: var(--bow25) !important; border-color: var(--bow50) !important }
+.annotation-text { color: var(--bow); background-color: var(--wob25); border: thin solid var(--bow25) }
+.alternative-turn-title { color: var(--bow) }
+
+/* loading pgn */
+.paste-text { border-color: var(--grey5) }
+/* tabs */
+.current-tab { background-color: var(--bow) !important; color: var(--wob) !important }
+.tab { background-color: var(--tabs); color: var(--grey11) }
+.tabs { background-color: var(--tabs) }
+.tab:hover { background-color: var(--bow50) }
+/* timelines */
+.frame { background-color: var(--grey8); color: var(--wob)}
+.connecting-line { border-color: var(--grey2) }
+.alternating-frame { background-color:var(--bow50) !important }
+
+.timeline1 { background-color: var(--timeline1) }
+.timeline1 .timeline-bar { background-color: var(--timeline1) }
+.timeline1 .frame { background-color: var(--timeline1) }
+.timeline1 .connecting-line { border-color: var(--timeline1) }
+
+.timeline2 { background-color: var(--timeline2) }
+.timeline2 .timeline-bar { background-color: var(--timeline2) }
+.timeline2 .frame { background-color: var(--timeline2) }
+.timeline2 .connecting-line { border-color: var(--timeline2) }
+
+.timeline3 { background-color: var(--timeline3) }
+.timeline3 .timeline-bar { background: var(--timeline3) }
+.timeline3 .frame { background-color: var(--timeline3) }
+.timeline3 .connecting-line { border-color: var(--timeline3) }
+
+.timeline4 { background-color: var(--timeline4) }
+.timeline4 .timeline-bar { background-color: var(--timeline4) }
+.timeline4 .frame { background-color: var(--timeline4) }
+.timeline4 .connecting-line { border-color: var(--timeline4) }
+
+.timeline5 { background-color: var(--timeline5) }
+.timeline5 .timeline-bar { background: var(--timeline5) }
+.timeline5 .frame { background-color: var(--timeline5) }
+.timeline5 .connecting-line { border-color: var(--timeline5) }
+
+.timeline6 { background-color: var(--timeline6) }
+.timeline6 .timeline-bar { background-color: var(--timeline6) }
+.timeline6 .frame { background-color: var(--timeline6) }
+.timeline6 .connecting-line { border-color: var(--timeline6) }
+
+.timeline7 { background-color: var(--timeline7) }
+.timeline7 .timeline-bar { background: var(--timeline7) }
+.timeline7 .frame { background-color: var(--timeline7) }
+.timeline7 .connecting-line { border-color: var(--timeline7) }
+
+.timeline8 { background-color: var(--timeline8) }
+.timeline8 .timeline-bar { background-color: var(--timeline8) }
+.timeline8 .frame { background-color: var(--timeline8) }
+.timeline8 .connecting-line { border-color: var(--timeline8) }
+
+.timeline9 { background-color: var(--timeline9) }
+.timeline9 .timeline-bar { background: var(--timeline9) }
+.timeline9 .frame { background-color: var(--timeline9) }
+.timeline9 .connecting-line { border-color: var(--timeline9) }
+
+.timeline10 { background-color: var(--timeline10) }
+.timeline10 .timeline-bar { background-color: var(--timeline10) }
+.timeline10 .frame { background-color: var(--timeline10) }
+.timeline10 .connecting-line { border-color: var(--timeline10) }
+
+.timeline11 { background-color: var(--timeline11) }
+.timeline11 .timeline-bar { background: var(--timeline11) }
+.timeline11 .frame { background-color: var(--timeline11) }
+.timeline11 .connecting-line { border-color: var(--timeline11) }
+
+.timeline12 { background-color: var(--timeline12) }
+.timeline12 .timeline-bar { background-color: var(--timeline12) }
+.timeline12 .frame { background-color: var(--timeline12) }
+.timeline12 .connecting-line { border-color: var(--timeline12) }
+
+.timeline13 { background-color: var(--timeline13) }
+.timeline13 .timeline-bar { background: var(--timeline13) }
+.timeline13 .frame { background-color: var(--timeline13) }
+.timeline13 .connecting-line { border-color: var(--timeline13) }
+
+.timeline14 { background-color: var(--timeline14) }
+.timeline14 .timeline-bar { background-color: var(--timeline14) }
+.timeline14 .frame { background-color: var(--timeline14) }
+.timeline14 .connecting-line { border-color: var(--timeline14) }
+
+.timeline15 { background-color: var(--timeline15) }
+.timeline15 .timeline-bar { background: var(--timeline15) }
+.timeline15 .frame { background-color: var(--timeline15) }
+.timeline15 .connecting-line { border-color: var(--timeline15) }
+
+.timeline16 { background-color: var(--timeline16) }
+.timeline16 .timeline-bar { background-color: var(--timeline16) }
+.timeline16 .frame { background-color: var(--timeline16) }
+.timeline16 .connecting-line { border-color: var(--timeline16) }
+
+.timeline17 { background-color: var(--timeline17) }
+.timeline17 .timeline-bar { background: var(--timeline17) }
+.timeline17 .frame { background-color: var(--timeline17) }
+.timeline17 .connecting-line { border-color: var(--timeline17) }
+
+.timeline18 { background-color: var(--timeline18) }
+.timeline18 .timeline-bar { background-color: var(--timeline18) }
+.timeline18 .frame { background-color: var(--timeline18) }
+.timeline18 .connecting-line { border-color: var(--timeline18) }
+
+.timeline19 { background-color: var(--timeline19) }
+.timeline19 .timeline-bar { background: var(--timeline19) }
+.timeline19 .frame { background-color: var(--timeline19) }
+.timeline19 .connecting-line { border-color: var(--timeline19) }
+
+.timeline20 { background-color: var(--timeline20) }
+.timeline20 .timeline-bar { background-color: var(--timeline20) }
+.timeline20 .frame { background-color: var(--timeline20) }
+.timeline20 .connecting-line { border-color: var(--timeline20) }
+
+.timeline21 { background-color: var(--timeline21) }
+.timeline21 .timeline-bar { background: var(--timeline21) }
+.timeline21 .frame { background-color: var(--timeline21) }
+.timeline21 .connecting-line { border-color: var(--timeline21) }
+
+.timeline22 { background-color: var(--timeline22) }
+.timeline22 .timeline-bar { background-color: var(--timeline22) }
+.timeline22 .frame { background-color: var(--timeline22) }
+.timeline22 .connecting-line { border-color: var(--timeline22) }
+
+.timeline23 { background-color: var(--timeline23) }
+.timeline23 .timeline-bar { background: var(--timeline23) }
+.timeline23 .frame { background-color: var(--timeline23) }
+.timeline23 .connecting-line { border-color: var(--timeline23) }
+
+.timeline24 { background-color: var(--timeline24) }
+.timeline24 .timeline-bar { background-color: var(--timeline24) }
+.timeline24 .frame { background-color: var(--timeline24) }
+.timeline24 .connecting-line { border-color: var(--timeline24) }
+
+.timeline25 { background-color: var(--timeline25) }
+.timeline25 .timeline-bar { background: var(--timeline25) }
+.timeline25 .frame { background-color: var(--timeline25) }
+.timeline25 .connecting-line { border-color: var(--timeline25) }
+
+.timeline26 { background-color: var(--timeline26) }
+.timeline26 .timeline-bar { background-color: var(--timeline26) }
+.timeline26 .frame { background-color: var(--timeline26) }
+.timeline26 .connecting-line { border-color: var(--timeline26) }
+
+.timeline27 { background-color: var(--timeline27) }
+.timeline27 .timeline-bar { background: var(--timeline27) }
+.timeline27 .frame { background-color: var(--timeline27) }
+.timeline27 .connecting-line { border-color: var(--timeline27) }
+
+.timeline28 { background-color: var(--timeline28) }
+.timeline28 .timeline-bar { background-color: var(--timeline28) }
+.timeline28 .frame { background-color: var(--timeline28) }
+.timeline28 .connecting-line { border-color: var(--timeline28) }
+
+.timeline29 { background-color: var(--timeline29) }
+.timeline29 .timeline-bar { background: var(--timeline29) }
+.timeline29 .frame { background-color: var(--timeline29) }
+.timeline29 .connecting-line { border-color: var(--timeline29) }
+
+.timeline30 { background-color: var(--timeline30) }
+.timeline30 .timeline-bar { background-color: var(--timeline30) }
+.timeline30 .frame { background-color: var(--timeline30) }
+.timeline30 .connecting-line { border-color: var(--timeline30) }

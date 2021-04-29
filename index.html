@@ -1,0 +1,231 @@
+<html>
+  <head>
+    <title>PGN editor / player / thing</title>
+    <link rel="stylesheet" href="fontawesome/css/all.min.css">
+    <script src="themes.js"></script>
+    <script src="samples.js"></script>
+    <script src="screenshots.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      window.onload = () => {
+        // samples
+        const sampleList = document.querySelector('.sample-list')
+        for (const sample of window.samples) {
+          const link = document.createElement('a')
+          link.href = `player.html?url=${sample}`
+          link.innerHTML = sample
+          const li = document.createElement('li')
+          li.appendChild(link)
+          sampleList.appendChild(li)
+        }
+        // filters
+        const browserSelect = document.querySelector('.browser-select')
+        browserSelect.onchange = refreshThumbnails
+        const deviceSelect = document.querySelector('.device-select')
+        deviceSelect.onchange = refreshThumbnails
+        const themeSelect = document.querySelector('.theme-select')
+        themeSelect.onchange = refreshThumbnails
+        const schemeSelect = document.querySelector('.scheme-select')
+        schemeSelect.onchange = refreshThumbnails
+        // screenshots
+        const uniqueDevices = []
+        const uniqueThemes = []
+        const uniqueSchemes = []
+        const screenshotList = document.querySelector('.screenshot-list')
+        for (const browser in window.screenshots) {
+          const browserOption = document.createElement('option')
+          browserOption.value = browser
+          browserOption.text = browser[0].toUpperCase() + browser.substring(1) + ' browser'
+          browserSelect.appendChild(browserOption)
+          for (const theme in window.screenshots[browser]) {
+            if (uniqueThemes.indexOf(theme) === -1) {
+              const themeOption = document.createElement('option')
+              themeOption.value = theme
+              themeOption.text = theme[0].toUpperCase() + theme.substring(1) + ' theme' 
+              themeSelect.appendChild(themeOption)
+              uniqueThemes.push(theme)
+            }
+            for (const device in window.screenshots[browser][theme]) {
+              if (uniqueDevices.indexOf(device) === -1) {
+                const deviceOption = document.createElement('option')
+                deviceOption.value = device
+                deviceOption.text = device
+                deviceSelect.appendChild(deviceOption)
+                uniqueDevices.push(device)
+              }
+              for (const scheme in window.screenshots[browser][theme][device]) {
+                if (uniqueSchemes.indexOf(scheme) === -1) {
+                  const schemeOption = document.createElement('option')
+                  schemeOption.value = scheme
+                  schemeOption.text = scheme[0].toUpperCase() + scheme.substring(1) + ' mode'
+                  schemeSelect.appendChild(schemeOption)
+                  uniqueSchemes.push(scheme)
+                }
+              }
+            }
+          }
+        }
+        browserSelect.selectedIndex = 1
+        deviceSelect.selectedIndex = 1
+        themeSelect.selectedIndex = 1
+        schemeSelect.selectedIndex = 1
+        return refreshThumbnails()
+      }
+
+      function refreshThumbnails (event) {
+        if (event && event.preventDefault) {
+          event.preventDefault()
+        }
+        const browserSelect = document.querySelector('.browser-select')
+        if (!browserSelect.value) {
+          return
+        }
+        const deviceSelect = document.querySelector('.device-select')
+        if (!deviceSelect.value) {
+          return
+        }
+        const themeSelect = document.querySelector('.theme-select')
+        if (!themeSelect.value) {
+          return
+        }
+        const schemeSelect = document.querySelector('.scheme-select')
+        if (!schemeSelect.value) {
+          return
+        }
+        const browser = browserSelect.value
+        const theme = themeSelect.value
+        const device = deviceSelect.value
+        const scheme = schemeSelect.value
+        const screenshots = window.screenshots[browser][theme][device][scheme]
+        const width = 256
+        let height
+        switch (device) {
+          case 'Desktop':
+            height = 1080 / 1920 * 256
+            break
+          case 'iPad Mini':
+            height = 1020 / 760 * 256
+            break
+          case 'iPad Pro':
+            height = 1360 / 1020 * 256
+            break
+          case 'iPhone SE':
+            height = 560 / 320 * 256
+            break
+          case 'Pixel 2 XL':
+            height = 820 / 410 * 256
+            break
+        }
+        height = Math.floor(height)
+        const screenshotOrder = {}
+        const tilesheetOrder = []
+        const screenshotHTML = []
+        for (const screenshot of screenshots) {
+          let name = screenshot.substring(0, screenshot.lastIndexOf('-'))
+          if (name.endsWith('-1') || name.endsWith('-2') || name.endsWith('-3')) {
+            name = name.substring(0, name.lastIndexOf('-'))
+          }
+          if (!screenshotOrder[name]) {
+            screenshotOrder[name] = [screenshot]
+            tilesheetOrder.push(name)
+          } else {
+            screenshotOrder[name].push(screenshot)
+          }
+        }
+        const screenshotContainer = document.querySelector('.screenshot-container')
+        screenshotContainer.innerHTML = ''
+        let lastName, screenshotList
+        for (const screenshot of screenshots) {
+          let name = screenshot.substring(0, screenshot.lastIndexOf('-'))
+          if (name.endsWith('-1') || name.endsWith('-2') || name.endsWith('-3')) {
+            name = name.substring(0, name.lastIndexOf('-'))
+          }
+          if (name !== lastName) {
+            const title = document.createElement('h3')
+            title.innerHTML = name[0].toUpperCase() + name.substring(1).split('-').join(' ')
+            screenshotContainer.appendChild(title)
+            screenshotList = document.createElement('ul')
+            screenshotList.className = 'screenshot-list'
+            screenshotContainer.appendChild(screenshotList)
+          }
+          lastName = name
+          const tilesheetNumber = tilesheetOrder.indexOf(name)
+          const screenshotNumber = screenshotOrder[name].indexOf(screenshot)
+          const link = document.createElement('a')
+          link.style.backgroundImage = `url("screenshots/${browser}/${theme}/${device}/${scheme}/tilesheet.png")`
+          link.style.backgroundPositionX = -(screenshotNumber * width) + 'px'
+          link.style.backgroundPositionY = -(tilesheetNumber * height) + 'px'
+          link.style.width = width + 'px'
+          link.style.height = height + 'px'
+          const li = document.createElement('li')
+          li.appendChild(link)
+          screenshotList.appendChild(li)
+        }
+      }
+    </script>
+    <style>
+      html { height: 100%; font-size: 100% }
+      body { min-width: 320px; font-family: sans-serif; padding: 1rem; margin: 0; height: 100%; background-color: #EEE }
+      a,
+      button,
+      img,
+      input,
+      textarea,
+      ul,
+      li { outline: 0; list-style-type: none; padding: 0; margin: 0 }
+      .screenshot-list { margin-top: 1rem }
+      .screenshot-list li { background-color: #FFF; border: thin solid #CCC; display: inline-block; margin: 0 1rem 1rem 0 }
+      .screenshot-list li a { display: block }
+      .filter-container { display: flex }
+      .filter-container .select { margin-right: 1rem; width: 100% }
+      .select { margin-bottom: 0.5rem; display: grid; grid-template-areas: "select"; align-items: center; position: relative; border-radius: 0.25em; font-size: 0.9rem; cursor: pointer; line-height: 1.1rem }
+      .select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%) }
+      .select::after,
+      .select select { grid-area: select }
+      .select select { background-color: transparent; appearance: none; border: none; outline: 0; padding: 0.25rem; margin: 0; border-radius: 0.25rem; font-family: inherit; font-size: inherit; cursor: inherit; line-height: inherit }
+      .select select::-ms-expand { display: none }
+      .select select:hover,
+      .select select:focus { border-radius: 0.25rem } 
+      .select::after { content: ""; justify-self: end; width: 0.6rem; margin-right: 0.5rem; height: 0.3rem; clip-path: polygon(100% 0%, 0 0%, 50% 100%); grid-area: select }
+      .select select { color: rgba(0, 0, 0, 0.75); border: thin solid rgba(0, 0, 0, 0.25) }
+      .select select:hover,
+      .select select:focus { background-color: #EEE }
+      .select { background-color: rgba(0, 0, 0, 0) }
+      .select::after { background-color: rgba(0, 0, 0, 0.5) }
+    </style>
+  </head>
+  <body>
+    <div style="display: flex">
+      <h2>Sample links</h2>
+      <ul class="sample-list"></ul>
+    </div>
+    <div>
+      <h2>Screenshots</h2>
+      <div class="filter-container">
+        <div class="select">
+          <select class="browser-select">
+            <option disabled>Browser</option>
+          </select>
+        </div>
+        <div class="select">
+          <select class="device-select">
+            <option disabled>Device</option>
+          </select>
+        </div>
+        <div class="select">
+          <select class="theme-select">
+            <option disabled>Theme</option>
+          </select>
+        </div>
+        <div class="select">
+          <select class="scheme-select">
+            <option disabled>Color scheme</option>
+          </select>
+        </div>
+      </div>
+      <div class="screenshot-container">
+
+      </div>
+    </div>
+  </body>
+</html>
